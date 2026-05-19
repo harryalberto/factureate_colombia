@@ -90,7 +90,7 @@ $fvencimiento = date('d-m-Y',$fvencimiento_t);
                 <!-- datos emidor -->
                 <div class="contenedor_formulario_column">
                     <div class="formulario_grupo_row" style="width:100px;">
-                        <label for="emisornro">RNC EMISOR</label>
+                        <label for="emisornro">NIT EMISOR</label>
                         <input type="text" class="formulario_control" id="emisornro" name="emisornro" value="<?=$arrfactura['emisornro']?>" readonly>
                     </div>
                     <div class="formulario_grupo_row" style="width:400px;">
@@ -102,7 +102,7 @@ $fvencimiento = date('d-m-Y',$fvencimiento_t);
                 <!-- datos del pagador -->
                 <div class="contenedor_formulario_column">
                     <div class="formulario_grupo_row" style="width:100px;">
-                        <label for="clientenro">RNC CLIENTE</label>
+                        <label for="clientenro">NIT CLIENTE</label>
                         <input type="text" class="formulario_control" id="clientenro" name="clientenro" value="<?=$arrfactura['identificacion']?>" readonly>
                     </div>
                     <div class="formulario_grupo_row" style="width:400px;">
@@ -137,7 +137,7 @@ $fvencimiento = date('d-m-Y',$fvencimiento_t);
 
                 <div class="contenedor_formulario_column">
                     <div class="formulario_grupo_row" style="width:100px;">
-                        <label for="impuestoventa">ITBIS</label>
+                        <label for="impuestoventa">IVA</label>
                         <input type="text" class="formulario_control" id="impuestoventa" name="impuestoventa" value="<?=number_format($arrfactura['impuestoventa'],2,'.',',')?>" style="text-align: right;" readonly>
                     </div>
                     <div class="formulario_grupo_row" style="width:100px;">

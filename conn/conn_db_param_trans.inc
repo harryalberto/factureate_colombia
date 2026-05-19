@@ -1,9 +1,9 @@
 <?php
 class db_param_trans extends DB_Sql_trans {
   var $Host     = "localhost";
-  var $User     = "brdkai60_adseg_fact";
-  var $Password = "199-215-265-299-299-313-169-171-173-175-177-201-287-267-";
-  var $Database = "brdkai60_FTrans_COL";
+  var $User     = "ftrans_col";
+  var $Password = "275-265-269-303-305-269-293-287-303-299-265-291-301-185-185-";
+  var $Database = "ftrans_col";
   var $timezone = "America/Lima";
 }
 ?>

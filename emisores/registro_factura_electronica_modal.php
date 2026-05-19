@@ -249,7 +249,7 @@ $v_dias_min = $v_dias_min.' días';
 
             <div class="contenedor_formulario_column">
                 <div class="formulario_grupo_row" style="width: 100px;">
-                    <label for="numerocliente">RNC:<b style="color:#b30a1f;">[*]</b></label>
+                    <label for="numerocliente">NIT:<b style="color:#b30a1f;">[*]</b></label>
                     <input type="text" name="numerocliente" id="numerocliente" class="formulario_control" value="<?=$numerocliente?>" <?=$readonly?>>
                 </div>
                 <div class="formulario_grupo_row" style="width: 300px;">
@@ -310,7 +310,7 @@ $v_dias_min = $v_dias_min.' días';
 
             <div class="contenedor_formulario_column">
                 <div class="formulario_grupo_row" style="width: 120px;">
-                    <label for="impuestoventa_view">ITBIS:<b style="color:#b30a1f;">[*]</b></label>
+                    <label for="impuestoventa_view">IVA:<b style="color:#b30a1f;">[*]</b></label>
                     <input type="text" id="impuestoventa_view" name="impuestoventa_view" placeholder="0.00" class="formulario_control" style="text-align: right;" value="<?= $impuestoventa_view ?>">
                 </div>
 
