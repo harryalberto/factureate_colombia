@@ -9,7 +9,7 @@ require("../lib-trans/maestros.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'GACCESOS';
     require("../lib/valida-acceso.php");
@@ -30,7 +30,7 @@ require("../lib-trans/maestros.php");
         }
     </script>
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $obj_mae = new maestros;
@@ -45,7 +45,7 @@ $v_arr_accesos_nasig = $obj_mae->get_accesos($v_perfil_id,'NASIGNADO');
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     date_default_timezone_set("America/Lima");
     $menu = 'maestros/g-accesos.php';
     //------ PARTE SUPERIOR ------
@@ -64,7 +64,7 @@ $v_arr_accesos_nasig = $obj_mae->get_accesos($v_perfil_id,'NASIGNADO');
                 <li style="float: left;display: block;padding: 5px;">Perfil:</li>
                 <li style="float: left;display: block;padding: 5px;">
                 <select id="perfil_id" name="perfil_id" onchange="javascript:slcchange()">
-                <?
+                <?php
                 for ($i=0; $i<count($v_arr_perfiles); $i++){
                     if ($v_arr_perfiles[$i]['perfil_id'] == $v_perfil_id) echo '<option value="'.$v_perfil_id.'" selected>'.$v_arr_perfiles[$i]['nombre'].' | '.$v_arr_perfiles[$i]['descripcion'].' | '.$v_arr_perfiles[$i]['tipo'].'</option>';
                     else echo '<option value="'.$v_arr_perfiles[$i]['perfil_id'].'">'.$v_arr_perfiles[$i]['nombre'].' | '.$v_arr_perfiles[$i]['descripcion'].' | '.$v_arr_perfiles[$i]['tipo'].'</option>';
@@ -86,7 +86,7 @@ $v_arr_accesos_nasig = $obj_mae->get_accesos($v_perfil_id,'NASIGNADO');
                             <td style="border: 1px solid;padding:5px;text-align:center;">PAGINA URL</td>
                             <td style="border: 1px solid;padding:5px;text-align:center;"></td>
                         </tr>
-                        <?
+                        <?php
     for ($i=0; $i<count($v_arr_accesos_asig); $i++){
         echo '          <tr>
                             <td style="border: 1px solid;padding:5px;text-align:center;">'.$v_arr_accesos_asig[$i]['menu_id'].'</td>
@@ -114,7 +114,7 @@ $v_arr_accesos_nasig = $obj_mae->get_accesos($v_perfil_id,'NASIGNADO');
                             <td style="border: 1px solid;padding:5px;text-align:center;">PAGINA URL</td>
                             <td style="border: 1px solid;padding:5px;text-align:center;"></td>
                         </tr>
-                        <?
+                        <?php
     for ($i=0; $i<count($v_arr_accesos_nasig); $i++){
         echo '          <tr>
                             <td style="border: 1px solid;padding:5px;text-align:center;">'.$v_arr_accesos_nasig[$i]['menu_id'].'</td>

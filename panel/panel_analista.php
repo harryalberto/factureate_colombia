@@ -12,13 +12,13 @@ require("../lib-trans/c_inversiones.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'PANELANALI';
     require("../lib/valida-acceso.php");
 ?>
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $obj_factura = new factura;
@@ -71,7 +71,7 @@ if (($v_arr_sub_encomp['maximo'] >= $v_arr_sub_encomp['parametro']) && $v_arr_su
     $v_bgc_sub_encomp = 'a93032';
     $v_color_sub_encomp = 'ffffff';
 }
-if (($v_arr_sub_comp['maximo'] >= $v_arr_sub_comp['parametro']) && $v_arr_sub_comp['count'] > 0){
+if ($v_arr_sub_comp['count'] > 0){
     $v_bgc_sub_comp = 'a93032';
     $v_color_sub_comp = 'ffffff';
 }
@@ -90,7 +90,7 @@ if ($v_arr_riesgo_vencido['count'] > 0){
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     date_default_timezone_set("America/Lima");
     $menu = 'panel/panel_analista.php';
     //------ PARTE SUPERIOR ------
@@ -112,7 +112,7 @@ if ($v_arr_riesgo_vencido['count'] > 0){
                         Facturas enviadas por revisar <span class="icon-eye" style="color:#000000;font-size: 14px;"></span>
                     </abbr></p>
                 <p style="margin:10px 0px;text-align:center;font-size:18px;font-weight: bold;">
-                    <? echo '<a href="../facturas/facturas_xestado.php" style="text-align:center;font-size:18px;font-weight: bold;">'.$v_arr_enviadas['count'].'</a>';?>
+                    <?php echo '<a href="../facturas/facturas_xestado.php" style="text-align:center;font-size:18px;font-weight: bold;">'.$v_arr_enviadas['count'].'</a>';?>
                 </p>
                 <p style="margin:10px 0px;text-align:center;font-size:14px;">Facturas</p>
             </li>
@@ -123,7 +123,7 @@ if ($v_arr_riesgo_vencido['count'] > 0){
                         Facturas por vencer dentro de <?=$v_arr_xvencer['parametro']?> d&iacute;as <span class="icon-eye" style="color:#000000;font-size: 14px;"></span>
                     </abbr></p>
                 <p style="margin:10px 0px;text-align:center;font-size:18px;font-weight: bold;">
-                    <? echo '<a href="../facturas/facturas_xvencer.php" style="text-align:center;font-size:18px;font-weight: bold;">'.$v_arr_xvencer['count'].'</a>';?>
+                    <?php echo '<a href="../facturas/facturas_xvencer.php" style="text-align:center;font-size:18px;font-weight: bold;">'.$v_arr_xvencer['count'].'</a>';?>
                 </p>
                 <p style="margin:10px 0px;text-align:center;font-size:14px;">Facturas</p>
             </li>
@@ -134,7 +134,7 @@ if ($v_arr_riesgo_vencido['count'] > 0){
                         Facturas vencidas <span class="icon-eye" style="color:#000000;font-size: 14px;"></span>
                     </abbr></p>
                 <p style="margin:10px 0px;text-align:center;font-size:18px;font-weight: bold;">
-                    <? echo '<a href="../facturas/facturas_vencidas.php" style="text-align:center;font-size:18px;font-weight: bold;">'.$v_arr_vencidas['count'].'</a>';?>
+                    <?php echo '<a href="../facturas/facturas_vencidas.php" style="text-align:center;font-size:18px;font-weight: bold;">'.$v_arr_vencidas['count'].'</a>';?>
                 </p>
                 <p style="margin:10px 0px;text-align:center;font-size:14px;">Facturas</p>
             </li>
@@ -147,7 +147,7 @@ if ($v_arr_riesgo_vencido['count'] > 0){
                         Subastas Activas <span class="icon-eye" style="color:#000000;font-size: 14px;"></span>
                     </abbr></p>
                 <p style="margin:10px 0px;text-align:center;font-size:18px;font-weight: bold;">
-                    <? echo '<a href="../subastas/subastas_activas.php" style="text-align:center;font-size:18px;font-weight: bold;">'.$v_arr_sub_activas['count'].'</a>';?>
+                    <?php echo '<a href="../subastas/subastas_activas.php" style="text-align:center;font-size:18px;font-weight: bold;">'.$v_arr_sub_activas['count'].'</a>';?>
                 </p>
                 <p style="margin:10px 0px;text-align:center;font-size:14px;">Subastas</p>
             </li>
@@ -158,7 +158,7 @@ if ($v_arr_riesgo_vencido['count'] > 0){
                         Subastas en compensacion <span class="icon-eye" style="color:#000000;font-size: 14px;"></span>
                     </abbr></p>
                 <p style="margin:10px 0px;text-align:center;font-size:18px;font-weight: bold;">
-                    <? echo '<a href="../subastas/subastas_encomp.php" style="text-align:center;font-size:18px;font-weight: bold;">'.$v_arr_sub_encomp['count'].'</a>';?>
+                    <?php echo '<a href="../subastas/subastas_encomp.php" style="text-align:center;font-size:18px;font-weight: bold;">'.$v_arr_sub_encomp['count'].'</a>';?>
                 </p>
                 <p style="margin:10px 0px;text-align:center;font-size:14px;">Subastas</p>
             </li>
@@ -169,7 +169,7 @@ if ($v_arr_riesgo_vencido['count'] > 0){
                         Subastas compensadas <span class="icon-eye" style="color:#000000;font-size: 14px;"></span>
                     </abbr></p>
                 <p style="margin:10px 0px;text-align:center;font-size:18px;font-weight: bold;">
-                    <? echo '<a href="../subastas/subastas_comp.php" style="text-align:center;font-size:18px;font-weight: bold;">'.$v_arr_sub_comp['count'].'</a>';?>
+                    <?php echo '<a href="../subastas/subastas_comp.php" style="text-align:center;font-size:18px;font-weight: bold;">'.$v_arr_sub_comp['count'].'</a>';?>
                 </p>
                 <p style="margin:10px 0px;text-align:center;font-size:14px;">Subastas</p>
             </li>
@@ -182,7 +182,7 @@ if ($v_arr_riesgo_vencido['count'] > 0){
                         Obligados al pago por validar <span class="icon-eye" style="color:#000000;font-size: 14px;"></span>
                     </abbr></p>
                 <p style="margin:10px 0px;text-align:center;font-size:18px;font-weight: bold;">
-                    <? echo '<a href="../empresas/opxvalidar.php" style="text-align:center;font-size:18px;font-weight: bold;">'.$v_arr_opxvalidar['count'].'</a>';?>
+                    <?php echo '<a href="../empresas/opxvalidar.php" style="text-align:center;font-size:18px;font-weight: bold;">'.$v_arr_opxvalidar['count'].'</a>';?>
                 </p>
                 <p style="margin:10px 0px;text-align:center;font-size:14px;">Empresas</p>
             </li>
@@ -190,10 +190,10 @@ if ($v_arr_riesgo_vencido['count'] > 0){
             <li style="display:block;margin:5px;width:200px;float:left;border-color: #555555;border-style: solid;border-width: 1px 1px 1px 1px;line-height: 15px;padding:10px;background-color:#<?=$v_bgc_riskxvencer?>;color:#<?=$v_color_riskxvencer?>;">
                 <p style="text-align:center;font-size:14px;">
                     <abbr title="Empresas con evaluacion de riesgo por vencer">
-                        Empresas con riesgo por vencer dentro de los proximos <?echo $v_arr_riesgo_xvencer['maximo']?> dias <span class="icon-eye" style="color:#000000;font-size: 14px;"></span>
+                        Empresas con riesgo por vencer dentro de los proximos <?php echo $v_arr_riesgo_xvencer['maximo']?> dias <span class="icon-eye" style="color:#000000;font-size: 14px;"></span>
                     </abbr></p>
                 <p style="margin:10px 0px;text-align:center;font-size:18px;font-weight: bold;">
-                    <? echo '<a href="../empresas/xxx.php" style="text-align:center;font-size:18px;font-weight: bold;">'.$v_arr_riesgo_xvencer['count'].'</a>';?>
+                    <?php echo '<a href="../empresas/xxx.php" style="text-align:center;font-size:18px;font-weight: bold;">'.$v_arr_riesgo_xvencer['count'].'</a>';?>
                 </p>
                 <p style="margin:10px 0px;text-align:center;font-size:14px;">Empresas</p>
             </li>
@@ -204,7 +204,7 @@ if ($v_arr_riesgo_vencido['count'] > 0){
                         Empresas con riesgo vencido <span class="icon-eye" style="color:#000000;font-size: 14px;"></span>
                     </abbr></p>
                 <p style="margin:10px 0px;text-align:center;font-size:18px;font-weight: bold;">
-                    <? echo '<a href="../empresas/xxx.php" style="text-align:center;font-size:18px;font-weight: bold;">'.$v_arr_riesgo_vencido['count'].'</a>';?>
+                    <?php echo '<a href="../empresas/xxx.php" style="text-align:center;font-size:18px;font-weight: bold;">'.$v_arr_riesgo_vencido['count'].'</a>';?>
                 </p>
                 <p style="margin:10px 0px;text-align:center;font-size:14px;">Empresas</p>
             </li>

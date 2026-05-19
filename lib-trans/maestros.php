@@ -1,4 +1,4 @@
-<?
+<?php
 class maestros{
     function get_datos_emisor($emisorid){
         $conn = new db_param_trans;
@@ -67,24 +67,24 @@ class maestros{
     }
 
     function get_nombre_empresa_xdoc($identificacion){
-        $conn = new db_param_trans;
-        $conn2 = new db_param_trans;
-        $conn->connect();
-        $conn2->connect();
+        $conn = new db_param_trans; $conn->connect();
 
         $idqry = $conn->query("select count(1) as contador from empresa where identificacion = '".trim($identificacion)."'");
-        if (!$idqry) echo pg_last_error($cfact->Link_ID);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
         $obj = $conn->next_record();
         
         if ($obj->contador > 0){
+            $conn2 = new db_param_trans; $conn2->connect();
+
             $idqry = $conn2->query("select nombre from empresa where identificacion = '".trim($identificacion)."' limit 1");
-            if (!$idqry) echo 'error2, '.pg_last_error($cfact->Link_ID);
+            if (!$idqry) echo 'error2, '.pg_last_error($conn2->Link_ID);
             $obj = $conn2->next_record();
             $empresa = $obj->nombre;
+            //$conn2->close();
         } else $empresa = '';
 
-        $conn->close();
-        $conn2->close();
+        //$conn->close();
+
         return $empresa;
     }
     function get_parametros(){
@@ -235,7 +235,9 @@ class maestros{
                                         'color_riesgo_score' => 'de3d4c',               'colorfuente_riesgo_score' => 'fff',
                                         'crscore' => '---',                             'nrscore' => 'PENDIENTE',
                                         'color_riesgo_fact' => 'de3d4c',                'colorfuente_riesgo_fact' => 'fff',
-                                        'crfact' => '---',                              'nrfact' => 'PENDIENTE');
+                                        'crfact' => '---',                              'nrfact' => 'PENDIENTE',
+                                        'riesgo_factid' => 0,                           'desc_riesgofact' => '',
+                                        'riesgo_scoreid' => 0,                          'desc_riesgoscore' => '');
 
         $conn->close();
         return $arrobpagoriesgo;
@@ -784,8 +786,8 @@ class maestros{
         $retorno['maximo'] = $v_preventivo;
         
         $conn->close();
-        $conn2->close();
-        $conn3->close();
+        //$conn2->close();
+        //$conn3->close();
 
         return $retorno;
     }
@@ -806,7 +808,7 @@ class maestros{
         $retorno['maximo'] = $v_max_dias;
         
         $conn->close();
-        $conn3->close();
+        //$conn3->close();
 
         return $retorno;
     }
@@ -1346,7 +1348,7 @@ class maestros{
     function get_zona_horaria(){
         $conn = new db_param_trans; $conn->connect();
 
-        $conn->query("select valor_char from parametros where id = 21");
+        $idqry = $conn->query("select valor_char from parametros where id = 21");
         if (!$idqry) echo pg_last_error($conn->Link_ID);
         $obj = $conn->next_record();
         $v_zona = $obj->valor_char;
@@ -1567,7 +1569,7 @@ class maestros{
             $obj2 = $conn2->next_record();
         }
 
-        $conn->close(); $conn2->close();
+        //$conn->close(); $conn2->close();
 
         return $varr_comisiones;
     }
@@ -1934,7 +1936,7 @@ class maestros{
             $v_resultado = $obj2->valor_num;
         }
 
-        $conn->close(); $conn2->close();
+        //$conn->close(); $conn2->close();
         return $v_resultado;
     }
 
@@ -2843,6 +2845,59 @@ class maestros{
         $conn->close();
 
         return 1;
+    }
+
+    function get_tipos_documentos_elec($p_cadena){
+        if (strpos($p_cadena, "-") !== false) {
+            $arr = explode("-", $p_cadena);
+        } else {
+            $arr = array($p_cadena);
+        }
+
+        return $arr;
+    }
+
+    function valida_emrpesa_id($parr_datos){
+        $conn = new db_param_trans; $conn->connect();
+        $conn2 = new db_param_trans; $conn2->connect();
+
+        if (isset($parr_datos['nombre'])){
+            $qry = "select count(1) as contador from empresa where nombre = LTRIM(RTRIM('".$parr_datos['nombre']."')) and estado > 0";
+
+            $idqry = $conn->query($qry);
+            if (!$idqry) echo pg_last_error($conn->Link_ID);
+            $obj = $conn->next_record();
+
+            if ($obj->contador > 0){
+                $qry = "select id from empresa where nombre = LTRIM(RTRIM('".$parr_datos['nombre']."')) and estado > 0";
+
+                $idqry = $conn2->query($qry);
+                if (!$idqry) echo pg_last_error($conn2->Link_ID);
+                $obj = $conn2->next_record();
+
+                $v_id = $obj->id;
+            } else $v_id = 0;
+        } elseif (isset($parr_datos['documento'])){
+            $qry = "select count(1) as contador from empresa where identificacion = LTRIM(RTRIM('".$parr_datos['documento']."')) and estado > 0";
+
+            $idqry = $conn->query($qry);
+            if (!$idqry) echo pg_last_error($conn->Link_ID);
+            $obj = $conn->next_record();
+
+            if ($obj->contador > 0){
+                $qry = "select id from empresa where identificacion = LTRIM(RTRIM('".$parr_datos['documento']."')) and estado > 0";
+
+                $idqry = $conn2->query($qry);
+                if (!$idqry) echo pg_last_error($conn2->Link_ID);
+                $obj = $conn2->next_record();
+
+                $v_id = $obj->id;
+            } else $v_id = 0;
+        } else $v_id = 0;
+
+        //$conn->close(); $conn2->close();
+
+        return $v_id;
     }
 }
 ?>

@@ -23,6 +23,16 @@ if (isset($_POST['numeroemisor'])){
     $tipoaccion = $_POST['tipoaccion'];
 
     //========RECUPERANDO INFORMACION DE LA FACTURA
+    if (isset($_POST['conmaxdescuento'])){
+        $v_conmaxdcto = $_POST['conmaxdescuento'];
+        $v_maxdcto = $_POST['maxdescuento'];
+    } else {
+        $v_conmaxdcto = 0;
+        $v_maxdcto = 0;
+    }
+    if (isset($_POST['xml_path'])) $xml_path = $_POST['xml_path'];
+    else $xml_path = '';
+
     $arrfactura = array(
         'porcimpuestoventa' => $_POST['porcimpuestoventa'],
         'MAX_FILE_SIZE' => $_POST['MAX_FILE_SIZE'],
@@ -43,9 +53,9 @@ if (isset($_POST['numeroemisor'])){
         'otrostributos' => $_POST['otrostributos'],
         'total' => $_POST['total'],
         'tipofinanciamiento' => $_POST['tipofinanciamiento'],
-        'conmaxdescuento' => $_POST['conmaxdescuento'],
-        'maxdescuento' => $_POST['maxdescuento'],
-        'xmlpath' => $_POST['xmlpath'],
+        'conmaxdescuento' => $v_conmaxdcto,
+        'maxdescuento' => $v_maxdcto,
+        'xmlpath' => $xml_path,
         'tipo_factura' => $_POST['tipo_factura']
         );
 
@@ -55,16 +65,15 @@ if (isset($_POST['numeroemisor'])){
     $var_formato_permitido = array('pdf','jpg','jpeg','png');
 
     // verifica si tiene limite de descuento
-    if ($_POST['conmaxdescuento'] != 1){
+    /*if ($_POST['conmaxdescuento'] != 1){
         $arrfactura['conmaxdescuento'] = 0;
         $arrfactura['maxdescuento'] = 0;
-    }
+    }*/
     
     // verifica si adjunto o no el pdf
     if (!isset($_FILES['facturafile'])){ 
         $arrfactura['pdfpath'] = '';
-    }
-    else{
+    } else{
         $var_extension = pathinfo($nombre_archivo, PATHINFO_EXTENSION);
         
         if ((in_array($var_extension,$var_formato_permitido)) && ($tamano_archivo < 1000000)){
@@ -81,6 +90,14 @@ if (isset($_POST['numeroemisor'])){
             $error = 10002;
         }
     }
+
+    //TRATAMIENTO DEL XML
+    if (isset($_POST['xml_path'])){
+        rename('../pdf/'.'EMI'.$_SESSION['user']['empresaid'].'/temp/'.$_POST['nombre_xml'], '../pdf/'.'EMI'.$_SESSION['user']['empresaid'].'/'.$_POST['nombre_xml']);
+        $xml_path = '../pdf/'.'EMI'.$_SESSION['user']['empresaid'].'/'.$_POST['nombre_xml'];
+    } else $xml_path = '';
+
+    $arrfactura['xmlpath'] = $xml_path;
 
     if ($tipoaccion == 'new' || $tipoaccion == 'xml'){
         // verificacion de existencia del cliente

@@ -1,4 +1,4 @@
-<?
+<?php
 class seguridad{
     function encrypta($cadena){
         $longitud = strlen($cadena);
@@ -171,7 +171,7 @@ class seguridad{
         $obj = $conn->next_record();
 
         $resultado = array('usuarioid'=>$usuarioid,                   'nombre'=>$obj->nombre,
-                            'apellido'=>$obj->apellido,               'certificado'=>$certificado,
+                            'apellido'=>$obj->apellido,
                             'perfiltipo'=>$obj->tipo,                 'tipousuario'=>$obj->tipousuario,
                             'empresaid'=>$obj->empresaid,             'email' => $obj->email,
                             'identificacion' => $obj->identificacion, 'tipodoc'=>$obj->tipodoc,         'tipodoc_nombre'=>$obj->tipodoc_nombre, 

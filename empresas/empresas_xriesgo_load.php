@@ -42,7 +42,10 @@ for ($i = 0; $i < count($varr_empresas); $i++){
     $v_boton_detalle = '<button type="button" class="btn btn-primary" style="font-size:11px;background-color:var(--color-azulv2);border:none;" onclick="verDetalle('.$varr_empresas[$i]['empresa_id'].')"><i class="fa-solid fa-magnifying-glass"></i></button>';
 
     if (!is_null($varr_empresas[$i]['f_registro'])){$t_fregistro = strtotime($varr_empresas[$i]['f_registro']);$f_registro = date('d-m-Y',$t_fregistro);}
+
     if (!is_null($varr_empresas[$i]['f_modifica'])){$t_fmodifica = strtotime($varr_empresas[$i]['f_modifica']);$f_modifica = date('d-m-Y',$t_fmodifica);}
+    else $f_modifica = '';
+
     if (!is_null($varr_empresas[$i]['f_envio'])){$t_fenvio = strtotime($varr_empresas[$i]['f_envio']);$f_envio = date('d-m-Y',$t_fenvio);}
     if (!is_null($varr_empresas[$i]['f_aprobacion'])){$t_faprobacion = strtotime($varr_empresas[$i]['f_aprobacion']);$f_aprobacion = date('d-m-Y',$t_faprobacion);}
 

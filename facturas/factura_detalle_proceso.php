@@ -9,7 +9,7 @@ require("../lib-trans/maestros.php");
 require("../lib-trans/factura.php");
 require("../lib-trans/c_subasta.php");
 require("../lib-trans/c_inversiones.php");
-require("../libmail/class.phpmailer.php");
+//require("../libmail/class.phpmailer.php");
 require("../lib/mail_util.php");
 
 /*--------------------------------------------------------*/

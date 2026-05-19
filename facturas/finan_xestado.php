@@ -6,153 +6,142 @@ require("../conn/conn_db_trans.inc");
 require("../conn/conn_db_param_trans.inc");
 require("../lib-seg/seguridad-acceso.php");
 require("../lib-trans/maestros.php");
+require("../lib-trans/factura.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'FINANCIAMIENTO';
     require("../lib/valida-acceso.php");
 ?>
-    <script type="text/javascript">
-        $(document).ready(function() {
-            $('.paginate').on('click', function(){
-                $('#content2').html('<div class="loading"><img src="../img/loading.gif" width="70px" height="70px"/></div>');
-		        var page = $(this).attr('pagenum');
-		        var rowcount = $(this).attr('rowcount');
-		        var estados = $(this).attr('estados');
-		        var dataString = 'page='+page+'&rowcount='+rowcount+'&estados='+estados;
-
-		        $.ajax({
-                    type: "GET",
-                    url: "pagina_finan_xestado.php",
-                    data: dataString,
-                    success: function(data) {
-                        $('#content2').fadeIn(1000).html(data);
-                        $('.pagination li').removeClass('active');
-                        $('.pagination li a[pagenum="'+page+'"]').parent().addClass('active');
-                    }
-                });
-            });
-        });
-    </script>
-    <script type="text/javascript">
-        function filtrar(){
-            document.frm.submit();
-        }
-    </script>
 </HEAD>
-<?
-/*###############################################
-############## LOGICA */
+<?php
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+//@@@@@@@@@@@@@@@@@@@ LOGICA
 $objmaestro = new maestros;
+$vobj_factura = new factura;
+
 $arrestados = $objmaestro->get_estados('FINANCIAMIENTO');
 $dias_max_xvencer = $objmaestro->dias_vigencia_riesgos(12);
 
 date_default_timezone_set("America/Santo_Domingo");
 //========= LOGICA DE ESTADOS
-$v_estado_id = 27;
-$v_estados = '27,51,-1,-1,-1,-1';
-$v_arr_estados[0] = 27; $v_arr_estados[1] = 51;
+$v_q_estados = count($arrestados);
 
 if (!empty($_POST['estados'])){
     $v_i = 0;
     $v_estados = '';
+    
     foreach($_POST['estados'] as $selected){
         if ($v_i > 0) $v_estados .= ',';
+
         $v_estados .= $selected;
-        $v_arr_estados[$v_i] = $selected;
+        $varr_estados_f[$v_i] = $selected;
         $v_i ++;
     }
 
     $v_i++;
 
-    if ($v_i <= 6){
-        for ($v_j = $v_i; $v_j <= 6; $v_j++){
+    if ($v_i <= $v_q_estados){
+        for ($v_j = $v_i; $v_j <= $v_q_estados; $v_j++){
             $v_estados .= ',-1';
         }
     }
+} else {
+    $v_estados = '27, 51, -1, -1, -1';
+    $varr_estados_f[0] = 27; $varr_estados_f[1] = 51;
 }
-if (!empty($_GET['estados'])){
-    $v_estados = $_GET['estados'];
-    $v_longitud = strlen($v_estados);
-    $v_aux = '';
-    $v_count = 0;
 
-    for ($i = 0; $i < $v_longitud; $i++){
-        $v_pos = ($v_longitud - $i) * -1;
-        $v_char = substr($v_estados, $v_pos, 1);
+//==== CALCULO LOS FILTROS
+$filtros = 'financiamiento.estado in ('.$v_estados.')';
 
-        if ($v_char != ',') $v_aux .= $v_char;
-        else {
-            $v_arr_estados[$v_count] = $v_aux;
-            $v_count ++;
-            $v_aux = '';
-        }
-    }
+//==== CALCULO LA CANTIDAD DE REGISTROS CONSIDERANDO FILTROS
+$rowcount = $vobj_factura->get_financiamientos('COUNT', 0, 0, $filtros,'');
 
-    $v_arr_estados[$v_count] = $v_aux;
-}
 //#############################################################
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     $menu = 'facturas/finan_xestado.php';
     //------ PARTE SUPERIOR ------
     require("../lib/superior.php");
     //------ PARTE IZQUIERDA ------
     require("../lib/menu-n1.php");
 ?>
-    <!------ CUERPO PRINCIPAL ------>
+    <!--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    @@@@@@@@@@@@@@@@@ ZONA BODY -->
+
     <div style="overflow:hidden;text-align:center;font-size: 18px;font-weight: bold;color:#064677;padding:10px;">
         Relaci&oacute;n de Financiamientos
     </div>
+    
+    <!--================================================== 
+    ========================== FILTROS -->
     <div class="frmtransaccion">
         <form name='frm' method='post' id='frm' action="finan_xestado.php">
         <ul>
-            <li><span class="icon-filter"></span> Estados de los FINANCIAMIENTOS:</li>
+            <li><span class="icon-filter"></span> Estados de FINANCIAMIENTOS:</li>
         </ul>
+
         <ul>
-    <?
-        for ($i=0; $i<count($arrestados); $i++){
-            if (in_array($arrestados[$i]['id'], $v_arr_estados))
-                echo '
+<?php
+    // PINTO LOS ESTADOS
+    for ($i=0; $i<count($arrestados); $i++){
+        if (in_array($arrestados[$i]['id'], $varr_estados_f))
+            echo '
             <li><input type="checkbox" class="frminput_text" name="estados[]" value="'.$arrestados[$i]['id'].'" checked><label style="padding-left:5px;padding-right:5px;">'.$arrestados[$i]['nombre'].'</label></li>';
-            else 
-                echo '
+        else 
+            echo '
             <li><input type="checkbox" class="frminput_text" name="estados[]" value="'.$arrestados[$i]['id'].'"><label style="padding-left:5px;padding-right:5px;">'.$arrestados[$i]['nombre'].'</label></li>';
-        }
+    }
         
-    ?>
-            <!--<li class="botontransaccionazul" style="width:100px;"><a href="javascript:filtrar()"><span class="icon-filter"></span> Filtrar</a></li>-->
-            <button style="font-size:12px;background-color:var(--color-azulv2);" type="button" class="btn btn-primary" onclick="filtrar()"><span class="icon-filter" style="font-size:16px;"></span> Filtrar</button>
+?>
+            <li>
+                <button type="button" class="btn btn-primary" style="font-size:11px;background-color:var(--color-azulv2);border:none;margin-right: 10px;" onclick="filtrar()"><i class="fa-solid fa-filter"></i> Filtrar</button>
+            </li>
         </ul>
         </form>
     </div>
-    
-    <!--###############################################
-        ############### PAGINA -->
-    <div id="content2"><? require('pagina_finan_xestado.php'); ?></div>
-    
-    <!-- ############################################## 
-        ############## BOTONES DE PAGINACION -->
-    <?
-    if ($total_paginas > 1) {
-        echo '<div class="pagination">';
-        echo '  <ul>';
-        if ($pageNum != 1) echo '  <li><a class="paginate" pagenum="'.($pageNum-1).'" rowcount="'.$rowcount.'" estados="'.$v_estados.'">Anterior</a></li>';
-    
-        for ($i=1;$i<=$total_paginas;$i++) {
-            if ($pageNum == $i) echo '<li class="active"><a class="paginate" pagenum="'.$i.'" rowcount="'.$rowcount.'" estados="'.$v_estados.'">'.$i.'</a></li>';
-            else echo '<li><a class="paginate" pagenum="'.$i.'" rowcount="'.$rowcount.'" estados="'.$v_estados.'">'.$i.'</a></li>';
-        }
-    
-        if ($pageNum != $total_paginas) echo '<li><a class="paginate" pagenum="'.($pageNum+1).'" rowcount="'.$rowcount.'" estados="'.$v_estados.'">Siguiente</a></li>';
-        echo '  </ul>
-            </div>';
-    }
-    ?>
-    <!------ END CUERPO PRINCIPAL ------>
+
+    <!--==== TABLA HEADER -->
+    <div style="overflow:hidden;margin:5px;padding:5px;">
+        <div style="overflow:hidden;margin:5px;padding:5px;">
+            <table class="tabla_resize">
+                <thead>
+                    <tr>
+                        <th scope="col" class="sort asc">OPERACION ID</th>          <th scope="col" class="sort asc">EMISOR</th>
+                        <th scope="col" class="sort asc">PAGADOR</th>               <th scope="col" class="sort asc">FACTURA</th>
+                        <th scope="col" class="sort asc">F VTO</th>                 <th scope="col" class="sort asc">DIAS FINAN</th>
+                        <th scope="col" class="sort asc">MONEDA</th>                <th scope="col" class="sort asc">MONTO FINAN</th>    
+                        <th scope="col" class="sort asc">MONTO FACTURA</th>         <th scope="col" class="sort asc">DIAS XVENCER</th>    
+                        <th scope="col" class="sort asc">PAGO CONFIRMA</th>         <th scope="col" class="sort asc">F CONFIRMA</th>
+                        <th scope="col" class="sort asc">ACCION</th>
+                    </tr>
+                </thead>
+                <tbody id="content">
+
+                </tbody>
+            </table>
+        </div>
+
+        <!--==== PAGINACION -->
+        <div class="row justify-content-between">
+            <div class="col-12 col-md-4">
+                <label id="lbl-total" style="font-size: 10px;"></label>
+            </div>
+
+            <div class="col-12 col-md-4" id="nav-paginacion"></div>
+
+            <input type="hidden" id="pagina" value="1">
+            <input type="hidden" id="orderCol" value="1">
+            <input type="hidden" id="orderType" value="asc">
+            <input type="hidden" id="num_registros" value="10">
+            <input type="hidden" id="rowcount" value="<?=$rowcount?>">
+            <input type="hidden" id="filtros" value="<?=$filtros?>">
+        </div>
+    </div>
+
     <!--#####################################################
     ########### ZONA MODAL 
     #########################################################-->
@@ -174,16 +163,93 @@ if (!empty($_GET['estados'])){
             </div>
         </div>
     </div>
-    <!-- llamada al modal -->
-    <script>
-        $('.openBtn2').on('click',function(){
-            var ffid = $(this).attr('ffid');
+    
+    <!--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    @@@@@@@@@@@@@@@@@ ZONA SCRIPT -->
+    <script type="text/javascript">
+        // Llamando a la función getData() al cargar la página
+        document.addEventListener("DOMContentLoaded", getData);
+
+        // Función para obtener datos con AJAX
+        function getData() {
+            //let input = document.getElementById("campo").value
+            let num_registros = document.getElementById("num_registros").value
+            let content = document.getElementById("content")
+            let pagina = document.getElementById("pagina").value || 1;
+            let orderCol = document.getElementById("orderCol").value
+            let orderType = document.getElementById("orderType").value
+            let rowcount = document.getElementById("rowcount").value
+            let filtros = document.getElementById("filtros").value
+
+            let formaData = new FormData()
+            //formaData.append('campo', input)
+            formaData.append('registros', num_registros)
+            formaData.append('pagina', pagina)
+            formaData.append('orderCol', orderCol)
+            formaData.append('orderType', orderType)
+            formaData.append('rowcount', rowcount)
+            formaData.append('filtros', filtros)
             
-            $('.modal-body').load('detalle_financiamiento.php?ffid='+ffid,function(){
-                $('#myModal').modal({show:true});
-            });
+            fetch("finan_xestado_load.php", {
+                    method: "POST",
+                    body: formaData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    content.innerHTML = data.data
+                    document.getElementById("lbl-total").innerHTML = `Mostrando ${data.totalFiltro} de ${data.totalRegistros} registros`;
+                    document.getElementById("nav-paginacion").innerHTML = data.paginacion
+
+                    // Si la página actual no tiene resultados, ajustar la paginación para mostrar la primera página
+                    if (data.data.includes('Sin resultados') && parseInt(pagina) !== 1) {
+                        nextPage(1); // Ir a la primera página
+                    }
+                })
+                .catch(err => console.log(err))
+        }
+
+        // Función para cambiar de página
+        function nextPage(pagina) {
+            document.getElementById('pagina').value = pagina
+            getData()
+        }
+
+        // Función para ordenar columnas
+        function ordenar(e) {
+            let elemento = e.target;
+            let orderType = elemento.classList.contains("asc") ? "desc" : "asc";
+
+            document.getElementById('orderCol').value = elemento.cellIndex;
+            document.getElementById("orderType").value = orderType;
+            elemento.classList.toggle("asc");
+            elemento.classList.toggle("desc");
+
+            getData()
+        }
+
+        // Event listeners para los eventos de cambio en el campo de entrada y el select
+        //document.getElementById("campo").addEventListener("keyup", getData);
+        //document.getElementById("num_registros").addEventListener("change", getData);
+
+        // Event listener para ordenar las columnas
+        let columns = document.querySelectorAll(".sort");
+        columns.forEach(column => {
+            column.addEventListener("click", ordenar);
         });
     </script>
-    <!---=============== end modal ==============--->
+
+    <script>
+        function filtrar(){
+            document.frm.submit();
+        }
+
+        function verDetalle(p_finan_id){
+                $('.modal-title').text('DETALLE INVERSOR');
+                $('.modal-body').load('detalle_financiamiento.php?ffid='+p_finan_id,function(){
+                    $('#myModal').modal({show:true});
+                });
+        }
+    </script>
+    
 </BODY>
 </HTML>

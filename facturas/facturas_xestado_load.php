@@ -36,9 +36,8 @@ $output = [];
 $output['totalRegistros'] = $rowcount;
 $output['totalFiltro'] = $totalFiltro;
 $output['data'] = '';
-//$output['data'] = $varr_facturas;
 $output['paginacion'] = '';
-
+//$output['select'] = $varr_facturas;
 for ($i = 0; $i < count($varr_facturas); $i++){
     $v_boton_detalle = '<button type="button" class="btn btn-primary" style="font-size:11px;background-color:var(--color-azulv2);border:none;" onclick="verDetalle('.$varr_facturas[$i]['facturaid'].')"><i class="fa-solid fa-magnifying-glass"></i></button>';
 
@@ -56,9 +55,9 @@ for ($i = 0; $i < count($varr_facturas); $i++){
     $t_fvencimiento = strtotime($varr_facturas[$i]['fvencimiento']);
     $fvencimiento = date('d-m-Y',$t_fvencimiento);
 
-    $v_montofin = number_format($varr_subastas[$i]['montofin'],2,'.',',');
-    $v_fvencimiento = date('d-m-Y',strtotime($varr_subastas[$i]['fvencimiento']));
-    $v_fsubasta = date('d-m-Y',strtotime($varr_subastas[$i]['fsubasta_creacion']));
+    //$v_montofin = number_format($varr_subastas[$i]['montofin'],2,'.',',');
+    //$v_fvencimiento = date('d-m-Y',strtotime($varr_subastas[$i]['fvencimiento']));
+    //$v_fsubasta = date('d-m-Y',strtotime($varr_subastas[$i]['fsubasta_creacion']));
     
     $output['data'] .= '<tr>
                             <td data-label="OPERACION ID">'.$varr_facturas[$i]['facturaid'].'</td>  <td data-label="EMISOR">'.$varr_facturas[$i]['emisor'].'</td>

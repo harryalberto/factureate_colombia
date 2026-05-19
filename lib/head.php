@@ -1,4 +1,4 @@
-<?
+<?php
 echo "<title>Factureate</title>
     <meta content='text/html; charset=UTF-8' http-equiv='content-type'>
     <meta name='description' content='Factureate'>

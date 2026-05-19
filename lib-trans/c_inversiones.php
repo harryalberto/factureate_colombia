@@ -1,4 +1,4 @@
-<?
+<?php
 class inversiones{
     function get_inversion_xusuario($usuarioid,$tipo, $empresaid, $p_rowini, $p_rows){
         $csub = new db_param_trans;
@@ -642,8 +642,8 @@ class inversiones{
             }
         }
 
-        $conn->close(); $conn_base->close(); $conn_risk->close(); $conn_risk_user->close(); $conn_sector->close(); $conn_sector_user->close();
-        $conn_time->close(); $conn_time_user->close();
+        //$conn->close(); $conn_base->close(); $conn_risk->close(); $conn_risk_user->close(); $conn_sector->close(); $conn_sector_user->close();
+        //$conn_time->close(); $conn_time_user->close();
 
         return $varr_inversores;
     }

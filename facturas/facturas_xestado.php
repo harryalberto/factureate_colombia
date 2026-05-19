@@ -10,7 +10,7 @@ require("../lib-trans/factura.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'FACTURAS';
     require("../lib/valida-acceso.php");
@@ -20,7 +20,7 @@ require("../lib-trans/factura.php");
 ##################### PARA USO DEL ANALISTA DE FACTUREATE
 #########################################################
 #########################################################-->
-<?
+<?php
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //@@@@@@@@@@@@@@@@@@@ LOGICA
 
@@ -49,7 +49,7 @@ $rowcount = $vobj_factura->get_facturas('COUNT', 0, 0, $filtros,'');
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     date_default_timezone_set($_SESSION['user']['zona_horaria']);
     $menu = 'facturas/facturas_xestado.php';
     //------ PARTE SUPERIOR ------
@@ -70,7 +70,7 @@ $rowcount = $vobj_factura->get_facturas('COUNT', 0, 0, $filtros,'');
     <div class="frmtransaccion">
         <form name='frm' method='post' id='frm' action="facturas_xestado.php">
         <ul>
-            <?
+            <?php
             if ($filtroestado == 'on'){
                 echo '<li>Estado Factura:</li>
                     <li><select name="estadoid" class="formulario_control">';

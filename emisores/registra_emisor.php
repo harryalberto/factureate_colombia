@@ -10,14 +10,14 @@ require("../lib-trans/c_cuentas.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'REGEMISOR';
     require("../lib/valida-acceso.php");
 ?>
     
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $obj_mae = new maestros;
@@ -45,7 +45,7 @@ if ($v_perfil == 'USER'){
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     $menu = 'emisores/registra_emisor.php';
     //------ PARTE SUPERIOR ------
     require("../lib/superior.php");
@@ -70,11 +70,14 @@ if ($v_perfil == 'USER'){
     <div class="contenedor_principal" id="contenedor_principal">
         <div class="contenedor_formulario">
 <?php
-    if ($_GET['estado'] == 2)
-        echo '
+
+    if (isset($_GET['estado'])){
+        if ($_GET['estado'] == 2)
+            echo '
             <div style="font-weight: bold;color:var(--color-azulv2);font-size: 14px;margin-top: 10px;width:100%;float:left;"> 
                 Su información esta siendo evaluada por nuestros analistas, en breve recibirá un correo de confirmación con el link del contrato.
             </div>';
+    }
 ?>
             <div style="font-weight: bold;color:var(--color-rojo);font-size: 10px;margin-top: 10px;width:100%;float:left;"> 
                 [*] Información Obligatoria
@@ -87,11 +90,11 @@ if ($v_perfil == 'USER'){
             <div class="contenedor_formulario_column">
                 <div class="formulario_grupo_row" style="width: 250px;">
                     <label for="nombre_empresa">NOMBRE EMPRESA <b style="color:var(--color-rojo);">[*]</b></label>
-                    <input type="text" name="nombre_empresa" id="nombre_empresa" class="formulario_control" value="<?=$arr_empresa['nombre']?>" <?echo $readonly;?>>
+                    <input type="text" name="nombre_empresa" id="nombre_empresa" class="formulario_control" value="<?=$arr_empresa['nombre']?>" <?php echo $readonly;?>>
                 </div>
                 <div class="formulario_grupo_row" style="width: 100px;">
-                    <label for="ruc">NIT <b style="color:var(--color-rojo);">[*]</b></label>
-                    <input type="text" name="ruc" id="ruc" class="formulario_control" value="<?=$arr_empresa['identificacion']?>" <?echo $readonly;?>>
+                    <label for="ruc">RNC <b style="color:var(--color-rojo);">[*]</b></label>
+                    <input type="text" name="ruc" id="ruc" class="formulario_control" value="<?=$arr_empresa['identificacion']?>" <?php echo $readonly;?>>
                 </div>
                 <div class="formulario_grupo_row" style="width: 100px;">
                     <label for="ruc">ESTADO</label>
@@ -100,7 +103,7 @@ if ($v_perfil == 'USER'){
                 <div class="formulario_grupo_row" style="width: 150px;">
                     <label for="tamanoid">TAMAÑO EMPRESA <b style="color:var(--color-rojo);">[*]</b></label>
                     <input type="hidden" name="tamanoid_old" id="tamanoid_old" value="<?=$arr_empresa['tamanoid']?>">
-                    <select name="tamanoid" id="tamanoid" class="formulario_control" <?echo $disabled_total;?>>
+                    <select name="tamanoid" id="tamanoid" class="formulario_control" <?php echo $disabled_total;?>>
 <?php
     $arr_ttamano = $obj_mae->get_tipos('TAMANHOEMP');
 
@@ -117,13 +120,13 @@ if ($v_perfil == 'USER'){
             <div class="contenedor_formulario_column">
                 <div class="formulario_grupo_row" style="width: 250px;">
                     <label for="direccion">DIRECCION <b style="color:var(--color-rojo);">[*]</b></label>
-                    <input type="text" name="direccion" id="direccion" class="formulario_control" value="<?=$arr_empresa['direccion']?>" <?echo $readonly_total;?>>
+                    <input type="text" name="direccion" id="direccion" class="formulario_control" value="<?=$arr_empresa['direccion']?>" <?php echo $readonly_total;?>>
                     <input type="hidden" name="direccion_old" id="direccion_old" value="<?=$arr_empresa['direccion']?>">
                 </div>
                 <div class="formulario_grupo_row" style="width: 200px;">
                     <label for="sectorid">ACTIVIDAD ECONOMICA <b style="color:var(--color-rojo);">[*]</b></label>
                     <input type="hidden" name="sectorid_old" id="sectorid_old" value="<?=$arr_empresa['sectorid']?>">
-                    <select name="sectorid" id="sectorid" class="formulario_control" <?echo $disabled_total;?>>
+                    <select name="sectorid" id="sectorid" class="formulario_control" <?php echo $disabled_total;?>>
 <?php
     $arr_sector = $obj_mae->get_tipos('SECTORECO');
 
@@ -141,7 +144,7 @@ if ($v_perfil == 'USER'){
                 <div class="formulario_grupo_row" style="width: 250px;">
                     <label for="actividad">DESCRIPCION ACTIVIDAD <b style="color:var(--color-rojo);">[*]</b></label>
                     <input type="hidden" name="actividad_old" id="actividad_old" value="<?=$arr_empresa['actividad']?>">
-                    <textarea id="actividad" name="actividad" cols="100" rows="5" <?echo $readonly_total;?>><?echo $arr_empresa['actividad'];?></textarea>
+                    <textarea id="actividad" name="actividad" cols="100" rows="5" <?php echo $readonly_total;?>><?php echo $arr_empresa['actividad'];?></textarea>
                 </div>
             </div>
 
@@ -154,18 +157,18 @@ if ($v_perfil == 'USER'){
             <div class="contenedor_formulario_column">
                 <div class="formulario_grupo_row" style="width: 200px;">
                     <label for="nombre_repre">NOMBRE <b style="color:var(--color-rojo);">[*]</b></label>
-                    <input type="text" name="nombre_repre" id="nombre_repre" class="formulario_control" value="<?=$arr_empresa['nombre_repre']?>" <?echo $readonly_total;?>>
+                    <input type="text" name="nombre_repre" id="nombre_repre" class="formulario_control" value="<?=$arr_empresa['nombre_repre']?>" <?php echo $readonly_total;?>>
                     <input type="hidden" name="nombre_repre_old" id="nombre_repre_old" value="<?=$arr_empresa['nombre_repre']?>">
                 </div>
                 <div class="formulario_grupo_row" style="width: 200px;">
                     <label for="email_repre">E-MAIL <b style="color:var(--color-rojo);">[*]</b></label>
-                    <input type="text" name="email_repre" id="email_repre" class="formulario_control" value="<?=$arr_empresa['email_repre']?>" <?echo $readonly_total;?>>
+                    <input type="text" name="email_repre" id="email_repre" class="formulario_control" value="<?=$arr_empresa['email_repre']?>" <?php echo $readonly_total;?>>
                     <input type="hidden" name="email_repre_old" id="email_repre_old" value="<?=$arr_empresa['email_repre']?>">
                 </div>
                 <div class="formulario_grupo_row" style="width: 100px;">
                     <label for="tdoc_repre">TIPO DOC <b style="color:var(--color-rojo);">[*]</b></label>
                     <input type="hidden" name="tdoc_repre_old" id="tdoc_repre_old" value="<?=$arr_empresa['tdoc_repre']?>">
-                    <select name="tdoc_repre" id="tdoc_repre" class="formulario_control" <?echo $disabled_total;?>>
+                    <select name="tdoc_repre" id="tdoc_repre" class="formulario_control" <?php echo $disabled_total;?>>
 <?php
     $arr_tdoc = $obj_mae->get_tipos('TIPOIDENTIF');
 
@@ -179,7 +182,7 @@ if ($v_perfil == 'USER'){
                 </div>
                 <div class="formulario_grupo_row" style="width: 200px;">
                     <label for="nrodoc_repre">NRO DOC <b style="color:var(--color-rojo);">[*]</b></label>
-                    <input type="text" name="nrodoc_repre" id="nrodoc_repre" class="formulario_control" value="<?=$arr_empresa['nrodoc_repre']?>" <?echo $readonly_total;?>>
+                    <input type="text" name="nrodoc_repre" id="nrodoc_repre" class="formulario_control" value="<?=$arr_empresa['nrodoc_repre']?>" <?php echo $readonly_total;?>>
                     <input type="hidden" name="nrodoc_repre_old" id="nrodoc_repre_old" value="<?=$arr_empresa['nrodoc_repre']?>">
                 </div>
             </div>
@@ -187,7 +190,7 @@ if ($v_perfil == 'USER'){
             <div class="contenedor_formulario_column">
                 <div class="formulario_grupo_row" style="width: 250px;">
                     <label for="file_dni">DOCUMENTO <b style="color:var(--color-rojo);">[*]</b></label>
-                    <input type="file" name="file_dni" id="file_dni" class="formulario_control" <?echo $disabled_total;?>>
+                    <input type="file" name="file_dni" id="file_dni" class="formulario_control" <?php echo $disabled_total;?>>
                 </div>
                 <div class="formulario_grupo_row" style="width: 70px;">
                     <label for="documento_view">PDF</label>
@@ -203,7 +206,7 @@ if ($v_perfil == 'USER'){
                 </div>
                 <div class="formulario_grupo_row" style="width: 250px;">
                     <label for="file_poderes">REGISTRO MERCANTIL <b style="color:var(--color-rojo);">[*]</b></label>
-                    <input type="file" name="file_poderes" id="file_poderes" class="formulario_control" <?echo $disabled_total;?>>
+                    <input type="file" name="file_poderes" id="file_poderes" class="formulario_control" <?php echo $disabled_total;?>>
                 </div>
                 <div class="formulario_grupo_row" style="width: 70px;">
                     <label for="poderes_view">PDF</label>
@@ -226,18 +229,18 @@ if ($v_perfil == 'USER'){
             <div class="contenedor_formulario_column">
                 <div class="formulario_grupo_row" style="width: 250px;">
                     <label for="nombre_contacto">NOMBRE <b style="color:var(--color-rojo);">[*]</b></label>
-                    <input type="text" name="nombre_contacto" id="nombre_contacto" value="<?=$arr_empresa['nombre_contacto']?>" class="formulario_control" <?echo $readonly_total;?>>
+                    <input type="text" name="nombre_contacto" id="nombre_contacto" value="<?=$arr_empresa['nombre_contacto']?>" class="formulario_control" <?php echo $readonly_total;?>>
                     <input type="hidden" name="nombre_contacto_old" id="nombre_contacto_old" value="<?=$arr_empresa['nombre_contacto']?>">
                 </div>
                 <div class="formulario_grupo_row" style="width: 200px;">
                     <label for="email_contacto">E-MAIL <b style="color:var(--color-rojo);">[*]</b></label>
-                    <input type="text" name="email_contacto" id="email_contacto" class="formulario_control" value="<?=$arr_empresa['email_contacto']?>" <?echo $readonly_total;?>>
+                    <input type="text" name="email_contacto" id="email_contacto" class="formulario_control" value="<?=$arr_empresa['email_contacto']?>" <?php echo $readonly_total;?>>
                     <input type="hidden" name="email_contacto_old" id="email_contacto_old" value="<?=$arr_empresa['email_contacto']?>">
                 </div>
                 <div class="formulario_grupo_row" style="width: 100px;">
                     <label for="tdoc_contacto">TIPO DOC <b style="color:var(--color-rojo);">[*]</b></label>
                     <input type="hidden" name="tdoc_contacto_old" id="tdoc_contacto_old" value="<?=$arr_empresa['tdoc_contacto']?>">
-                    <select name="tdoc_contacto" id="tdoc_contacto" class="formulario_control" <?echo $disabled_total;?>>
+                    <select name="tdoc_contacto" id="tdoc_contacto" class="formulario_control" <?php echo $disabled_total;?>>
 <?php
     $arr_tdoc = $obj_mae->get_tipos('TIPOIDENTIF');
 
@@ -251,12 +254,12 @@ if ($v_perfil == 'USER'){
                 </div>
                 <div class="formulario_grupo_row" style="width: 100px;">
                     <label for="nrodoc_contacto">NRO DOC <b style="color:var(--color-rojo);">[*]</b></label>
-                    <input type="text" name="nrodoc_contacto" id="nrodoc_contacto" class="formulario_control" value="<?=$arr_empresa['nrodoc_contacto']?>" <?echo $readonly_total;?>>
+                    <input type="text" name="nrodoc_contacto" id="nrodoc_contacto" class="formulario_control" value="<?=$arr_empresa['nrodoc_contacto']?>" <?php echo $readonly_total;?>>
                     <input type="hidden" name="nrodoc_contacto_old" id="nrodoc_contacto_old" value="<?=$arr_empresa['nrodoc_contacto']?>">
                 </div>
                 <div class="formulario_grupo_row" style="width: 100px;">
                     <label for="telefono_contacto">TELEFONO <b style="color:var(--color-rojo);">[*]</b></label>
-                    <input type="text" name="telefono_contacto" id="telefono_contacto" class="formulario_control" value="<?=$arr_empresa['telf_contacto']?>" <?echo $readonly_total;?>>
+                    <input type="text" name="telefono_contacto" id="telefono_contacto" class="formulario_control" value="<?=$arr_empresa['telf_contacto']?>" <?php echo $readonly_total;?>>
                     <input type="hidden" name="telefono_contacto_old" id="telefono_contacto_old" value="<?=$arr_empresa['telf_contacto']?>">
                 </div>
             </div>
@@ -373,11 +376,11 @@ if ($_SESSION['user']['perfilid'] == 4){
 
             <div class="contenedor_formulario_column">
                 <div class="formulario_grupo_column" style="width: 200px;">
-                    <label for="tarifa_nacional">TARIFA REGISTRO <?echo $v_simbolo_nacional;?></label>
+                    <label for="tarifa_nacional">TARIFA REGISTRO <?php echo $v_simbolo_nacional;?></label>
                     <input type="text" name="tarifa_nacional" id="tarifa_nacional" value="<?=$v_tarifa_nacional?>" class="formulario_control" style="text-align: right;" readonly>
                 </div>
                 <div class="formulario_grupo_column" style="width: 200px;">
-                    <label for="tarifa_ext">TARIFA REGISTRO <?echo $v_simbolo_extranjero;?></label>
+                    <label for="tarifa_ext">TARIFA REGISTRO <?php echo $v_simbolo_extranjero;?></label>
                     <input type="text" name="tarifa_ext" id="tarifa_ext" value="<?=$v_tarifa_ext?>" class="formulario_control" style="text-align: right;" readonly>
                 </div>
             </div>

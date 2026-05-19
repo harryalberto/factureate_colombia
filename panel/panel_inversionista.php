@@ -12,7 +12,7 @@ require("../lib-trans/c_inversiones.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'PANELINV';
     require("../lib/valida-acceso.php");
@@ -26,7 +26,7 @@ require("../lib-trans/c_inversiones.php");
         }
     </script>
 </HEAD>
-<?
+<?php
 /*#####################################################
 #################### LOGICA */
 $objmaestro = new maestros;
@@ -59,6 +59,8 @@ $v_arr_inv = $obj_inversiones->get_montos_inversion($_SESSION['user']['usuarioid
 $v_arr_pagada = $obj_inversiones->get_montos_inversion($_SESSION['user']['usuarioid'], 'pagada', $_SESSION['user']['empresaid']);
 $v_arr_xpagar = $obj_inversiones->get_montos_inversion($_SESSION['user']['usuarioid'], 'xpagar', $_SESSION['user']['empresaid']);
 
+$v_label_encomp = '';
+$v_label_inv = '';
 //==== verifico si envian parametros de acceso express
 if (isset($_GET['fid'])) {
     $v_fid = $_GET['fid'];
@@ -78,7 +80,7 @@ $rowcount = $vobj_subastas->get_subastas_inversor('COUNT', 0, 0, $filtros, '', $
 //############# FIN DE LOGICA
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     date_default_timezone_set($_SESSION['user']['zona_horaria']);
     $menu = 'panel/panel_inversionista.php';
     //------ PARTE SUPERIOR ------
@@ -104,7 +106,7 @@ $rowcount = $vobj_subastas->get_subastas_inversor('COUNT', 0, 0, $filtros, '', $
                     <abbr title="Propuestas que ha realizado, pero aún no son una inversión hasta que se termine la subasta y usted resulte elegido para la inversión">
                     <span class="icon-eye" style="color:#000000;font-size: 14px;"></span> En Propuesta
                     </abbr></p>
-                <?
+                <?php
                 if ($v_q_propuestas > 0){
                     $v_label_propuestas = '';
 
@@ -129,7 +131,7 @@ $rowcount = $vobj_subastas->get_subastas_inversor('COUNT', 0, 0, $filtros, '', $
                     <abbr title="Usted fue elegido para la inversión pero aún se está dejando todo a punto para ejecutar la inversión">
                     <span class="icon-eye" style="color:#000000;font-size: 14px;"></span> En Compensaci&oacute;n
                     </abbr></p>
-                <?
+                <?php
                 if ($v_q_encomp > 0){
                     $v_label_encomp = '';
 
@@ -141,10 +143,10 @@ $rowcount = $vobj_subastas->get_subastas_inversor('COUNT', 0, 0, $filtros, '', $
                 } else $v_q_encomp = 0;
                 ?>
                 <p style="margin:10px 0px;text-align:left;font-size:16px;color:#000000;font-weight: bold;">
-                    <? echo $v_label_encomp;?>
+                    <?php echo $v_label_encomp;?>
                 </p>
                 <p style="margin:10px 0px;text-align:left;color:var(--color-gris-oscuro);">
-                    <? echo '<b>'.$v_q_encomp.'</b> propuesta(s) en compensaci&oacute;n';?>
+                    <?php echo '<b>'.$v_q_encomp.'</b> propuesta(s) en compensaci&oacute;n';?>
                 </p>
             </li>
             
@@ -154,7 +156,7 @@ $rowcount = $vobj_subastas->get_subastas_inversor('COUNT', 0, 0, $filtros, '', $
                     <abbr title="Es la relación de instrumentos en los que usted ha invertido y se encuentran vivos hasta el momento del vencimiento de su inversión">
                     <span class="icon-eye" style="color:#000000;font-size: 14px;"></span> En Inversi&oacute;n
                     </abbr></p>
-                <?
+                <?php
                 if ($v_q_inv > 0){
                     $v_label_inv = '';
 
@@ -166,10 +168,10 @@ $rowcount = $vobj_subastas->get_subastas_inversor('COUNT', 0, 0, $filtros, '', $
                 } else $v_q_inv = 0;
                 ?>
                 <p style="margin:10px 0px;text-align:left;font-size:16px;color:#000000;font-weight:bold;">
-                    <? echo $v_label_inv;?>
+                    <?php echo $v_label_inv;?>
                 </p>
                 <p style="margin:10px 0px;text-align:left;color:var(--color-gris-oscuro);">
-                    <? echo '<b>'.$v_q_inv.'</b> inversiones activas';?>
+                    <?php echo '<b>'.$v_q_inv.'</b> inversiones activas';?>
                 </p>
             </li>
             
@@ -179,7 +181,7 @@ $rowcount = $vobj_subastas->get_subastas_inversor('COUNT', 0, 0, $filtros, '', $
                     <abbr title="Son las ganancias que hasta el momento ha conseguido con FACTUREATE">
                     <span class="icon-eye" style="color:#000000;font-size: 14px;"></span> Ganancias
                     </abbr></p>
-                <?
+                <?php
                 $v_ganancias = 0;
                 $v_label_ganancias = '';
 
@@ -201,7 +203,7 @@ $rowcount = $vobj_subastas->get_subastas_inversor('COUNT', 0, 0, $filtros, '', $
                 ?>
                 
                 <p style="margin:10px 0px;text-align:left;color:var(--color-gris-oscuro);">
-                    <? echo '<b>Ganancias conseguidas</b>';?>
+                    <?php echo '<b>Ganancias conseguidas</b>';?>
                 </p>
             </li>
             
@@ -211,7 +213,7 @@ $rowcount = $vobj_subastas->get_subastas_inversor('COUNT', 0, 0, $filtros, '', $
                     <abbr title="Son las ganancias que usted percibirá cuando sus inversiones terminen o sean liquidadas">
                     <span class="icon-eye" style="color:#000000;font-size: 14px;"></span> Ganancias Futuras
                     </abbr></p>
-                <?
+                <?php
                 $v_futuros = 0;
                 $v_label_futuros = '';
 
@@ -233,7 +235,7 @@ $rowcount = $vobj_subastas->get_subastas_inversor('COUNT', 0, 0, $filtros, '', $
                 ?>
                 
                 <p style="margin:10px 0px;text-align:left;color:var(--color-gris-oscuro);">
-                    <? echo '<b>Ganancias futuras por cobrar</b>';?>
+                    <?php echo '<b>Ganancias futuras por cobrar</b>';?>
                 </p>
             </li>
 

@@ -10,14 +10,14 @@ require("../lib-trans/factura.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'REGFACT';
     require("../lib/valida-acceso.php");
 ?>
 
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $tipo = $_GET['tipo'];
@@ -29,6 +29,10 @@ $objfactura = new factura;
 $arremisor = $objmaestros->get_datos_emisor($_SESSION['user']['empresaid']);
 $arrparametros = $objmaestros->get_parametros();
 $hoy = date('Y-m-d');
+$v_inicial = 0;
+$v_remanente = 0;
+$v_financiado = 0;
+$v_tasa_dcto = 0;
 
 if ($tipo == 'new'){
     $fnula = strtotime($hoy); $ffnula = date('Y-m-d', $fnula);
@@ -69,6 +73,7 @@ if ($tipo == 'new'){
     $v_comi_fact_emi = $arrparametros['COMISION']['valornum'];
     $v_porc_adelanto = $arrparametros['% FINANCIA']['valornum'];
     $facturaid = 0;
+    $disabled = '';
 } elseif ($tipo == 'upd' || $tipo == 'view'){
     $facturaid = $_GET['id'];
     $arrfactura = $objfactura->get_datos_factura($facturaid);
@@ -229,7 +234,7 @@ $v_dias_min = $v_dias_min.' días';
 ?>
 
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     //------ PARTE SUPERIOR ------
     
     //------ PARTE IZQUIERDA ------
@@ -277,9 +282,9 @@ $v_dias_min = $v_dias_min.' días';
         </ul>
 
         <ul style="overflow:hidden;list-style:none; padding-left:5px; background: var(--color-oro); margin-left: 12px; font-size: 12px; color: #fff;">
-            <li style="float:left; display: block; padding-right: 10px;">Monto mínimo <?echo $v_moneda_nac;?></li>
-            <li style="float:left; display: block; padding-right: 10px;">Monto mínimo <?echo $v_moneda_ext;?></li>
-            <li style="float:left; display: block;">Días mínimo vencimiento <?echo $v_dias_min;?></li>
+            <li style="float:left; display: block; padding-right: 10px;">Monto mínimo <?php echo $v_moneda_nac;?></li>
+            <li style="float:left; display: block; padding-right: 10px;">Monto mínimo <?php echo $v_moneda_ext;?></li>
+            <li style="float:left; display: block;">Días mínimo vencimiento <?php echo $v_dias_min;?></li>
         </ul>
     </div>
 
@@ -336,7 +341,7 @@ $v_dias_min = $v_dias_min.' días';
 
             <div class="contenedor_formulario_column">
                 <div class="formulario_grupo_row" style="width: 100px;">
-                    <label for="numerocliente">NIT:<b style="color:#b30a1f;">[*]</b></label>
+                    <label for="numerocliente">RNC:<b style="color:#b30a1f;">[*]</b></label>
                     <input type="text" name="numerocliente" id="numerocliente" class="formulario_control" value="<?=$numerocliente?>" <?=$readonly?>>
                 </div>
                 <div class="formulario_grupo_row" style="width: 300px;">
@@ -397,7 +402,7 @@ $v_dias_min = $v_dias_min.' días';
 
             <div class="contenedor_formulario_column">
                 <div class="formulario_grupo_row" style="width: 120px;">
-                    <label for="impuestoventa_view">IVA:<b style="color:#b30a1f;">[*]</b></label>
+                    <label for="impuestoventa_view">ITBIS:<b style="color:#b30a1f;">[*]</b></label>
                     <input type="text" id="impuestoventa_view" name="impuestoventa_view" placeholder="0.00" class="formulario_control" style="text-align: right;" value="<?= $impuestoventa_view ?>" <?=$readonly?>>
                 </div>
 
@@ -440,11 +445,11 @@ $v_dias_min = $v_dias_min.' días';
                 </div>
                 <div class="formulario_grupo_row" style="width: 50px;">
                     <label for="conmaxdescuento" style="color:#fff;">CHK</label>
-                    <input id="conmaxdescuento" type="checkbox" class="formulario_control" name="conmaxdescuento" value="1" <?echo $v_condesc_maximo;?> onchange="javascript:checkdescuento('conmaxdescuento','maxdescuento')" <?=$disabled?>>
+                    <input id="conmaxdescuento" type="checkbox" class="formulario_control" name="conmaxdescuento" value="1" <?php echo $v_condesc_maximo;?> onchange="javascript:checkdescuento('conmaxdescuento','maxdescuento')" <?=$disabled?>>
                 </div>
                 <div class="formulario_grupo_row" style="width: 150px;">
                     <label for="maxdescuento"><abbr title="Es el % maximo que esta dispuesto a aceptar que le descuenten, este valor es calculado siempre que su cliente pague en la fecha de vencimiento">MAXIMO DCTO(%):</abbr></label>
-                    <input id="maxdescuento" type="number" name="maxdescuento" class="formulario_control" value="<?=$v_desc_maximo?>" min="2" max="20" <?echo $v_desc_maximo_readonly;?> style="text-align:right;background-color:<?echo $v_desc_maximo_bgc;?>">
+                    <input id="maxdescuento" type="number" name="maxdescuento" class="formulario_control" value="<?=$v_desc_maximo?>" min="2" max="20" <?php echo $v_desc_maximo_readonly;?> style="text-align:right;background-color:<?php echo $v_desc_maximo_bgc;?>">
                 </div>
             </div>
 
@@ -463,7 +468,8 @@ $v_dias_min = $v_dias_min.' días';
 ?>
                 <div class="formulario_grupo_column" style="width: 500px;">
                     <label for="xmlpath">XML de la factura:</label>
-                    <?echo $xmlpath;?>
+                    <?php echo '
+                    <span style="margin-right:10px;font-size:20;"><a href="'.$xmlpath.'" target="_blank"><i class="fa-solid fa-file-arrow-up"></i></a></span>';?>
                     <input type="hidden" name="xmlpath" value="<?=$nombrexml?>">
                 </div>
 <?php
@@ -478,7 +484,7 @@ $v_dias_min = $v_dias_min.' días';
 ?>
             <div class="contenedor_formulario_column">
                 <div class="formulario_grupo_column" style="width: 500px;">
-                    <label for="rechazo">Motivo de Rechazo:<?echo $rechazopath;?></label>
+                    <label for="rechazo">Motivo de Rechazo:<?php echo $rechazopath;?></label>
                     <textarea name="rechazo" cols="100" rows="5" class="formulario_control" readonly>'.$arrfactura['motivorechazo'].'</textarea>
                 </div>
             </div>
@@ -492,10 +498,15 @@ $v_dias_min = $v_dias_min.' días';
                 <p style="font-size: 12px;font-weight: bold; margin-top: 10px; padding-top: 10px; color: var(--color-rojo);">CALCULO APROXIMADO DE SU FINANCIAMIENTO:</p>
             </div>
 
+<?php
+        $v_adelanto_aprox = $v_simbolo.' '.$v_inicial;
+        $v_remanente_aprox = $v_simbolo.' '.$v_remanente;
+        $v_total_aprox = $v_simbolo.' '.$v_financiado;
+?>
             <div class="contenedor_formulario_column">
                 <div class="formulario_grupo_row" style="width: 120px;">
                     <label for="adelanto" style="color: var(--color-rojo);">Adelanto Aprox:<abbr title="Es el monto que recibiría al inicio, esta es solo una simulación aproximada, el monto definitivo se conocerá luego de la evaluación de su factura"><i class="fa-solid fa-eye"></i></abbr></label>
-                    <input type="text" name="adelanto" id="adelanto" class="formulario_control" value="<?=$v_simbolo.' '.$v_inicial?>" style="text-align:right;" readonly>
+                    <input type="text" name="adelanto" id="adelanto" class="formulario_control" value="<?=$v_adelanto_aprox?>" style="text-align:right;" readonly>
                 </div>
 
                 <div class="formulario_grupo_row" style="width: 50px;">
@@ -505,7 +516,7 @@ $v_dias_min = $v_dias_min.' días';
 
                 <div class="formulario_grupo_row" style="width: 120px;">
                     <label for="remanente" style="color: var(--color-rojo);">Remanente Aprox:<abbr title="Es el monto que recibirá cuando su cliente pague, esta es solo una simulación aproximada, el monto definitivo depende de las condiciones del inversor y luego que su cliente pague"><i class="fa-solid fa-eye"></i></abbr></label>
-                    <input type="text" name="remanente" id="remanente" class="formulario_control" value="<?=$v_simbolo.' '.$v_remanente?>" style="text-align:right;" readonly>
+                    <input type="text" name="remanente" id="remanente" class="formulario_control" value="<?=$v_remanente_aprox?>" style="text-align:right;" readonly>
                 </div>
 
                 <div class="formulario_grupo_row" style="width: 50px;">
@@ -515,7 +526,7 @@ $v_dias_min = $v_dias_min.' días';
 
                 <div class="formulario_grupo_row" style="width: 120px;">
                     <label for="totalrecibido" style="color: var(--color-rojo);">Total aproximado:<abbr title="Es el monto total que recibirá, que es la suma de los dos montos anteriores (Monto Inicial + Remanente)"><i class="fa-solid fa-eye"></i></abbr></label>
-                    <input type="text" name="totalrecibido" id="totalrecibido" class="formulario_control" value="<?=$v_simbolo.' '.$v_financiado?>" style="text-align:right;" readonly>
+                    <input type="text" name="totalrecibido" id="totalrecibido" class="formulario_control" value="<?=$v_total_aprox?>" style="text-align:right;" readonly>
                 </div>
                 <div class="formulario_grupo_row" style="width: 120px;">
                     <label for="tasa_descuento" style="color: var(--color-rojo);">Tasa de Dcto(%):<abbr title="Es la tasa de descuento que obtendra = monto total que recibira / monto de la factura"><i class="fa-solid fa-eye"></i></abbr></label>

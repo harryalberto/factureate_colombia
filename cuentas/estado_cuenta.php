@@ -14,22 +14,22 @@ require("../lib-trans/c_cuentas.php");
 
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'CTAEFE';
     require("../lib/valida-acceso.php");
 ?>
 
     <script type="text/javascript">
-        
+
         function filtrar(){
             document.frm.submit();
         }
-        
+
         function estado_cuenta(p_id){
             location.href = 'estado_cuenta_inversionista.php?cuenta_id='+p_id;
         }
-        
+
         function closemodal(){
             $('.modalclase').fadeOut();
         }
@@ -38,7 +38,7 @@ require("../lib-trans/c_cuentas.php");
 
 </HEAD>
 
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 
@@ -76,7 +76,7 @@ if ($_SESSION['user']['empresaid'] > 0){
 
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
 
-<?
+<?php
     date_default_timezone_set("America/Lima");
     $menu = 'cuentas/estado_cuenta.php';
     //------ PARTE SUPERIOR ------
@@ -84,23 +84,23 @@ if ($_SESSION['user']['empresaid'] > 0){
     //------ PARTE IZQUIERDA ------
     require("../lib/menu-n1.php");
 ?>
-    
+
     <!------ CUERPO VARIABLE ------>
-    
+
     <div style="overflow:hidden;text-align:center;font-size: 18px;font-weight: bold;color:#064677;padding:10px;max-width:700px;margin:0px auto;">
         Cuenta Efectivo Inversionista
     </div>
-    
+
 <?php
-    
+
     for ($i=0; $i<count($arr_saldos); $i++){
         if ($arr_saldos[$i]['saldo_disponible'] < 0) $estilo = 'style="color:#d42639;font-size:10px;"';
         else $estilo = 'style="font-size:10px;"';
-        
+
         $arr_movimientos = $obj_cuenta->get_movimientos_cuenta($arr_saldos[$i]['cuenta_id'],5,0);
 
         // PROPUESTAS PRELIMINARES
-        
+
         $v_monto_preliminares = 0;
         $v_simbolo_moneda = '';
         $v_monto_enpropuestas = $objsubasta->monto_propuestas_subasta($_SESSION['user']['usuarioid'], $_SESSION['user']['empresaid'],$arr_saldos[$i]['moneda_id']);
@@ -117,14 +117,14 @@ if ($_SESSION['user']['empresaid'] > 0){
 ?>
 
         <div class="frmtransaccion">
-            
+
             <ul style="margin-top:5px;">
-                <li style="font-size:14px;font-weight: bold;padding: 1px;margin: 1px;">NRO DE CUENTA: <? echo $arr_saldos[$i]['cuenta_id'];?></li>
+                <li style="font-size:14px;font-weight: bold;padding: 1px;margin: 1px;">NRO DE CUENTA: <?php echo $arr_saldos[$i]['cuenta_id'];?></li>
             </ul>
 
             <ul style="margin-top:5px;">
                 <li style="font-size:14px;font-weight: bold;padding: 1px;margin: 1px;">Moneda:</li>
-                <li style="font-size:14px;font-weight: bold;padding: 1px;margin: 1px;"><? echo $arr_saldos[$i]['moneda'];?></li>
+                <li style="font-size:14px;font-weight: bold;padding: 1px;margin: 1px;"><?php echo $arr_saldos[$i]['moneda'];?></li>
                 <li><button type="button" class="btn btn-primary" onclick="estado_cuenta(<?=$arr_saldos[$i]['cuenta_id']?>)" style="font-size:12px;background-color:var(--color-azulv2);border:none;">
                         <span class="icon-search" style="font-size:16px;"></span> Ver Estado Cuenta</button></li>
 
@@ -140,8 +140,8 @@ if ($_SESSION['user']['empresaid'] > 0){
 <?php
         }
 ?>
-
             </ul>
+
 <?php
 
         echo '
@@ -150,18 +150,18 @@ if ($_SESSION['user']['empresaid'] > 0){
                 <li class="box_subtitulo_blanco"><p><span class="icon-shield" style="font-size:16px;"></span> S. Comprometido:</p><p>'.number_format($arr_saldos[$i]['saldo_comprometido'],2,'.',',').'</p></li>
                 <li class="box_subtitulo_blanco"><p><span class="icon-coin-dollar" style="font-size:16px;"></span> Saldo Disponible:</p><p>'.number_format($arr_saldos[$i]['saldo_disponible'],2,'.',',').'</p></li>
                 <li class="box_subtitulo_blanco"><p><span class="icon-stats-dots" style="font-size:16px;"></span> Saldo Invertido:</p><p>'.number_format($arr_saldos[$i]['saldo_invertido'],2,'.',',').'</p></li>';
-    
+
     //---- MONTO RESUMEN DE LAS PROPUESTAS PRELIMINARES
-    
+
     if ($v_monto_preliminares > 0)
         echo '  <li class="box_subtitulo_blanco" style="background-color:var(--color-rojo);color:#ffffff;"><p><i class="fa-solid fa-triangle-exclamation"></i> Pendiente de Saldo:</p><p>'.$v_simbolo_moneda.' '.number_format($v_monto_preliminares,2,'.',',').'</p></li>';
-    
+
     //---- SALDO EN TRANSITO
     if ($arr_saldos[$i]['saldo_transito'] > 0){
         echo '  <li class="box_subtitulo_blanco" style="background-color:var(--color-verde);color:#ffffff;"><p><i class="fa-solid fa-hourglass-half"></i> Saldo en Transito:</p><p>'.$v_simbolo_moneda.' '.number_format($arr_saldos[$i]['saldo_transito'],2,'.',',').'</p></li>';
     }
 
-    echo '</ul>
+    echo '  </ul>
         </div>
 
         <div style="overflow:hidden;margin:5px;padding:5px;">';
@@ -173,7 +173,7 @@ if ($_SESSION['user']['empresaid'] > 0){
             <ul>
                 <li style="font-weight: bold;color:var(--color-rojo);font-size:12px;">PROPUESTAS PRELIMINARES SIN SALDO:</li>
             </ul>
-            
+
             <ul style="overflow:hidden;list-style:none;">
                 <table class="tabla_resize">
                     <thead>
@@ -205,7 +205,7 @@ if ($_SESSION['user']['empresaid'] > 0){
         }
 
         //---- SALDO EN TRANSITO
-        
+
         if ($arr_saldos[$i]['saldo_transito'] > 0){
             $varr_transito = $obj_cuenta->get_saldo_transito_detalle($arr_saldos[$i]['cuenta_id']);
 
@@ -213,7 +213,7 @@ if ($_SESSION['user']['empresaid'] > 0){
             <ul>
                 <li style="font-weight: bold;color:var(--color-verde);font-size:12px;">SALDO EN TRANSITO:</li>
             </ul>
-            
+
             <ul style="overflow:hidden;list-style:none;">
                 <table class="tabla_resize">
                     <thead>
@@ -243,7 +243,7 @@ if ($_SESSION['user']['empresaid'] > 0){
         }
 
         //---- SALDO COMPROMETIDO
-        
+
         if ($arr_saldos[$i]['saldo_comprometido'] != 0){
             $arr_comprometido = $obj_cuenta->get_saldo_detalle($_SESSION['user']['usuarioid'],$_SESSION['user']['empresaid'],$arr_saldos[$i]['moneda_id'],'COM');
             $v_detalle = 1;
@@ -251,7 +251,7 @@ if ($_SESSION['user']['empresaid'] > 0){
             <ul>
                 <li style="font-weight: bold;color:#b30a1f;font-size:12px;">SALDO COMPROMETIDO:</li>
             </ul>
-            
+
             <ul style="overflow:hidden;list-style:none;">
                 <table class="tabla_resize">
                     <thead><tr>
@@ -263,13 +263,13 @@ if ($_SESSION['user']['empresaid'] > 0){
                         <th scope="col">MONTO</th>
                     </tr></thead>
                     <tbody>';
-            
+
             echo $v_detalle_saldop;
 
             for ($j=0; $j<count($arr_comprometido); $j++){
                 $v_fecha = date('d-m-Y',strtotime($arr_comprometido[$j]['fecha']));
-                echo '
-                        <tr>
+
+                echo '  <tr>
                             <td data-label="ID">'.$arr_comprometido[$j]['factura_id'].'</td>
                             <td data-label="PROPUESTA">'.$arr_comprometido[$j]['propuesta_id'].'</td>
                             <td data-label="FECHA">'.$v_fecha.'</td>
@@ -283,9 +283,9 @@ if ($_SESSION['user']['empresaid'] > 0){
                 </table>
             </ul>';
         }
-        
+
         //---- SALDO DISPONIBLE
-        
+
         if ($arr_saldos[$i]['saldo_disponible'] < 0){
             $arr_disponible = $obj_cuenta->get_saldo_detalle($_SESSION['user']['usuarioid'],$_SESSION['user']['empresaid'],$arr_saldos[$i]['moneda_id'],'DIS');
             $v_detalle = 1;
@@ -293,7 +293,7 @@ if ($_SESSION['user']['empresaid'] > 0){
             <ul>
                 <li style="font-weight: bold;color:#b30a1f;font-size:12px;">SALDO DISPONIBLE:</li>
             </ul>
-            
+
             <ul style="overflow:hidden;list-style:none;">
                 <table class="tabla_resize">
                     <thead><tr>
@@ -305,12 +305,12 @@ if ($_SESSION['user']['empresaid'] > 0){
                         <th scope="col">MONTO</th>
                     </tr></thead>
                     <tbody>';
-            
+
             echo $v_detalle_saldod;
 
             for ($j=0; $j<count($arr_disponible); $j++){
                 $v_fecha = date('d-m-Y',strtotime($arr_disponible[$j]['fecha']));
-                echo '<tr>
+                echo '  <tr>
                             <td data-label="ID">'.$arr_disponible[$j]['factura_id'].'</td>
                             <td data-label="PROPUESTA">'.$arr_disponible[$j]['propuesta_id'].'</td>
                             <td data-label="FECHA">'.$v_fecha.'</td>
@@ -350,8 +350,7 @@ if ($_SESSION['user']['empresaid'] > 0){
             for ($j=0; $j<count($arr_invertido); $j++){
                 $v_fecha = date('d-m-Y',strtotime($arr_invertido[$j]['fecha']));
 
-                echo '
-                        <tr>
+                echo '  <tr>
                             <td data-label="ID">'.$arr_invertido[$j]['factura_id'].'</td>
                             <td data-label="PROPUESTA">'.$arr_invertido[$j]['propuesta_id'].'</td>
                             <td data-label="FECHA">'.$v_fecha.'</td>
@@ -365,16 +364,17 @@ if ($_SESSION['user']['empresaid'] > 0){
                 </table>
             </ul>';
         }
+
         echo '
         </div>';
     }
-    ?>
+?>
 
     <!------ END CUERPO VARIABLE ------>
-    
+
     <!--###################################
     ########### ZONA MODAL -->
-    
+
     <div class="modal fade" id="SaldosModal" tabindex="-1" role="dialog">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -393,10 +393,10 @@ if ($_SESSION['user']['empresaid'] > 0){
     </div>
 
     <!--============= llamada al modal -->
-    
+
     <script>
-        
-        function cargar_saldo(p_cuenta_id, p_moneda_id, p_medios_pago,p_bancos){
+
+        function cargar_saldo(p_cuenta_id,p_moneda_id,p_medios_pago,p_bancos){
             if (p_medios_pago > 0 || p_bancos > 0){
                 alert('medios de pago y bancos');
             } else{

@@ -13,7 +13,7 @@ require("../lib-trans/c_cuentas.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'INVERSIONES';
     require("../lib/valida-acceso.php");
@@ -41,14 +41,14 @@ require("../lib-trans/c_cuentas.php");
         });
     </script>
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     $menu = 'emisores/confirmacion_financiamiento.php';
     //------ PARTE SUPERIOR ------
     require("../lib/superior.php");
@@ -62,8 +62,8 @@ require("../lib-trans/c_cuentas.php");
 
     <hr>
 
-    <div id="content2"><? require('confirmacion_financiamiento_pagina.php'); ?></div>
-    <?
+    <div id="content2"><?php require('confirmacion_financiamiento_pagina.php'); ?></div>
+    <?php
     if ($total_paginas > 1) {
         echo '<div class="pagination">';
         echo '  <ul>';

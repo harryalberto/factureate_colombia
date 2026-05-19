@@ -1,4 +1,11 @@
-<?
+<?php
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require '../phpmailer/src/Exception.php';
+require '../phpmailer/src/PHPMailer.php';
+require '../phpmailer/src/SMTP.php';
+
 class mail_util{
     function decrip($text){
         $longitud = strlen($text);
@@ -23,22 +30,29 @@ class mail_util{
         if ($arr_mail['mail_salida'] == 'pymes@factureate.com') $dato = $this->decrip("502-511-518-541-569-574-503-504-566-562-");
         if ($arr_mail['mail_salida'] == 'operaciones@factureate.com') $dato = $this->decrip("538-555-568-564-508-503-502-518-552-572-");
 
-        $mail = new PHPMailer();
-        $mail->IsSMTP();
-        $mail->SMTPAuth = true;
-        $mail->Host = "mail.brdkairos.com"; // A RELLENAR. Aqu� pondremos el SMTP a utilizar. Por ej. mail.midominio.com
-        $mail->Username = $arr_mail['mail_salida']; // A RELLENAR. Email de la cuenta de correo. ej.info@midominio.com La cuenta de correo debe ser creada previamente.
-        $mail->Password = $dato; // A RELLENAR. Aqui pondremos la contrase�a de la cuenta de correo
-        $mail->Port = 587; // Puerto de conexi�n al servidor de envio.(587)465
-        $mail->From = $arr_mail['mail_salida']; // A RELLENARDesde donde enviamos (Para mostrar). Puede ser el mismo que el email creado previamente.
-        $mail->FromName = $arr_mail['nombre_salida']; //A RELLENAR Nombre a mostrar del remitente.
+        $mail = new PHPMailer(true);
 
-        $mail->AddAddress($arr_mail['mail_destino']); // Esta es la direcci�n a donde enviamos
-        $mail->IsHTML(true); // El correo se env�a como HTML
-        $mail->Subject = $arr_mail['subject']; // Este es el titulo del email.
-        $mail->Body = $arr_mail['body']; // Mensaje a enviar.
-        $exito = $mail->Send(); // Env�a el correo.
-        $mail->ClearAllRecipients( ); // clear all
+        try{
+            $mail->IsSMTP();
+            $mail->Host = "mail.brdkairos.com"; // A RELLENAR. Aqu� pondremos el SMTP a utilizar. Por ej. mail.midominio.com
+            $mail->SMTPAuth = true;
+            $mail->Username = $arr_mail['mail_salida']; // A RELLENAR. Email de la cuenta de correo. ej.info@midominio.com La cuenta de correo debe ser creada previamente.
+            $mail->Password = $dato; // A RELLENAR. Aqui pondremos la contrase�a de la cuenta de correo
+             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port = 587;
+            $mail->CharSet = 'UTF-8';
+            $mail->setFrom(
+                $arr_mail['mail_salida'],
+                'Factureate Notificaciones'
+            );
+            $mail->AddAddress($arr_mail['mail_destino']); // Esta es la direcci�n a donde enviamos
+            $mail->IsHTML(true); // El correo se env�a como HTML
+            $mail->Subject = $arr_mail['subject']; // Este es el titulo del email.
+            $mail->Body = $arr_mail['body']; // Mensaje a enviar.
+            $mail->Send(); // Env�a el correo.
+        } catch (Exception $e) {
+            echo 'Error: ' . $mail->ErrorInfo;
+        }
     }
 
     function enviar_correo_attach($arr_mail){
@@ -151,8 +165,8 @@ class mail_util{
             }
         }
 
-        $conn->close();
-        $conn_perfil->close();
+        //$conn->close();
+        //$conn_perfil->close();
     }
     function enviar_multicorreo_interno($id_notificacion){
         $conn = new db_param;
@@ -193,10 +207,10 @@ class mail_util{
             }
         }
 
-        $conn->close();
+        /*$conn->close();
         $conn_perfil->close();
         $conn_noti->close();
-        $conn_delete->close();
+        $conn_delete->close();*/
     }
     function enviar_multicorreo_externo($id_notificacion, $id_usuario, $p_mail){
         $conn_noti = new db_param_trans;
@@ -224,8 +238,8 @@ class mail_util{
 
         $conn_delete->query("delete from genera_notificacion where id in (".$v_borrar.")");
         
-        $conn_noti->close();
-        $conn_delete->close();
+        /*$conn_noti->close();
+        $conn_delete->close();*/
     }
     function get_mail_usuario($p_usuario_id){
         $conn_user = new db_param;
@@ -237,7 +251,7 @@ class mail_util{
         
         $v_mail = $obj_user->email;
         
-        $conn_user->close();
+        //$conn_user->close();
         return $v_mail;
     }
     function enviar_notificacion_externo($p_notificacion_id){
@@ -273,9 +287,9 @@ class mail_util{
 
         $conn_delete->query("delete from genera_notificacion where id in (".$v_borrar.")");
         
-        $conn_noti->close();
+        /*$conn_noti->close();
         $conn_noti_base->close();
-        $conn_delete->close();
+        $conn_delete->close();*/
     }
 }
 ?>

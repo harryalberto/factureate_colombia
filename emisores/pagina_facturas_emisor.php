@@ -1,4 +1,4 @@
-<?
+<?php
 require("../lib-trans/factura.php");
 
 if(isset($_GET['page'])){
@@ -61,13 +61,19 @@ if ($rowcount > 0){
                 
     //-- DETALLE
     for ($i=0; $i<count($arrfacturas); $i++){
+        if (is_null($arrfacturas[$i]['fenvio'])) $v_fenvio = '';
+        else $v_fenvio = $arrfacturas[$i]['fenvio'];
+
+        if (is_null($arrfacturas[$i]['faprobacion'])) $v_faprobacion = '';
+        else $v_faprobacion = $arrfacturas[$i]['faprobacion'];
+
         $t_femision = strtotime($arrfacturas[$i]['femision']);
         $femision = date('d-m-Y',$t_femision);
         $t_fvencimiento = strtotime($arrfacturas[$i]['fvencimiento']);
         $fvencimiento = date('d-m-Y',$t_fvencimiento);
-        $t_fenvio = strtotime($arrfacturas[$i]['fenvio']);
+        $t_fenvio = strtotime($v_fenvio);
         $fenvio = date('d-m-Y',$t_fenvio);
-        $t_faprobacion = strtotime($arrfacturas[$i]['faprobacion']);
+        $t_faprobacion = strtotime($v_faprobacion);
         $faprobacion = date('d-m-Y',$t_faprobacion);
         if ($arrfacturas[$i]['estadoid'] == 11) $v_tipo_acceso = 'upd';
         else $v_tipo_acceso = 'view';

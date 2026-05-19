@@ -10,7 +10,7 @@ require("../lib-trans/factura.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'FACTFACTU';
     require("../lib/valida-acceso.php");
@@ -25,8 +25,8 @@ $objfactura = new factura;
 $objmaestro = new maestros;
 
 $facturaid = $_GET['facturaid'];
-if ($_GET['ret'] == 'facxe') $v_retorno = 'facturas_xestado.php?estadoid='.$_GET['eid'];
-if (isset($_POST['retorno'])) $v_retorno = $_POST['retorno'];
+//if ($_GET['ret'] == 'facxe') $v_retorno = 'facturas_xestado.php?estadoid='.$_GET['eid'];
+//if (isset($_POST['retorno'])) $v_retorno = $_POST['retorno'];
 
 $arrfactura = $objfactura->get_datos_factura($facturaid);
 $varr_fact_libre = $objmaestro->get_parametro_detalle(56);
@@ -54,7 +54,6 @@ $fvencimiento = date('d-m-Y',$fvencimiento_t);
         <input type="hidden" name="emisorid" value="<?=$arrfactura['emisorid']?>">
         <input type="hidden" name="accion" value="">
         <input type="hidden" name="u_envio_id" value="<?=$arrfactura['u_envio_id']?>">
-        <input type="hidden" name="eid" value="<?=$_GET['eid']?>">
         <input type="hidden" name="factura_libre" id="factura_libre" value="<?=$varr_fact_libre['valornum']?>">
         <input type="hidden" name="estado_id" id="estado_id" value="<?=$arrfactura['estado']?>">
 
@@ -91,7 +90,7 @@ $fvencimiento = date('d-m-Y',$fvencimiento_t);
                 <!-- datos emidor -->
                 <div class="contenedor_formulario_column">
                     <div class="formulario_grupo_row" style="width:100px;">
-                        <label for="emisornro">NIT EMISOR</label>
+                        <label for="emisornro">RNC EMISOR</label>
                         <input type="text" class="formulario_control" id="emisornro" name="emisornro" value="<?=$arrfactura['emisornro']?>" readonly>
                     </div>
                     <div class="formulario_grupo_row" style="width:400px;">
@@ -103,7 +102,7 @@ $fvencimiento = date('d-m-Y',$fvencimiento_t);
                 <!-- datos del pagador -->
                 <div class="contenedor_formulario_column">
                     <div class="formulario_grupo_row" style="width:100px;">
-                        <label for="clientenro">NIT CLIENTE</label>
+                        <label for="clientenro">RNC CLIENTE</label>
                         <input type="text" class="formulario_control" id="clientenro" name="clientenro" value="<?=$arrfactura['identificacion']?>" readonly>
                     </div>
                     <div class="formulario_grupo_row" style="width:400px;">
@@ -138,7 +137,7 @@ $fvencimiento = date('d-m-Y',$fvencimiento_t);
 
                 <div class="contenedor_formulario_column">
                     <div class="formulario_grupo_row" style="width:100px;">
-                        <label for="impuestoventa">IVA</label>
+                        <label for="impuestoventa">ITBIS</label>
                         <input type="text" class="formulario_control" id="impuestoventa" name="impuestoventa" value="<?=number_format($arrfactura['impuestoventa'],2,'.',',')?>" style="text-align: right;" readonly>
                     </div>
                     <div class="formulario_grupo_row" style="width:100px;">

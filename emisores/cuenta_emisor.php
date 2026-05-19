@@ -10,7 +10,7 @@ require("../lib-trans/factura.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'CUENTAEMISOR';
     require("../lib/valida-acceso.php");
@@ -21,7 +21,7 @@ require("../lib-trans/factura.php");
         }
     </script>
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $objfactura = new factura;
@@ -37,7 +37,7 @@ if (isset($_POST['femision'])){
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     date_default_timezone_set("America/Lima");
     $menu = 'emisores/cuenta_emisor.php';
     //------ PARTE SUPERIOR ------
@@ -65,7 +65,7 @@ if (isset($_POST['femision'])){
         </ul>
         </form>
     </div>
-    <?
+    <?php
     $v_nregistros = $objfactura->get_financiamiento_xemisor($_SESSION['user']['empresaid'],$ffinicio,'count');
 
     if ($v_nregistros <= 0){
@@ -82,7 +82,7 @@ if (isset($_POST['femision'])){
                         <tr>
                             <th scope="col">OPERACION ID</th>
                             <th scope="col">FACTURA</th>
-                            <th scope="col">NIT</th>
+                            <th scope="col">RNC</th>
                             <th scope="col">CLIENTE</th>
                             <th scope="col">MONEDA</th>
                             <th scope="col">ADELANTO</th>

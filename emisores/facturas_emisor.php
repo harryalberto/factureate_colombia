@@ -9,7 +9,7 @@ require("../lib-trans/maestros.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'FACTURAS';
     require("../lib/valida-acceso.php");
@@ -45,7 +45,7 @@ require("../lib-trans/maestros.php");
         }
     </script>
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $objmaestro = new maestros;
@@ -82,8 +82,8 @@ $v_empresaid = $_SESSION['user']['empresaid'];
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
-    date_default_timezone_set("America/Lima");
+<?php
+    date_default_timezone_set($_SESSION['user']['zona_horaria']);
     $menu = 'emisores/facturas_emisor.php';
     //------ PARTE SUPERIOR ------
     require("../lib/superior.php");
@@ -97,7 +97,7 @@ $v_empresaid = $_SESSION['user']['empresaid'];
     <div class="frmtransaccion">
         <form name='frm' method='post' id='frm' action="facturas_emisor.php">
         <ul>
-            <?
+            <?php
             if ($filtroestado == 'on'){
                 echo '<li>Estado Factura:</li>
                     <li><select name="estadoid" class="formulario_control" id="estadoid">';
@@ -135,8 +135,8 @@ $v_empresaid = $_SESSION['user']['empresaid'];
         </ul>
         </form>
     </div>
-    <div id="content2"><? require('pagina_facturas_emisor.php'); ?></div>
-    <?
+    <div id="content2"><?php require('pagina_facturas_emisor.php'); ?></div>
+    <?php
     if ($total_paginas > 1) {
         echo '<div class="pagination">';
         echo '  <ul>';

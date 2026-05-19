@@ -1,4 +1,4 @@
-<?
+<?php
 class factura{
     function graba_factura($arrfactura){
         $cfact = new db_param_trans;
@@ -66,7 +66,7 @@ class factura{
                             'calificacion' => $obj->faccalificacion,        'colorriesgo' => $obj->faccolorriesgo,
                             'motivorechazo' => $obj->facmotivorechazo,      'u_envio_id' => $obj->u_envio_id,
                             'porciento_adelanto' => $obj->porciento_adelanto, 
-                            'riesgo_factura_id' => $obj->riesgo_factura_id, 'riesgo_factura_nombre' => $obj->riesgo_factura_nombre, 
+                            'riesgo_factura_id' => $obj->riesgo_factura_id, 'riesgo_factura_nombre' => $obj->riesgo_factura_nom,
                             'riesgo_factura_calificacion' => $obj->riesgo_factura_calificacion,
                             'riesgo_factura_descripcion' => $obj->riesgo_factura_descripcion, 
                             'riesgo_factura_color' => $obj->riesgo_factura_color,
@@ -457,7 +457,7 @@ class factura{
         }
 
         $conn_1->close();
-        $conn_2->close();
+        //$conn_2->close();
         return $arr_result;
     }
     function relacion_facturas_indicador($p_tipo){
@@ -495,7 +495,7 @@ class factura{
         }
 
         $conn_1->close();
-        $conn_2->close();
+        //$conn_2->close();
         return $arr_result;
     }
     function comunica_pagador($p_empresaid, $p_facturaid){
@@ -1026,6 +1026,52 @@ class factura{
         return $varr_result;
     }
 
+    function registra_factura_temp ($parr_datos){
+        $conn = new db_param_trans; $conn->connect();
+        $conn2 = new db_param_trans; $conn2->connect();
 
+        $idqry = $conn->query("select nextval ('s_factura_temp') as ft_id");
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+        $v_ft_id = $obj->ft_id;
+
+        $qry = "insert into factura_temp (id, nro_factura, moneda_id, cliente_doc, cliente_nom, f_emision, f_vencimiento, subtotal, anticipos, descuentos, valor_venta,
+                                        itbis, otros, total, xml_path, xml_name, retenciones)
+                values (".$v_ft_id.", '".$parr_datos['nro_factura']."', ".$parr_datos['moneda_id'].", '".$parr_datos['cliente_doc']."', '".$parr_datos['cliente_nom']."',
+                        '".$parr_datos['f_emision']."', '".$parr_datos['f_vencimiento']."', ".$parr_datos['subtotal'].", ".$parr_datos['anticipos'].", ".$parr_datos['descuentos'].",
+                        ".$parr_datos['valor_venta'].", ".$parr_datos['itbis'].", ".$parr_datos['otros'].", ".$parr_datos['total'].", '".$parr_datos['xml_path']."', '".$parr_datos['xml_name']."',
+                        ".$parr_datos['retenciones'].")";
+
+        $idqry = $conn2->query($qry);
+        if (!$idqry) echo pg_last_error($conn2->Link_ID);
+        $conn2->next_record();
+
+        //$conn->close();
+        //$conn2->close();
+
+        return $v_ft_id;
+    }
+
+    function get_factura_temporal($p_ft_id){
+        $conn = new db_param_trans; $conn->connect();
+
+        $qry = "select nro_factura, moneda_id, cliente_doc, cliente_nom, f_emision, f_vencimiento, subtotal, anticipos, descuentos, valor_venta, itbis, otros, total, xml_path, xml_name,
+                        retenciones 
+                from factura_temp
+                where id = ".$p_ft_id;
+
+        $idqry = $conn->query($qry);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+
+        $varr_result = array('nro_factura' => $obj->nro_factura,    'moneda_id' => $obj->moneda_id,         'cliente_doc' => $obj->cliente_doc,     'cliente_nom' => $obj->cliente_nom,
+                            'f_emision' => $obj->f_emision,         'f_vencimiento' => $obj->f_vencimiento, 'subtotal' => $obj->subtotal,           'anticipos' => $obj->anticipos,
+                            'descuentos' => $obj->descuentos,       'valor_venta' => $obj->valor_venta,      'itbis' => $obj->itbis,                 'otros' => $obj->otros,
+                            'total' => $obj->total,                 'xml_path' => $obj->xml_path,           'xml_name' => $obj->xml_name,           'retenciones' => $obj->retenciones);
+
+        $conn->close();
+
+        return $varr_result;
+    }
 }
 ?>

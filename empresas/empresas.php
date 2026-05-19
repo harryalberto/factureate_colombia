@@ -9,7 +9,7 @@ require("../lib-trans/maestros.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'EMPRESAS';
     require("../lib/valida-acceso.php");
@@ -46,7 +46,7 @@ $rowcount = $objmaestro->get_empresas('COUNT', 0, 0, $filtros, '');
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     date_default_timezone_set($_SESSION['user']['zona_horaria']);
     $menu = 'empresas/empresas.php';
     $pagina = 'empresas/empresas.php';

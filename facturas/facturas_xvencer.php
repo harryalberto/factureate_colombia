@@ -9,7 +9,7 @@ require("../lib-trans/maestros.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'FACTURAS';
     require("../lib/valida-acceso.php");
@@ -41,14 +41,14 @@ require("../lib-trans/maestros.php");
             <a href="#" class="closemodal" onclick="closemodal();" style="text-align:center;font-weight:bold;color:#ffffff;font-size: 14px;width:50px;background-color: #e89b24;">Cerrar</a>
         </div>
 </div>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     date_default_timezone_set("America/Lima");
     $menu = 'facturas/facturas_xvencer.php';
     //------ PARTE SUPERIOR ------
@@ -60,7 +60,7 @@ require("../lib-trans/maestros.php");
     <div style="overflow:hidden;text-align:center;font-size: 18px;font-weight: bold;color:#064677;padding:10px;">
         Relaci&oacute;n de Facturas x Vencer
     </div>
-    <div class="listpag"><? require('pagina_facturas_xvencer.php'); ?></div>
+    <div class="listpag"><?php require('pagina_facturas_xvencer.php'); ?></div>
     <!--============ Modal =============-->
     <div class="modal fade" id="myModal" role="dialog">
         <div class="modal-dialog modal-lg modal-dialog-centered">

@@ -1,4 +1,4 @@
-<?
+<?php
 if(isset($_GET['page'])){
     //-------------- cuando cambia de pagina
     $rowcount = $_GET['rowcount'];
@@ -10,6 +10,7 @@ if(isset($_GET['page'])){
 $vobj_sub = new subasta;
 
 $varr_confirmaciones = $vobj_sub->get_confirmaciones($_SESSION['user']['empresaid']);
+$total_paginas = 0;
 
 if ($rowcount < 0){
     $rowcount = count($varr_confirmaciones);

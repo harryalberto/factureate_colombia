@@ -10,7 +10,7 @@ require("../lib-trans/c_subasta.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'SUBASTAS';
     require("../lib/valida-acceso.php");
@@ -66,7 +66,7 @@ $rowcount = $vobj_subasta->get_subastas_v2('COUNT', 0, 0, $filtros,'');
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     date_default_timezone_set($_SESSION['user']['zona_horaria']);
     $menu = 'subastas/subastas.php';
     //------ PARTE SUPERIOR ------

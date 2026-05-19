@@ -14,7 +14,7 @@
 
         <!-- nombre de usuario version MM -->
         <span class="nombre_usuario_superior">
-            <?
+            <?php
             echo $_SESSION['user']['nombre'].' '.$_SESSION['user']['apellido'];
             
             if ($_SESSION['user']['empresaid'] > 0 && $_SESSION['user']['empresaid'] != $_SESSION['user']['usuarioid']) 
@@ -29,7 +29,7 @@
                 <img src="../img/transparente.png" class="transparente_superior_img">
             </li>
             <li style="font-size:12px;color:##064677;padding:5px;color: var(--color-gris-claro);" id="nombre_superior">
-                    <?
+                    <?php
                     echo $_SESSION['user']['nombre'].' '.$_SESSION['user']['apellido'];
                     if ($_SESSION['user']['empresaid'] > 0 && $_SESSION['user']['empresaid'] != $_SESSION['user']['usuarioid']) 
                         echo '('.$_SESSION['user']['empresa'].')';

@@ -1,4 +1,4 @@
-<?
+<?php
 class subasta{
     function get_subastas_disponibles($rows,$rowini,$tipo){
         $conector = new db_param_trans;
@@ -448,32 +448,55 @@ class subasta{
             $idqry = $conector->query("select count(1) as contador from subasta where estado = 23");
             if (!$idqry) echo pg_last_error($conector->Link_ID);
             $obj = $conector->next_record();
+
             $arr_result['count'] = $obj->contador;
-            $idqry = $conector2->query("SELECT max(current_date - subasta.fcreacion) as maximo, parametros.valor_num from subasta, parametros where parametros.id = 14 and subasta.estado = 23 group by parametros.valor_num");
-            if (!$idqry) echo pg_last_error($conector2->Link_ID);
-            $obj2 = $conector2->next_record();
-            $arr_result['maximo'] = $obj2->maximo;
-            $arr_result['parametro'] = $obj2->valor_num;
+
+            if ($obj->contador > 0){
+                $idqry = $conector2->query("SELECT max(current_date - subasta.fcreacion) as maximo, parametros.valor_num from subasta, parametros where parametros.id = 14 and subasta.estado = 23 group by parametros.valor_num");
+                if (!$idqry) echo pg_last_error($conector2->Link_ID);
+                $obj2 = $conector2->next_record();
+
+                $arr_result['maximo'] = $obj2->maximo;
+                $arr_result['parametro'] = $obj2->valor_num;
+            } else {
+                $arr_result['maximo'] = 0;
+                $arr_result['parametro'] = 0;
+            }
         } elseif ($p_tipo == 'ACTIVAS'){
             $idqry = $conector->query("select count(1) as contador from subasta where estado = 24");
             if (!$idqry) echo pg_last_error($conector->Link_ID);
             $obj = $conector->next_record();
+
             $arr_result['count'] = $obj->contador;
-            $idqry = $conector2->query("SELECT max(current_date - subasta.ffin) as maximo, parametros.valor_num from subasta, parametros where parametros.id = 3 and subasta.estado = 24 group by parametros.valor_num");
-            if (!$idqry) echo pg_last_error($conector2->Link_ID);
-            $obj2 = $conector2->next_record();
-            $arr_result['maximo'] = $obj2->maximo;
-            $arr_result['parametro'] = $obj2->valor_num;
+
+            if ($obj->contador > 0){
+                $idqry = $conector2->query("SELECT max(current_date - subasta.ffin) as maximo, parametros.valor_num from subasta, parametros where parametros.id = 3 and subasta.estado = 24 group by parametros.valor_num");
+                if (!$idqry) echo pg_last_error($conector2->Link_ID);
+                $obj2 = $conector2->next_record();
+
+                $arr_result['maximo'] = $obj2->maximo;
+                $arr_result['parametro'] = $obj2->valor_num;
+            } else {
+                $arr_result['maximo'] = 0;
+                $arr_result['parametro'] = 0;
+            }
         } elseif ($p_tipo == 'COMPENSACION'){
             $idqry = $conector->query("select count(1) as contador from subasta where estado = 25");
             if (!$idqry) echo pg_last_error($conector->Link_ID);
             $obj = $conector->next_record();
+
             $arr_result['count'] = $obj->contador;
-            $idqry = $conector2->query("SELECT max(current_date - subasta.ffin) as maximo, parametros.valor_num from subasta, parametros where parametros.id = 16 and subasta.estado = 25 group by parametros.valor_num");
-            if (!$idqry) echo pg_last_error($conector2->Link_ID);
-            $obj2 = $conector2->next_record();
-            $arr_result['maximo'] = $obj2->maximo;
-            $arr_result['parametro'] = $obj2->valor_num;
+
+            if ($obj->contador > 0){
+                $idqry = $conector2->query("SELECT max(current_date - subasta.ffin) as maximo, parametros.valor_num from subasta, parametros where parametros.id = 16 and subasta.estado = 25 group by parametros.valor_num");
+                if (!$idqry) echo pg_last_error($conector2->Link_ID);
+                $obj2 = $conector2->next_record();
+                $arr_result['maximo'] = $obj2->maximo;
+                $arr_result['parametro'] = $obj2->valor_num;
+            } else {
+                $arr_result['maximo'] = 0;
+                $arr_result['parametro'] = 0;
+            }
         } elseif ($p_tipo == 'COMPENSADA'){
             $idqry = $conector->query("select * from KPI_SUB_COMPENSADA()");
             if (!$idqry) echo pg_last_error($conector->Link_ID);
@@ -489,7 +512,7 @@ class subasta{
         }
 
         $conector->close();
-        $conector2->close();
+        //$conector2->close();
         return $arr_result;
     }
     function ordena_transferencia_financiamiento_autm($p_subasta_id, $p_factura_id, $p_path){
@@ -908,7 +931,7 @@ class subasta{
             $varr_subastas = $obj->contador;
         }
         
-        $conector->close(); $consulta->close(); $conn_risk->close(); $conn_sector->close(); $conn_time->close();
+        //$conector->close(); $consulta->close(); $conn_risk->close(); $conn_sector->close(); $conn_time->close();
 
         return $varr_subastas;
     }

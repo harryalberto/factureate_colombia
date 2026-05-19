@@ -20,30 +20,16 @@ if ($_SESSION['user']['tipousuario'] == 3){     //emisor
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'PANELEMI';
     require("../lib/valida-acceso.php");
-?>
-    <script type="text/javascript">
-        function subirxml(dato){
-            var v_var = 1;
-        }
-        function enviaxml(p_dato){
-            var v_archivo = document.getElementById('xmlfile');
-            var v_ruta = v_archivo.value;
-            var v_ext = /(.xml|.pdf)$/i;
 
-            if (!v_ext.exec(v_ruta)){
-                alert('La extension del archivo no valida');
-                v_archivo.value = '';
-                return false;
-            } else document.frm.submit();
-        }
-    </script>
-    <?echo $redir;?>
+    echo $redir;
+?>
+
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $objfactura = new factura;
@@ -61,7 +47,7 @@ $filtros = '';
 $rowcount = $objfactura->get_facturas_activas_xemisor('COUNT', 0, 0, $filtros,'', $_SESSION['user']['empresaid']);
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     date_default_timezone_set($_SESSION['user']['zona_horaria']);
     $menu = 'emisores/panel_emisor.php';
     //------ PARTE SUPERIOR ------
@@ -73,7 +59,7 @@ $rowcount = $objfactura->get_facturas_activas_xemisor('COUNT', 0, 0, $filtros,''
     
     <!--================== INDICADORES EMISOR
     ==================================================== -->
-<?
+<?php
     $v_registradas = $objfactura->get_count_facturas_xestadoemisor($_SESSION['user']['empresaid'],11,0);
     $v_ensolicitud = $objfactura->get_count_facturas_xestadoemisor($_SESSION['user']['empresaid'],12,0);
     $v_subastadas = $objfactura->get_count_facturas_xestadoemisor($_SESSION['user']['empresaid'],-1,18);
@@ -87,7 +73,7 @@ $rowcount = $objfactura->get_facturas_activas_xemisor('COUNT', 0, 0, $filtros,''
                 <p style="text-align:left;color:var(--color-gris-oscuro)">
                     <abbr title="Facturas que se encuentran registradas, están listas para que solicite financiamiento"><span class="icon-eye" style="color:#000000;font-size: 14px;"></span> REGISTRADAS
                     </abbr></p>
-                <p style="margin:10px 0px;text-align:left;font-size:16px;color:#000000;font-weight: bold;"><? echo $v_registradas;?></p>
+                <p style="margin:10px 0px;text-align:left;font-size:16px;color:#000000;font-weight: bold;"><?php echo $v_registradas;?></p>
                 <p style="margin:10px 0px;text-align:left;color:var(--color-gris-oscuro)">Factura(s)</p>
             </li>
 
@@ -96,7 +82,7 @@ $rowcount = $objfactura->get_facturas_activas_xemisor('COUNT', 0, 0, $filtros,''
                 <p style="text-align:left;color:var(--color-gris-oscuro)">
                     <abbr title="Facturas que se encuentran siendo analizadas por nuestro equipo"><span class="icon-eye" style="color:#000000;font-size: 14px;"></span> EN SOLICITUD
                     </abbr></p>
-                <p style="margin:10px 0px;text-align:left;font-size:16px;color:#000000;font-weight: bold;"><? echo $v_ensolicitud;?></p>
+                <p style="margin:10px 0px;text-align:left;font-size:16px;color:#000000;font-weight: bold;"><?php echo $v_ensolicitud;?></p>
                 <p style="margin:10px 0px;text-align:left;color:var(--color-gris-oscuro)">Factura(s)</p>
             </li>
 
@@ -105,7 +91,7 @@ $rowcount = $objfactura->get_facturas_activas_xemisor('COUNT', 0, 0, $filtros,''
                 <p style="text-align:left;color:var(--color-gris-oscuro)">
                     <abbr title="Facturas que se encuentran en subasta, en cualquien momento le conseguimos financiamiento"><span class="icon-eye" style="color:#000000;font-size: 14px;"></span> EN SUBASTA
                     </abbr></p>
-                <p style="margin:10px 0px;text-align:left;font-size:16px;color:#000000;font-weight: bold;"><? echo $v_subastadas;?></p>
+                <p style="margin:10px 0px;text-align:left;font-size:16px;color:#000000;font-weight: bold;"><?php echo $v_subastadas;?></p>
                 <p style="margin:10px 0px;text-align:left;color:var(--color-gris-oscuro)">Consiguiendo financiamiento</p>
             </li>
 
@@ -114,30 +100,25 @@ $rowcount = $objfactura->get_facturas_activas_xemisor('COUNT', 0, 0, $filtros,''
                 <p style="text-align:left;color:var(--color-gris-oscuro)">
                     <abbr title="Facturas que se entregó el adelanto, y si ya pagó su cliente ya recibió el remanente"><span class="icon-eye" style="color:#000000;font-size: 14px;"></span> FINANCIADAS
                     </abbr></p>
-                <p style="margin:10px 0px;text-align:left;font-size:16px;color:#000000;font-weight: bold;"><? echo $v_financiadas;?></p>
+                <p style="margin:10px 0px;text-align:left;font-size:16px;color:#000000;font-weight: bold;"><?php echo $v_financiadas;?></p>
                 <p style="margin:10px 0px;text-align:left;color:var(--color-gris-oscuro)">Obtuvieron financiamiento</p>
             </li>
         </ul>
 
         <!--================== OPCIONES ==================== -->
         <ul style="overflow:hidden;list-style:none;padding-left: 5px;margin-left: 20px;">
-            <li style="display:block;float:left;font-size:14px;color:#064677;font-weight: bold;">Facturas activas:</li>
             <li style="display:block;float:left;margin-left: 10px;">
-                <button type="button" class="btn btn-primary" style="font-size:11px;background-color:var(--color-azulv2);border:none;" onclick="registrarFF()"><i class="fa-solid fa-file-pen"></i> Registrar factura fisica</button>
+                <button type="button" class="btn btn-primary" style="font-size:11px;background-color:var(--color-azulv2);border:none;" onclick="registrarFF()"><i class="fa-solid fa-file-pen"></i> Registrar factura manual</button>
             </li>
 <?php
     if ($varr_fe['valornum'] > 0) echo '
-            <li style="display:block;float:left;margin-left: 10px;">
-                <form name="frm" method="post" id="frm" enctype="multipart/form-data" action="registro_factura_electronica.php">
-
-                <input type="hidden" name="tipo" value="enew">
-                <a href=javascript:enviaxml("xml")><span class="icon-upload"></span> Factura electronica</a>
+            <li style="display:block;float:left;margin-left: 20px; font-size: 12px; background-color:var(--color-verde); padding: 5px; color:#fff;">
+                <span class="icon-upload"></span> Cargar Factura electronica
             </li>
 
             <li style="display:block;float:left;margin-left: 10px;">
-                <input name="xmlfile" type="file" id="xmlfile" style="font-size:10px;color:#555555;width:200px;" onchange="javascript:subirxml()">
-                
-                </form>
+                <input type="hidden" name="tipo" value="enew">
+                <input name="xmlfile" type="file" id="xmlfile" style="font-size:12px;color:#555555;width:200px; padding:5px;" onchange="javascript:subirxml()">
             </li>';
 ?>
         </ul>
@@ -356,6 +337,65 @@ $rowcount = $objfactura->get_facturas_activas_xemisor('COUNT', 0, 0, $filtros,''
         function refresh_page(){
             location.href = "panel_emisor.php";
         }
+
+        function subirxml(){
+            let archivo = document.getElementById("xmlfile").files[0];
+            var procede = 1;
+
+            if(!archivo){
+                alert('Debe seleccionar un archivo XML');
+                procede = 0;
+            }
+
+            // validando la extension
+            const nombre = archivo.name.toLowerCase();
+
+            if(!nombre.endsWith('.xml') && !nombre.endsWith('.xsd')){
+                alert('Debe seleccionar un archivo XML');
+                e.target.value = '';
+                procede = 0;
+            }
+
+            if (procede == 1){
+                const formData = new FormData();
+
+                formData.append('xml', archivo);
+
+                $.ajax({
+                    url: 'leer_factura_electronica.php',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false
+                })
+                .done(function(rpta){
+                    if (rpta <= 0){
+                        if (rpta == 0) alert('El contenido del archivo no es valido, verifique por favor');
+                        if (rpta == -1) alert('Sus datos como Emisor no coinciden con los de la factura');
+                        if (rpta == -2) alert('Los datos de su cliente no coincide con los datos que tenemos en nuestra base de datos, comuniquese con operaciones por favor');
+                        if (rpta == -3) alert('La factura que intenta cargar no cumple con los minimos de montos minimos de Factureate');
+                        if (rpta == -4) alert('El tipo de documento electronico que intenta cargar no es admitido por Factureate');
+                    } else {
+                        $('.modal-title').text('Nueva factura electrónica');
+                        $('.modal-body').load('registro_factura_electronica_modal.php?idtemp='+rpta,function(){
+                            $('#FINANVIEW').modal({show:true});
+                        });
+                    }
+                });
+            }
+        }
+
+        function cambia_modal_factura(factura_id){
+            // CIERRA MODEL DE FELECTRONICA
+            $('#FINANVIEW').removeClass('in');
+            $('#FINANVIEW').hide();
+            $('body').removeClass('modal-open');
+            $('.modal-backdrop').remove();
+
+            //APERTURA DEL MODAL CON LA FACTURA YA GUARDADA
+            verDetalle(factura_id, 11, 0);
+        }
+
     </script>
     <!---=============== end modal ==============--->
 </BODY>

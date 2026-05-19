@@ -3,7 +3,7 @@
     else $v_heigth_menu = '';
 ?>
 
-<div class="menu_superior" <?echo $v_heigth_menu;?>>
+<div class="menu_superior" <?php echo $v_heigth_menu;?>>
     <ul>
 
 <?php

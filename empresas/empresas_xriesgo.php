@@ -9,14 +9,14 @@ require("../lib-trans/maestros.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'EMPRESAS';
     require("../lib/valida-acceso.php");
 ?>
 
 </HEAD>
-<?
+<?php
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //@@@@@@@@@@@@@@@@@@@ LOGICA
 $objmaestro = new maestros;
@@ -62,7 +62,7 @@ $rowcount = $objmaestro->get_empresas_xestadoriesgo($varr_estados['PENDIENTES'],
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     date_default_timezone_set($_SESSION['user']['zona_horaria']);
     $menu = 'empresas/empresas_xriesgo.php';
     $pagina = 'empresas/empresas_xriesgo.php';

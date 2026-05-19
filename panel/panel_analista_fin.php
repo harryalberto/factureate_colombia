@@ -12,13 +12,13 @@ require("../lib-trans/c_inversiones.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'PANELANALI_FIN';
     require("../lib/valida-acceso.php");
 ?>
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $obj_factura = new factura;
@@ -41,7 +41,7 @@ $v_verde = '1F9A8E';
 //########## TRANSFERENCIAS POR REVISAR /   EMPRESAS POR EVALUAR    /   TRANSITO
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     date_default_timezone_set("America/Santo_Domingo");
     $menu = 'panel/panel_analista_fin.php';
     //------ PARTE SUPERIOR ------
@@ -63,7 +63,7 @@ $v_verde = '1F9A8E';
                     Operaciones en compensación <span class="icon-eye" style="color:#000000;font-size: 14px;"></span>
                     </abbr></p>
                 <p>
-                    <a href="../subastas/subastas_comp.php"><span class="icon-bell" style="font-size: 14px;"></span> En compensación: <b style="font-size:16px;"><?echo $v_arr_sub_encomp['count'];?></b></a>
+                    <a href="../subastas/subastas_comp.php"><span class="icon-bell" style="font-size: 14px;"></span> En compensación: <b style="font-size:16px;"><?php echo $v_arr_sub_encomp['count'];?></b></a>
                 </p>
     <?php
         if ($v_arr_sub_encomp['count_alert'] > 0) echo '
@@ -83,7 +83,7 @@ $v_verde = '1F9A8E';
                     Operaciones compensadas <span class="icon-eye" style="color:#000000;font-size: 14px;"></span>
                     </abbr></p>
                 <p>
-                    <a href="../subastas/subastas_comp.php"><span class="icon-bell" style="font-size: 14px;"></span> Operaciones compensadas: <b style="font-size:16px;"><?echo $v_arr_sub_comp['count'];?></b></a>
+                    <a href="../subastas/subastas_comp.php"><span class="icon-bell" style="font-size: 14px;"></span> Operaciones compensadas: <b style="font-size:16px;"><?php echo $v_arr_sub_comp['count'];?></b></a>
                 </p>
     <?php
         if ($v_arr_sub_comp['count_alert'] > 0) echo '
@@ -103,7 +103,7 @@ $v_verde = '1F9A8E';
                     Operaciones que estan proximas a vencer dentro de <?php echo $v_arr_xvencer['parametro'].' días';?><span class="icon-eye" style="color:#000000;font-size: 14px;"></span>
                     </abbr></p>
                 <p>
-                    <a href="../facturas/facturas_xvencer.php"><span class="icon-bell" style="font-size: 14px;"></span> Operaciones x Vencer: <b style="font-size:16px;"><?echo $v_arr_xvencer['count'];?></b></a>
+                    <a href="../facturas/facturas_xvencer.php"><span class="icon-bell" style="font-size: 14px;"></span> Operaciones x Vencer: <b style="font-size:16px;"><?php echo $v_arr_xvencer['count'];?></b></a>
                 </p>
             </li>
     <?php
