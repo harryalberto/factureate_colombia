@@ -1,0 +1,617 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+:root{
+    --color-gris-claro: #DDDDDD;
+    --color-azul: #064677;
+    --color-oro: #e89b24;
+    --color-rojo: #b30a1f;
+    --color-azul-menu: #3F5165;
+    --coor-azul-oscuro: #232E3B;
+}
+*{
+    margin:0px;
+    padding:0px;
+}
+body{
+    background-color:#ffffff;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+	font-size:12px;
+	text-align:left;
+    height: 100%;
+}
+/*==================================================================================================
+********************************* HEADER 
+===================================================================================================*/
+header{
+    width:100%;
+    background-color:#ffffff;
+    overflow:hidden;
+}
+header nav{
+    width:80%;
+    max-width:1000px;
+    margin:0px auto;
+    background-color:#ffffff;
+    float: right;
+}
+header nav ul{
+    overflow:hidden; /* para que no se superpongan los div o secciones */
+    list-style:none;
+}
+header nav ul li{
+    float:left; /* cada elemento li se pone uno al lado del otro */
+}
+header nav ul li a{
+    color:#064677;
+    padding: 8px 23px;
+    display: block; /* con esto hace efecto el padding a los 4 lados */
+    text-decoration:none;
+    font-size:14px;
+    font-weight: bold;
+}
+header nav ul li span{
+    margin-right:10px;
+}
+header nav ul li a:hover{
+    color:#064677;
+}
+.logo-menu_img{
+    /*border-radius:8px;*/
+    color:#ffffff;
+}
+
+/*==================================================================================================
+********************************* MENU IZQUIERDA
+===================================================================================================*/
+.menu_izquierda{
+    width:150px;
+    height:100%;
+    background-color:#2B394A;
+    float: left;
+    display: block;
+    justify-content: flex-start;
+    overflow: hidden;
+    flex-direction: column;
+    font-size: 14px;
+}
+.menu_izquierda ul{
+    list-style:none;
+    margin: 0;
+    padding: 0;
+}
+.menu_izquierda ul li{
+    text-align:left;
+    padding-left: 10px;
+}
+.menu_izquierda ul li a{
+    color:#ffffff;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    display: block;
+    text-decoration: none;
+    font-size: 10px;
+}
+.menu_izquierda ul li span{
+    margin-right: 10px;
+}
+.menu_izquierda ul li:hover{
+    background-color: #e89b24;
+    color:#000000;
+}
+.menu_izquierda ul li a:hover{
+    background-color: #e89b24;
+    color:#000000;
+}
+
+/*###############################################################################################*/
+/*---- formulario ----*/
+.formulario{
+    font-size: 10px;
+    margin: 20px auto;
+    /*background-color:#efefef;*/
+    overflow:hidden;
+}
+.formulario ul{
+    list-style:none;
+}
+.boton{
+    border-color: #DDDDDD;
+    border-style: solid;
+    border-width: 1px 1px 1px 1px;
+    line-height: 15px;
+    padding: 0 10px;
+    text-decoration: none;
+	cursor:pointer;
+	color: #ffffff;
+	background-color: #e89b24;
+	border-radius: 6px;
+	padding: 5px;
+	text-align:center;
+}
+.boton a{
+    color:#ffffff;
+}
+
+
+/*==============================================================================
+************* ZONA RESIZE ******************************************************
+===============================================================================*/
+@media screen and (max-width:800px){ /* de 800 para abajo el menu cambia a modo responsive */
+    .logo-menu_img{
+        max-width:80%;
+    }
+}
+
+.frmtransaccion{
+    font-size: 11px;
+    font-family: 'Helvetica';
+    overflow:hidden;
+    margin:1px auto;
+    padding: 1px 10px;
+}
+.frmtransaccion ul{
+    list-style:none;
+    overflow:hidden;
+}
+.frmtransaccion ul li{
+    float:left;
+    display: block; /* con esto hace efecto el padding a los 4 lados */
+    margin: 1px;
+    padding:2px;
+}
+.botontransaccionazul{
+    border-color: #064677;
+    border-style: solid;
+    border-width: 1px 1px 1px 1px;
+    /*line-height: 15px;*/
+    padding-top: 6px;
+    text-decoration: none;
+	cursor:pointer;
+	color: #ffffff;
+	background-color: #064677;
+	border-radius: 6px;
+	text-align:center;
+    width: 120px;
+    height: 25px;
+    font-size: 11px;
+    text-transform: uppercase;
+    align-items: center;
+}
+.botontransaccionazul a{
+    color:#ffffff;
+}
+.botontransaccionazul a:hover{
+    color:#ffffff;
+}
+.botontransaccionazul:hover{
+    background-color: #005cc8;
+    color:#ffffff;
+}
+.botontransaccion{
+    border-color: #064677;
+    border-style: solid;
+    border-width: 1px 1px 1px 1px;
+    line-height: 15px;
+    padding: 0 10px;
+    text-decoration: none;
+	cursor:pointer;
+	color: #064677;
+	/*background-color: #e89b24;*/
+	border-radius: 6px;
+	padding: 5px;
+	text-align:center;
+    width: 100px;
+}
+.botontransaccion a{
+    color:#064677;
+}
+.botontransaccionoff{
+    border-color: #999999;
+    border-style: solid;
+    border-width: 1px 1px 1px 1px;
+    line-height: 15px;
+    padding: 0 10px;
+    text-decoration: none;
+	cursor:pointer;
+	color: #999999;
+	/*background-color: #e89b24;*/
+	border-radius: 6px;
+	padding: 5px;
+	text-align:center;
+    width: 100px;
+}
+.botontransaccionoff a{
+    color:#999999;
+}
+.botontransaccionrojo{
+    border-color: #b30a1f;
+    border-style: solid;
+    border-width: 1px 1px 1px 1px;
+    /*line-height: 15px;*/
+    padding-top: 6px;
+    text-decoration: none;
+	cursor:pointer;
+	color: #ffffff;
+	background-color: #b30a1f;
+	border-radius: 6px;
+	text-align:center;
+    width: 120px;
+    height: 25px;
+    font-size: 11px;
+    text-transform: uppercase;
+    align-items: center;
+}
+.botontransaccionrojo a{
+    color:#ffffff;
+    text-decoration: none;
+}
+.botontransaccionrojo a:hover{
+    color:#ffffff;
+}
+.botontransaccionrojo:hover{
+    background-color: #fa0f00;
+    color:#ffffff;
+}
+.frm_label{
+    max-width: 100px;
+}
+.frminput_text_off{
+    border-color: #2b2b2b;
+    border-style: solid;
+    border-width: 1px 1px 1px 1px;
+    line-height: 15px;
+    padding: 4 3px;
+    text-decoration: none;
+	/*color: #b30a1f;*/
+	background-color: #d9d9d9;
+	border-radius: 6px;
+	text-align:left;
+}
+.frminput_text{
+    border-color: #2b2b2b;
+    border-style: solid;
+    border-width: 1px 1px 1px 1px;
+    line-height: 15px;
+    padding: 4 3px;
+    text-decoration: none;
+	/*color: #b30a1f;*/
+	background-color: #ffffff;
+	border-radius: 6px;
+	text-align:left;
+}
+.frm_input_off{
+    border-color: #999999;
+    border-style: solid;
+    border-width: 1px 1px 1px 1px;
+    line-height: 15px;
+    padding: 5px 10px;
+    text-decoration: none;
+	cursor:pointer;
+	color: #999999;
+	/*background-color: #e89b24;*/
+	border-radius: 2px;
+	/*text-align:center;*/
+}
+.listado{
+    font-size: 10px;
+    overflow:hidden;
+    margin:5px auto;
+    padding: 10px 40px;
+}
+.listado ul{
+    list-style:none;
+    overflow: hidden;
+}
+.listado ul:hover{
+    background-color: #efefef;
+}
+.listado ul li{
+    float: left;
+    display: block;
+    /*width: 100px;*/
+    /*border-color: #555555;
+    border-style: solid;
+    border-width: 0px 0px 1px 0px;*/
+    padding: 5px;
+    /*text-align: center;*/
+}
+
+.listado_header{
+    text-align: center;
+    font-weight: bold;
+    background-color: #efefef;
+    margin: 1px;
+}
+
+.modalclase{
+    position: fixed;
+    width:50%;
+    height: 90vh;
+    background: rgba(0, 0, 0, 0.81);
+    display: none;
+    margin: auto;
+}
+.bodymodal{
+    width: 100%;
+    height: 100%;
+    display: -webkit-inline-flex;
+    display: -moz-inline-flex;
+    display: -ms-inline-flex;
+    display: -o-inline-flex;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+.bodymodal ul{
+    list-style:none;
+    overflow: hidden;
+}
+.bodymodeal ul li{
+    width: 100%;
+}
+/* estilos de la paginacion */
+.loading {
+    width:100%;
+    text-align:center;
+    margin-top:40px;
+    height:100px;
+}
+.paginate{
+    FONT-SIZE: 12px;
+    color: #00535E;
+    font-weight: bold;
+}
+.pagination {
+    height: 10px;
+    margin: 5px 0;
+}
+.pagination ul {
+    border-radius: 1px 1px 1px 1px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+    display: inline-block;
+    margin-bottom: 5px;
+	margin-left:10px;
+	box-shadow: 0 2px 5px #666666;
+}
+.pagination li {
+    display: inline;
+}
+.pagination a {
+    -moz-border-bottom-colors: none;
+    /*-moz-border-image: none;*/
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    border-color: #DDDDDD;
+    border-style: solid;
+    border-width: 1px 1px 1px 0;
+    float: left;
+    line-height: 15px;
+    padding: 0 10px;
+    text-decoration: none;
+	cursor:pointer;
+}
+.pagination a:hover, .pagination .active a {
+    color:#2d2d28;
+	outline:0;
+	text-decoration:none;
+	font-weight: bold;
+}
+.pagination .active a {
+    color: #999999;
+    cursor: default;
+}
+.pagination .disabled a, .pagination .disabled a:hover {
+    background-color: transparent;
+    color: #999999;
+    cursor: default;
+}
+.pagination li:first-child a {
+    border-left-width: 1px;
+    border-radius: 3px 0 0 3px;
+}
+.pagination li:last-child a {
+    border-radius: 0 3px 3px 0;
+}
+.pagination-centered {
+    text-align: center;
+}
+.pagination-right {
+    text-align: right;
+}
+.boxview{
+    border-color: #1e1e1e;
+    border-style: solid;
+    border-width: 1px 1px 1px 1px;
+    /*line-height: 15px;*/
+    text-decoration: none;
+	cursor:pointer;
+	color: #1e1e1e;
+	/*background-color: #e89b24;*/
+	/*border-radius: 6px;*/
+	/*padding: 5px;*/
+	/*text-align:center;*/
+}
+/*-------------------------------------------------------------------------
+tablas de listado
+-------------------------------------------------------------------------*/
+table tr:hover{
+    background-color: #efefef;
+}
+.listtable{
+    font-size: 10px;
+    overflow:hidden;
+    margin:5px auto;
+    padding: 10px 40px;
+}
+.listtable ul{
+    list-style:none;
+    overflow: hidden;
+}
+.listtable ul li{
+    float: left;
+    display: block;
+    padding: 5px;
+}
+/*-------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------*/
+
+.logo_menu_bar{
+    background-color:#f0f0f1;
+    width:100px;
+}
+.menu_social{
+    height: 25px;
+    width:100%;
+    margin: auto;
+    text-align: left;
+    background-color: #ffffff;
+}
+.menu_social ul{
+    list-style:none;
+}
+.menu_social ul li{
+    float: left;
+}
+.menu_social ul li a{
+    display:block;
+    padding: 5px;
+    text-decoration:none;
+    color:#555555;
+}
+.menu_social ul li span{
+    margin-right: 5px;
+}
+.menu_bar{
+    display:none;
+}
+
+.tablacurso{
+    overflow:hidden;
+    margin: 20px;
+}
+/*---- tabla de precios ----*/
+.tablaprecios{
+    overflow:hidden;
+    margin:10px 0px;
+}
+.tablaprecios ul{
+    list-style:none;
+}
+.tablaprecios ul li{
+    display: block;
+    padding:5px;
+    float:left;
+    border-width:1px 1px 1px 1px;
+    border-color:#000000;
+    border-style:solid;
+    margin:2px 0px;
+    display:inline;
+    height:70px;
+    margin:1px;
+}
+/**.curso{
+    
+}**/
+@media screen and (max-width:800px){ /* de 800 para abajo el menu cambia a modo responsive */
+    .logo_menu_bar{
+        width:20%;
+    }
+    .logo-menu_img{
+        max-width:80%;
+    }
+    .menu_social{
+        display:none;
+    }
+    .resumen{
+        max-width:300px;
+    }
+    .tablacurso ul li{
+        max-width:230px;
+    }
+    .curso{
+        max-width:80px;
+    }
+    .tablaprecios ul li{
+        height:130px;
+    }
+}
+/* --- pilares --- */
+.pilares{
+    overflow:hidden;
+    background-color: #f0f0f1;
+    font-size: 14px;
+    padding: 20px 50px 20px 0px;
+    color:#555555;
+}
+.item-pilar{
+    width:80%;
+    max-width:300px;
+    margin:0px auto;
+    float: left;
+    padding: 10px 30px 10px 30px;
+    text-align:justify;
+}
+.item-pilar a{
+    text-decoration:none;
+    color:#555555;
+}
+.item-pilar a h4{
+    font-size: 20px;
+    color:#555555;
+}
+/* --- resumen de pagina principal --- */
+.resumen{
+    float:right;
+    width:580px;
+    text-align:justify;
+    padding:30px 30px 10px 0px;
+}
+/* --- servicios --- */
+.servicios{
+    padding:0px 20px 0px 20px;
+}
+.servicios ul{
+    display:inline-block;
+}
+.servicios ul li{
+    display:inline-block;
+    width:300px;
+    border-width:1px 1px 1px 1px;
+    border-color:#000000;
+    border-style:solid;
+    text-align:justify;
+    padding:10px 20px;
+    margin: 20px;
+}
+/* --- menu de interiores --- */
+.menu_aux{
+    font-size: 16px;
+    /*font-weight: bold;*/
+    overflow:hidden; /* para que no se superpongan los div o secciones */
+}
+.menu_aux ul{
+    list-style:none;
+}
+.menu_aux ul li{
+    float:left; /* cada elemento li se pone uno al lado del otro */
+}
+.menu_aux ul li a{
+    color:#ffffff;
+    padding: 10px 23px;
+    display: block; /* con esto hace efecto el padding a los 4 lados */
+    text-decoration:none;
+    background-color:#23c0c2;
+    margin: 10px 20px 10px 20px;
+}
+/*---- modulos del curso ----*/
+.tablacurso ul{
+    list-style:none;
+}
+.tablacurso ul li{
+    float:left;
+    margin:10px;
+    padding:5px;
+    background-color:#dcdcdc;
+    width:500px;
+}
