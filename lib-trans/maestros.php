@@ -114,7 +114,7 @@ class maestros{
 
         $parametros = array('valornum'=>$obj->valor_num, 'valorchar'=>$obj->valor_char);
         
-        $conn->close();
+        //$conn->close();
         return $parametros;
     }
     function registro_express_cliente($identificacion,$nombre){
@@ -303,7 +303,7 @@ class maestros{
         if (!$idqry) echo pg_last_error($conn_seg->Link_ID);
         $conn_seg->next_record();
         
-        $conn->close(); $conn2->close(); $conn_seg->close();
+        //$conn->close(); $conn2->close(); $conn_seg->close();
 
         return $empresaid;
     }
@@ -2376,7 +2376,7 @@ class maestros{
         if (!$idqry) echo pg_last_error($conn->Link_ID);
         $conn->next_record();
 
-        $conn->close();
+        //$conn->close();
     }
 
     function envia_inversor($p_inversor_id){

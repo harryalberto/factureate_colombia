@@ -1,14 +1,14 @@
-<?
+<?php
 class seguridad_trans{
     function valida_existe_empresa($identificacion){
-        $conector = new db_param_trans;
-        $conector->connect();
+        $conector = new db_param_trans; $conector->connect();
+        // COUNT SI EXISTE
         $idqry = $conector->query("select SEG_EXISTE_EMPRESA_IDENTIFICACION ('".$identificacion."') as contador");
         if (!$idqry) echo pg_last_error($conector->Link_ID);
         $obj = $conector->next_record();
         $contador = $obj->contador;
 
-        $conector->close();
+        //$conector->close();
         return $contador;
     }
 
@@ -41,7 +41,8 @@ class seguridad_trans{
 
             if ($varr_usuario_result['usuarioid'] != -200){
                 //@@@@ PATH DESTINO DE ARCHIVO DE CEDULA
-                $v_carpeta_destino = '../archivos/INV_'.$parr_datos['nombre'].'_'.$parr_datos['a_paterno'].'_'.$parr_datos['a_materno'].'_'.$parr_datos['nro_doc'];
+                //$v_carpeta_destino = '../archivos/INV_'.$parr_datos['nombre'].'_'.$parr_datos['a_paterno'].'_'.$parr_datos['a_materno'].'_'.$parr_datos['nro_doc'];
+                $v_carpeta_destino = $_SERVER['DOCUMENT_ROOT'].'/archivos/INV_'.$parr_datos['nombre'].'_'.$parr_datos['a_paterno'].'_'.$parr_datos['a_materno'].'_'.$parr_datos['nro_doc'];
                 if (!is_dir($v_carpeta_destino)) mkdir($v_carpeta_destino, 0777, true);
 
                 $v_carpeta_vincula = $v_carpeta_destino.'/vinculacion';

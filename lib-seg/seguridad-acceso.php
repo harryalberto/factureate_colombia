@@ -227,12 +227,14 @@ class seguridad{
 
         $resultado = array('usuarioid' => $obj->usuarioid, 'identificacion' => $identificacion, 'password' => $v_pass);
 
-        //==== se iguala el secuencial de empresas con usuarios
-        $idqry = $conn_trans->query("select nextval('sempresa') as secuencial");
-        if (!$idqry) echo pg_last_error($conn_trans->Link_ID);
-        $conn_trans->next_record();
+        if ($obj->usuarioid != -200){
+            //==== se iguala el secuencial de empresas con usuarios
+            $idqry = $conn_trans->query("select nextval('sempresa') as secuencial");
+            if (!$idqry) echo pg_last_error($conn_trans->Link_ID);
+            $conn_trans->next_record();
+        }
 
-        $conn->close(); $conn_exe->close();
+        //$conn->close(); $conn_exe->close();
         return $resultado;
     }
     function get_submenu($menuid, $perfilid){
