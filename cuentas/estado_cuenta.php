@@ -71,6 +71,7 @@ if ($_SESSION['user']['empresaid'] > 0){
     }
 } else $v_titular = 'true';
 
+$v_detalle_saldoi = '';
 /*--------------------------------------------------------*/
 ?>
 

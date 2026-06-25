@@ -13,7 +13,7 @@ require("../lib-trans/c_cuentas.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'INVERSIONES';
     require("../lib/valida-acceso.php");
@@ -23,7 +23,7 @@ require("../lib-trans/c_cuentas.php");
 
 <!--##########################################-->
 </HEAD>
-<?
+<?php
 //############# LOGICA PAGINA ##################
 $vobj_mae = new maestros;
 $vobj_seg = new seguridad;
@@ -60,7 +60,7 @@ if ($varr_inversor['estado_id'] == 7 || $varr_inversor['estado_id'] == 8 || $var
 //##############################################
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     $menu = 'inversionistas/perfil_inversor.php';
     //------ PARTE SUPERIOR ------
     require("../lib/superior.php");

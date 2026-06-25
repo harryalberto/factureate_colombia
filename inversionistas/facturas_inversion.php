@@ -13,7 +13,7 @@ require("../lib-trans/c_cuentas.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'INVERSIONES';
     require("../lib/valida-acceso.php");
@@ -48,14 +48,15 @@ require("../lib-trans/c_cuentas.php");
         }
     </script>
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
-
+$total_paginas = 0;
+$v_saldo_pendiente = 0;
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     date_default_timezone_set("America/Lima");
     $menu = 'inversionistas/facturas_inversion.php';
     //------ PARTE SUPERIOR ------
@@ -68,8 +69,8 @@ require("../lib-trans/c_cuentas.php");
         Inversiones realizadas
     </div>
     
-    <div id="content2"><? require('pagina_facturas_inversion.php'); ?></div>
-    <?
+    <div id="content2"><?php require('pagina_facturas_inversion.php'); ?></div>
+    <?php
     if ($total_paginas > 1) {
         echo '<div class="pagination">';
         echo '  <ul>';

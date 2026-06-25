@@ -13,17 +13,14 @@ require("../lib-trans/c_cuentas.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'INVERSIONES';
     require("../lib/valida-acceso.php");
 ?>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<!--########### ZONA SCRIPTS JS ##############-->
-
-<!--##########################################-->
 </HEAD>
-<?
+<?php
 //############# LOGICA PAGINA ##################
 $vobj_mae = new maestros;
 $vobj_seg = new seguridad;
@@ -55,7 +52,7 @@ if ($varr_inversor['estado_id'] == 7 || $varr_inversor['estado_id'] == 8 || $var
 //##############################################
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     $menu = 'inversionistas/perfil_inversor.php';
     //------ PARTE SUPERIOR ------
     require("../lib/superior.php");
@@ -152,21 +149,8 @@ if ($varr_inversor['estado_id'] == 7 || $varr_inversor['estado_id'] == 8 || $var
                 <div class="formulario_grupo_row" style="width:200px;">
                     <label for="tipo_doc_nom">Tipo Documento</label>
 <?php
-    /*if ($varr_inversor['estado_id'] == 6){      // REGISTRADO
-        echo '      <select id="tipo_doc_nom" name="tipo_doc_nom" class="formulario_control">';
-
-        for ($i=0; $i<count($varr_tipodoc); $i++){
-            if ($varr_tipodoc[$i]['id'] == $varr_usuario['tipodoc'])
-                echo '      <option value="'.$varr_tipodoc[$i]['id'].'" selected>'.$varr_tipodoc[$i]['nombre'].'</option>';
-            else
-                echo '      <option value="'.$varr_tipodoc[$i]['id'].'">'.$varr_tipodoc[$i]['nombre'].'</option>';
-        }
-
-        echo '      </select>';
-    } else{*/
         echo '      <input type="text" class="formulario_control" id="tipo_doc_nom" name="tipo_doc_nom" value="'.$varr_usuario['tipodoc_nombre'].'" readonly>
                     <input type="hidden" id="tipo_doc" name="tipo_doc" value="'.$varr_usuario['tipodoc'].'">';
-    //}
 ?>                
                 </div>
 <?php
@@ -179,12 +163,12 @@ if ($varr_inversor['estado_id'] == 7 || $varr_inversor['estado_id'] == 8 || $var
 ?>                
                 <div class="formulario_grupo_row" style="width:100px;">
                     <label for="nro_doc">Nro Documento</label>
-                    <input type="text" class="formulario_control" id="nro_doc" name="nro_doc" value="<?=$varr_usuario['identificacion']?>" <?echo $v_readonly;?>>
+                    <input type="text" class="formulario_control" id="nro_doc" name="nro_doc" value="<?=$varr_usuario['identificacion']?>" <?php echo $v_readonly;?>>
                     <input type="hidden" name="archivo_documento" id="archivo_documento" value="<?=$varr_inversor['documento']?>">
                 </div>
                 <div class="formulario_grupo_row" style="width:50px;">
                     <label for="doc">Doc</label>
-                    <span id="doc"><?echo $v_documento_identidad;?></span>
+                    <span id="doc"><?php echo $v_documento_identidad;?></span>
                 </div>
             
             </div> <!-- INFORMACION PERSONAL -->
@@ -194,11 +178,11 @@ if ($varr_inversor['estado_id'] == 7 || $varr_inversor['estado_id'] == 8 || $var
 
                 <div class="formulario_grupo_row" style="width:200px;">
                     <label for="email_persona">Email</label>
-                    <input type="text" class="formulario_control" id="email_persona" name="email_persona" value="<?=$varr_usuario['email']?>" style="transition: var(--color-gris-oscuro) .15s easy-in-out;<?echo $v_mail_color;?>" onkeypress="focusFunction(this)" onchange="focusFunction(this)" <?echo $v_readonly;?>>
+                    <input type="text" class="formulario_control" id="email_persona" name="email_persona" value="<?=$varr_usuario['email']?>" style="transition: var(--color-gris-oscuro) .15s easy-in-out;<?php echo $v_mail_color;?>" onkeypress="focusFunction(this)" onchange="focusFunction(this)" <?php echo $v_readonly;?>>
                 </div>
                 <div class="formulario_grupo_row" style="width:100px;">
                     <label for="telefono_persona">Telefono</label>
-                    <input type="text" class="formulario_control" id="telefono_persona" name="telefono_persona" value="<?=$varr_inversor['telefono']?>" style="transition: var(--color-gris-oscuro) .15s easy-in-out;<?echo $v_telefono_color;?>" onkeypress="focusFunction(this)" onchange="focusFunction(this)" <?echo $v_readonly;?>>
+                    <input type="text" class="formulario_control" id="telefono_persona" name="telefono_persona" value="<?=$varr_inversor['telefono']?>" style="transition: var(--color-gris-oscuro) .15s easy-in-out;<?php echo $v_telefono_color;?>" onkeypress="focusFunction(this)" onchange="focusFunction(this)" <?php echo $v_readonly;?>>
                 </div>
 
             </div>
@@ -227,7 +211,7 @@ if ($varr_inversor['estado_id'] == 7 || $varr_inversor['estado_id'] == 8 || $var
 
                 <div class="formulario_grupo_row" style="width:200px;">
                     <label for="condicion_laboral">Condicion Laboral</label>
-                    <select name="condicion_laboral" id="condicion_laboral" class="formulario_control" style="transition: var(--color-gris-oscuro) .15s easy-in-out;<?echo $v_ocupacion_color;?>" onchange="cambiaCondicion()" <?echo $v_disabled;?>>
+                    <select name="condicion_laboral" id="condicion_laboral" class="formulario_control" style="transition: var(--color-gris-oscuro) .15s easy-in-out;<?php echo $v_ocupacion_color;?>" onchange="cambiaCondicion()" <?php echo $v_disabled;?>>
 
 <?php
         if ($varr_inversor['ocupacion_id'] == 0)
@@ -349,7 +333,7 @@ if ($varr_inversor['estado_id'] == 7 || $varr_inversor['estado_id'] == 8 || $var
             var email_persona = document.getElementById("email_persona").value;
             var telefono_persona = document.getElementById("telefono_persona").value;
 
-            if (nombre != "" && apellido != "" && tipo_doc_nom > 0 && nro_doc != "" && archivo_documento != "" && email_persona != "" && telefono_persona != "")
+            if (nombre != "" && apellido != "" && tipo_doc_nom != "" && nro_doc != "" && archivo_documento != "" && email_persona != "" && telefono_persona != "")
                 resultado = 0;
             else resultado = 1;
 

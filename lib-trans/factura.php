@@ -1,11 +1,9 @@
 <?php
 class factura{
     function graba_factura($arrfactura){
-        $cfact = new db_param_trans;
-        $v_conn_e = new db_param_trans;
-
-        $cfact->connect();
-        $v_conn_e->connect();
+        $cfact = new db_param_trans; $cfact->connect();
+        $v_conn_e = new db_param_trans; $v_conn_e->connect();
+        $conn = new db_param_trans; $conn->connect();
 
         if ($arrfactura['accion'] == 'insert'){
             $idqry = $cfact->query("select fact_guarda_factura_V2('insert',0,".$_SESSION['user']['empresaid'].",'".$arrfactura['nrofactura']."','".$arrfactura['femision']."',
@@ -29,8 +27,13 @@ class factura{
             if (!$idqry) echo pg_last_error($cfact->Link_ID);
             $facturaid = $arrfactura['facturaid'];
         }
-            
-        $cfact->close();
+
+        // ACTUALIZO LOS VALORES CON RETENCION
+        $v_sql = "update factura set gran_total = ".$arrfactura['gran_total'].", retenciones = ".$arrfactura['retenciones']." where id = ".$facturaid;
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $conn->next_record();
+
         return $facturaid;
     }
     function get_datos_factura($facturaid){
@@ -71,10 +74,11 @@ class factura{
                             'riesgo_factura_descripcion' => $obj->riesgo_factura_descripcion, 
                             'riesgo_factura_color' => $obj->riesgo_factura_color,
                             'riesgo_factura_color_fuente' => $obj->riesgo_factura_color_fuente,
-                            'f_confirmacion' => $obj->fconfirmacion
+                            'f_confirmacion' => $obj->fconfirmacion,
+                            'gran_total' => $obj->gran_total,               'retenciones' => $obj->retenciones
                         );
                                             
-        $cfact->close();
+        //$cfact->close();
         return $arrfactura;
     }
     function envia_factura($facturaid){
@@ -88,7 +92,7 @@ class factura{
 
         // -1 si la factura ya esta aprobada    // -2 si se rechazo     // 1 queda en estado de enviada     // 2 aprobacion automatica
 
-        $cfact->close();
+        //$cfact->close();
         return $resultado;
     }
     function get_facturas_xemisor($emisorid){
@@ -112,7 +116,7 @@ class factura{
             $obj = $cfact->next_record();
         }
 
-        $cfact->close();
+        //$cfact->close();
         return $arrfacturas;
     }
 
@@ -165,7 +169,7 @@ class factura{
             }
         }
 
-        $conn->close();
+        //$conn->close();
 
         return $v_result;
     }
@@ -180,7 +184,7 @@ class factura{
         //$obj = $cfact->next_record();
         //$resultado = $obj->resultado;
 
-        $cfact->close();
+        //$cfact->close();
         return 1;
     }
     function get_facturas_xestado($estadoid,$rows,$rowini,$tipo){
@@ -223,7 +227,7 @@ class factura{
             $arrfacturas = $obj->contador;
         }
 
-        $cfact->close();
+        //$cfact->close();
         return $arrfacturas;
     }
     function get_facturas_xestado_v2($estadoid,$rows,$rowini,$tipo, $p_tipousuario, $p_empresaid){
@@ -266,7 +270,7 @@ class factura{
             $arrfacturas = $obj->contador;
         }
 
-        $cfact->close();
+        //$cfact->close();
         return $arrfacturas;
     }
     function aprobar_factura($facturaid){
@@ -278,7 +282,7 @@ class factura{
         if (!$idqry) echo pg_last_error($cfact->Link_ID);
         $obj = $cfact->next_record();
         
-        $cfact->close();
+        //$cfact->close();
         return 1;
     }
     function grabar_factura_enrevision($facturaid,$solicitudpath,$acpath){
@@ -290,7 +294,7 @@ class factura{
         if (!$idqry) echo pg_last_error($cfact->Link_ID);
         $obj = $cfact->next_record();
         
-        $cfact->close();
+        //$cfact->close();
         return 1;
     }
     function upd_riesgo_factura($p_factura_id, $p_riesgo_id, $p_riesgo_desc){
@@ -303,7 +307,7 @@ class factura{
         if (!$idqry) echo pg_last_error($cfact->Link_ID);
         $obj = $cfact->next_record();
         
-        $cfact->close();
+        //$cfact->close();
     }
     function anotarencuenta_factura($facturaid,$acpath){
         $cfact = new db_param_trans;
@@ -315,7 +319,7 @@ class factura{
         $obj = $cfact->next_record();
         $resultado = $obj->resultado;
         
-        $cfact->close();
+        //$cfact->close();
         return $resultado;
     }
     function rechazar_factura($facturaid,$rechazopath,$motivo){
@@ -327,7 +331,7 @@ class factura{
         if (!$idqry) echo pg_last_error($cfact->Link_ID);
         $obj = $cfact->next_record();
         
-        $cfact->close();
+        //$cfact->close();
         return 1;
     }
     function riesgo_factura($facturaid){
@@ -344,7 +348,7 @@ class factura{
                         'nombre_riesgo' => $obj->nombre, 'calificacion_riesgo' => $obj->calificacion
                     );
         
-        $cfact->close();
+        //$cfact->close();
         return $result;
     }
     function get_datos_financiamiento($p_factura_id){
@@ -367,7 +371,7 @@ class factura{
                                 'subporciento_fin'=>$obj->subporciento_fin, 'submonto_fin'=>$obj->submonto_fin,
                                 'submonto_rem'=>$obj->submonto_rem, 'facmoneda_id'=>$obj->facmoneda_id,
                                 'facmoneda'=>$obj->facmoneda, 'facnumero'=>$obj->facnumero, 'f_financiamiento' => $obj->r_fecha_financiamiento);
-        $conn_1->close();
+        //$conn_1->close();
         return $arr_datos;
     }
     function get_count_facturas_xestadoemisor($p_emisor, $p_estado, $p_estadofin){
@@ -379,13 +383,13 @@ class factura{
             if (!$idqry) echo pg_last_error($conn_1->Link_ID);
             $obj = $conn_1->next_record();
             $v_contador = $obj->contador;
-            $conn_1->close();
+            //$conn_1->close();
         } else{
             $idqry = $conn_1->query("select count(1) as contador from factura where emisorid = ".$p_emisor." and estadofinanciamiento = ".$p_estadofin." and estado > 0");
             if (!$idqry) echo pg_last_error($conn_1->Link_ID);
             $obj = $conn_1->next_record();
             $v_contador = $obj->contador;
-            $conn_1->close();
+            //$conn_1->close();
         }
 
         return $v_contador;
@@ -401,7 +405,7 @@ class factura{
             $obj = $conn_1->next_record();
             $resultado = $obj->resultado;
         
-            $conn_1->close();
+            //$conn_1->close();
             return $resultado;
         } else{
             $idqry = $conn_1->query("select * from FINAN_XEMISOR(".$p_emisorid.",'".$p_fechaini."')");
@@ -419,7 +423,7 @@ class factura{
                 $obj = $conn_1->next_record();
             }
         
-            $conn_1->close();
+            //$conn_1->close();
             return $arr_datos;
         }
     }
@@ -435,11 +439,17 @@ class factura{
             if (!$idqry) echo pg_last_error($conn_1->Link_ID);
             $obj = $conn_1->next_record();
             $arr_result['count'] = $obj->contador;
-            $idqry = $conn_2->query("SELECT max(current_date - factura.fenvio) as maximo, parametros.valor_num from factura, parametros where parametros.id = 11 and factura.estado = 12 group by parametros.valor_num");
-            if (!$idqry) echo pg_last_error($conn_2->Link_ID);
-            $obj2 = $conn_2->next_record();
-            $arr_result['maximo'] = $obj2->maximo;
-            $arr_result['parametro'] = $obj2->valor_num;
+
+            if ($obj->contador > 0){
+                $idqry = $conn_2->query("SELECT max(current_date - factura.fenvio) as maximo, parametros.valor_num from factura, parametros where parametros.id = 11 and factura.estado = 12 group by parametros.valor_num");
+                if (!$idqry) echo pg_last_error($conn_2->Link_ID);
+                $obj2 = $conn_2->next_record();
+                $arr_result['maximo'] = $obj2->maximo;
+                $arr_result['parametro'] = $obj2->valor_num;
+            } else {
+                $arr_result['maximo'] = 0;
+                $arr_result['parametro'] = 0;
+            }
         } elseif ($p_tipo == 'XVENCER'){
             $idqry = $conn_1->query("select valor_num from parametros where id = 12");
             if (!$idqry) echo pg_last_error($conn_1->Link_ID);
@@ -456,7 +466,7 @@ class factura{
             $arr_result['count'] = $obj->contador;
         }
 
-        $conn_1->close();
+        //$conn_1->close();
         //$conn_2->close();
         return $arr_result;
     }
@@ -494,7 +504,7 @@ class factura{
             }
         }
 
-        $conn_1->close();
+        //$conn_1->close();
         //$conn_2->close();
         return $arr_result;
     }
@@ -516,7 +526,7 @@ class factura{
             $obj = $conn_1->next_record();
         }
 
-        $conn_1->close();
+        //$conn_1->close();
         return $arr_result;
     }
     function registra_comunicacion($p_empresaid, $p_facturaid, $p_mensaje, $p_nombre){
@@ -528,7 +538,7 @@ class factura{
         $obj = $conn_1->next_record();
         $resultado = $obj->comu_id;
 
-        $conn_1->close();
+        //$conn_1->close();
         return $resultado;
     }
     function confirma_pago($p_facturaid, $p_fpago){
@@ -539,7 +549,7 @@ class factura{
         if (!$idqry) echo pg_last_error($conn_1->Link_ID);
         $obj = $conn_1->next_record();
         
-        $conn_1->close();
+        //$conn_1->close();
         return 1;
     }
     /*==============================================================
@@ -583,7 +593,7 @@ class factura{
             $v_arr_result = $obj->contador;
         }
 
-        $cfact->close();
+        //$cfact->close();
         return $v_arr_result;
     }
     function get_financiamiento_xestado_varios($p_estados,$rows,$rowini,$tipo){
@@ -626,7 +636,7 @@ class factura{
             $v_arr_result = $obj->contador;
         }
 
-        $cfact->close();
+        //$cfact->close();
         return $v_arr_result;
     }
 
@@ -664,8 +674,8 @@ class factura{
                                     'monto_pagado'=>$obj2->total,               'notifica_op' => $obj->notifica_op,         'notifica_comprobante' => $obj->notifica_comprobante,
                                     'ganancia' => $obj->ganancia_e,             'comision_factureate' => $obj->comision_factureate_e);
         
-        $cfact->close();
-        $conn2->close();
+        /*$cfact->close();
+        $conn2->close();*/
         return $v_arr_result;
     }
     function get_financiamiento_xfactura($p_factura_id){
@@ -681,7 +691,7 @@ class factura{
         
         $v_arr_result = array('finan_id'=>$obj->id);
         
-        $cfact->close();
+        //$cfact->close();
         return $v_arr_result;
     }
     function registra_pago ($p_factura_id,$p_operacion_nro, $p_moneda_id, $p_monto, $p_fecha, $p_hora){
@@ -693,7 +703,7 @@ class factura{
         if (!$idqry) echo pg_last_error($cfact->Link_ID);
         $obj = $cfact->next_record();
         
-        $cfact->close();
+        //$cfact->close();
         
         return 1;
     }
@@ -718,7 +728,7 @@ class factura{
             $obj = $cfact->next_record();
         }
         
-        $cfact->close(); $conn1->close(); $conn2->close();
+        //$cfact->close(); $conn1->close(); $conn2->close();
         
         return $v_return;
     }
@@ -754,7 +764,7 @@ class factura{
         if (!$idqry) echo pg_last_error($conn->Link_ID);
         $obj = $conn->next_record();
         $v_arr = array('riesgo_factureate'=>$obj->riesgoid, 'riesgo_score'=>$obj->riesgoscoreid, 'porc_financiamiento'=>$obj->porc_financiamiento, 'calificacion'=>$obj->calificacion);
-        $conn->close();
+        //$conn->close();
 
         return $v_arr;
     }
@@ -776,7 +786,7 @@ class factura{
             $obj = $conn->next_record();
         }
 
-        $conn->close();
+        //$conn->close();
 
         return $v_arr;
     }
@@ -789,7 +799,7 @@ class factura{
         if (!$idqry) echo pg_last_error($conn->Link_ID);
         $obj = $conn->next_record();
 
-        $conn->close();
+        //$conn->close();
 
         return $v_arr;
     }
@@ -803,7 +813,7 @@ class factura{
         $obj = $conn->next_record();
         $v_tea = $obj->tea;
 
-        $conn->close();
+        //$conn->close();
 
         return $v_tea;
     }
@@ -816,7 +826,7 @@ class factura{
         if (!$idqry) echo pg_last_error($conn->Link_ID);
         $obj = $conn->next_record();
         
-        $conn->close();
+        //$conn->close();
     }
 
     function get_financiamientos($p_tipo,$p_rows,$p_rowini,$p_filtros,$p_order){   //$p_estados,$rows,$rowini,$tipo
@@ -867,7 +877,7 @@ class factura{
             $varr_result = $obj->contador;
         }
 
-        $cfact->close();
+        //$cfact->close();
         return $varr_result;
     }
 
@@ -879,7 +889,7 @@ class factura{
         if (!$idqry) echo pg_last_error($cfact->Link_ID);
         $obj = $cfact->next_record();
 
-        $cfact->close();
+        //$cfact->close();
     }
 
     function liquida_financiamiento_v2 ($p_factura_id, $p_moneda_id, $p_monto, $p_datosop, $p_tipo_mov, $p_fecha_pago, $p_hora_pago){
@@ -892,7 +902,7 @@ class factura{
             $this->registra_pago($p_factura_id,$p_datosop,$p_moneda_id,$p_monto,$p_fecha_pago,$p_hora_pago);
         }
         
-        $idqry = $conn1->query("select valor_num from parametros where id = 35");
+        $idqry = $conn1->query("select valor_num from parametros where id = 35");   // INTEGRACION CON BANCO
         if (!$idqry) echo pg_last_error($conn1->Link_ID);
         $obj1 = $conn1->next_record();
 
@@ -907,7 +917,7 @@ class factura{
             $obj = $cfact->next_record();
         }
         
-        $cfact->close(); $conn1->close(); $conn2->close();
+        //$cfact->close(); $conn1->close(); $conn2->close();
         
         return $v_return;
     }
@@ -924,7 +934,7 @@ class factura{
         if (!$idqry) echo pg_last_error($conn->Link_ID);
         $obj = $conn->next_record();
 
-        $conn->close();
+        //$conn->close();
 
         return $v_arr;
     }
@@ -983,7 +993,7 @@ class factura{
             $arrfacturas = $obj->contador;
         }
 
-        $cfact->close();
+        //$cfact->close();
         return $arrfacturas;
     }
 
@@ -996,7 +1006,7 @@ class factura{
         $obj = $conn->next_record();
         $resultado = $obj->resultado;
 
-        $conn->close();
+        //$conn->close();
 
         return $resultado;
     }
@@ -1021,7 +1031,7 @@ class factura{
             $obj = $conn->next_record();
         }
 
-        $conn->close();
+        //$conn->close();
 
         return $varr_result;
     }
@@ -1036,11 +1046,11 @@ class factura{
         $v_ft_id = $obj->ft_id;
 
         $qry = "insert into factura_temp (id, nro_factura, moneda_id, cliente_doc, cliente_nom, f_emision, f_vencimiento, subtotal, anticipos, descuentos, valor_venta,
-                                        itbis, otros, total, xml_path, xml_name, retenciones)
+                                        itbis, otros, total, xml_path, xml_name, retenciones, cliente_correo, cliente_direccion, cliente_contacto)
                 values (".$v_ft_id.", '".$parr_datos['nro_factura']."', ".$parr_datos['moneda_id'].", '".$parr_datos['cliente_doc']."', '".$parr_datos['cliente_nom']."',
                         '".$parr_datos['f_emision']."', '".$parr_datos['f_vencimiento']."', ".$parr_datos['subtotal'].", ".$parr_datos['anticipos'].", ".$parr_datos['descuentos'].",
                         ".$parr_datos['valor_venta'].", ".$parr_datos['itbis'].", ".$parr_datos['otros'].", ".$parr_datos['total'].", '".$parr_datos['xml_path']."', '".$parr_datos['xml_name']."',
-                        ".$parr_datos['retenciones'].")";
+                        ".$parr_datos['retenciones'].", '".$parr_datos['cliente_correo']."','".$parr_datos['cliente_direccion']."','".$parr_datos['cliente_contacto']."')";
 
         $idqry = $conn2->query($qry);
         if (!$idqry) echo pg_last_error($conn2->Link_ID);
@@ -1056,7 +1066,7 @@ class factura{
         $conn = new db_param_trans; $conn->connect();
 
         $qry = "select nro_factura, moneda_id, cliente_doc, cliente_nom, f_emision, f_vencimiento, subtotal, anticipos, descuentos, valor_venta, itbis, otros, total, xml_path, xml_name,
-                        retenciones 
+                        retenciones, cliente_correo, cliente_direccion, cliente_contacto
                 from factura_temp
                 where id = ".$p_ft_id;
 
@@ -1067,9 +1077,10 @@ class factura{
         $varr_result = array('nro_factura' => $obj->nro_factura,    'moneda_id' => $obj->moneda_id,         'cliente_doc' => $obj->cliente_doc,     'cliente_nom' => $obj->cliente_nom,
                             'f_emision' => $obj->f_emision,         'f_vencimiento' => $obj->f_vencimiento, 'subtotal' => $obj->subtotal,           'anticipos' => $obj->anticipos,
                             'descuentos' => $obj->descuentos,       'valor_venta' => $obj->valor_venta,      'itbis' => $obj->itbis,                 'otros' => $obj->otros,
-                            'total' => $obj->total,                 'xml_path' => $obj->xml_path,           'xml_name' => $obj->xml_name,           'retenciones' => $obj->retenciones);
+                            'total' => $obj->total,                 'xml_path' => $obj->xml_path,           'xml_name' => $obj->xml_name,           'retenciones' => $obj->retenciones,
+                            'cliente_correo' => $obj->cliente_correo, 'cliente_direccion' => $obj->cliente_direccion, 'cliente_contacto' => $obj->cliente_contacto);
 
-        $conn->close();
+        //$conn->close();
 
         return $varr_result;
     }

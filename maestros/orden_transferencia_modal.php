@@ -10,7 +10,7 @@ require("../lib-trans/factura.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'FINANCIAMIENTO';
     require("../lib/valida-acceso.php");
@@ -39,7 +39,7 @@ require("../lib-trans/factura.php");
         }
     </script>
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $obj_mae = new maestros;
@@ -52,7 +52,7 @@ $v_fhoy_en = date('Y-m-d');
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     date_default_timezone_set("America/Santo_Domingo");
     //------ PARTE SUPERIOR ------
     
@@ -80,9 +80,9 @@ $v_fhoy_en = date('Y-m-d');
         </ul>
         <ul>
             <li><span class="icon-coin-dollar" style="font-size:25px;color:#1F9A8E;"></span></li>
-            <li style="padding-left:5px;padding-right:5px;margin-left:10px;"><?echo $_GET['ot_id'];?></li>
-            <li style="padding-left:5px;padding-right:5px;margin-left:50px;"><?echo $varr_ot['destino_nombre'];?></li>
-            <li style="padding-left:5px;padding-right:5px;margin-left:10px;"><?echo $varr_ot['motivo'];?></li>
+            <li style="padding-left:5px;padding-right:5px;margin-left:10px;"><?php echo $_GET['ot_id'];?></li>
+            <li style="padding-left:5px;padding-right:5px;margin-left:50px;"><?php echo $varr_ot['destino_nombre'];?></li>
+            <li style="padding-left:5px;padding-right:5px;margin-left:10px;"><?php echo $varr_ot['motivo'];?></li>
         </ul>
         
         <div style="overflow:hidden;background-color:#555555;height:1px;"></div>

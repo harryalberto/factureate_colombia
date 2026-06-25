@@ -10,7 +10,7 @@ require("../lib-trans/c_subasta.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'SUBASTAS';
     require("../lib/valida-acceso.php");
@@ -44,7 +44,7 @@ require("../lib-trans/c_subasta.php");
         }
     </script>
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $objmaestro = new maestros;
@@ -68,7 +68,7 @@ if (isset($_POST['seconomicoid'])){
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     date_default_timezone_set("America/Lima");
     $menu = 'subastas/subastas_disponibles_inver.php';
     //------ PARTE SUPERIOR ------
@@ -86,7 +86,7 @@ if (isset($_POST['seconomicoid'])){
             <li>Sector econ&oacute;mico:</li>
             <li>
                 <select name="seconomicoid" class="frminput_text">
-                <?
+                <?php
                     $arrsectores = $objmaestro->get_tipos('SECTORECO');
 
                     if ($seconomicoid == 0) echo '<option value = "0" selected>Todos los sectores</option>';
@@ -103,7 +103,7 @@ if (isset($_POST['seconomicoid'])){
             <li>Riesgo Pagador:</li>
             <li>
                 <select name="triesgoid" class="frminput_text">
-                <?
+                <?php
                     $arrtriesgo = $objmaestro->get_triesgopagador();
 
                     if ($triesgoid == 0) echo '<option value = "0" selected>Todos los tipos</option>';
@@ -124,8 +124,8 @@ if (isset($_POST['seconomicoid'])){
         </ul>
         </form>
     </div>
-    <div id="content2"><? require('pagina_subastas_dispo_inver.php'); ?></div>
-    <?
+    <div id="content2"><?php require('pagina_subastas_dispo_inver.php'); ?></div>
+    <?php
     if ($total_paginas > 1) {
         echo '<div class="pagination">';
         echo '  <ul>';
@@ -174,10 +174,14 @@ if (isset($_POST['seconomicoid'])){
             var rowcount = $(this).attr('rowcount');
             var subastaid = $(this).attr('subastaid');
             
-            $('.modal-body').load('../inversionistas/propuesta_detalle_modal.php?fid='+fid+'&pid='+pid+'&retorno='+retorno+'&pagina='+pagina+'&rowcount='+rowcount+'&subastaid='+subastaid,function(){
+            $('.modal-body').load('propuesta_detalle_modal.php?fid='+fid+'&pid='+pid+'&retorno='+retorno+'&pagina='+pagina+'&rowcount='+rowcount+'&subastaid='+subastaid,function(){
                 $('#PropuestaDetalle').modal({show:true});
             });
         });
+
+        function refresh_page(){
+            location.href = 'subastas_disponibles_inver.php';
+        }
     </script>
 </BODY>
 </HTML>

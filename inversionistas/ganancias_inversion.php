@@ -13,7 +13,7 @@ require("../lib-trans/c_cuentas.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'INVERSIONES';
     require("../lib/valida-acceso.php");
@@ -24,7 +24,7 @@ require("../lib-trans/c_cuentas.php");
         }
     </script>
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $obj_inv = new inversiones;
@@ -34,6 +34,9 @@ $v_mes_hoy = date('n');
 $v_mes2_hoy = date('m');
 $v_anho_hoy = date('Y');
 $v_resumen_print = '';
+$v_total_inversion_mes = 0;
+$v_total_ganancia_mes = 0;
+$v_titulo_mes = '';
 
 if (isset($_POST['periodo'])) $periodo = $_POST['periodo'];
 if ($periodo == 0) $v_finicio = $v_anho_hoy.'-'.$v_mes2_hoy.'-01';
@@ -201,7 +204,7 @@ for ($j=0; $j<count($v_arr_resumen); $j++){
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     date_default_timezone_set("America/Lima");
     $menu = 'inversionistas/ganancias_inversion.php';
     //------ PARTE SUPERIOR ------
@@ -219,7 +222,7 @@ for ($j=0; $j<count($v_arr_resumen); $j++){
             <li style="font-weight:bold;padding-left:5px;padding-right:5px;margin-top:5px;">PERIODO DE ANALISIS:</li>
             <li>
                 <select name="periodo" class="frminput_text">
-                <?
+                <?php
                     $v_opcion_print = '';
 
                     if ($periodo == 0) $v_opcion_print .= '<option value="0" selected>Mes actual</option>'; else $v_opcion_print .= '<option value="0">Mes actual</option>';
@@ -240,7 +243,7 @@ for ($j=0; $j<count($v_arr_resumen); $j++){
     </div>
     <!-- resumen -->
     <div class="frmtransaccion">
-        <?echo $v_resumen_print;?>
+        <?php echo $v_resumen_print;?>
     </div>
     <!-- listado -->
     <div style="overflow:hidden;margin:5px;padding:5px;">

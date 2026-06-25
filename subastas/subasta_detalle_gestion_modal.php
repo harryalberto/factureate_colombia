@@ -13,7 +13,7 @@ require("../lib-trans/c_cuentas.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'INVERSIONES';
     require("../lib/valida-acceso.php");
@@ -29,7 +29,7 @@ require("../lib-trans/c_cuentas.php");
         }
     </script>
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $obj_factura = new factura;
@@ -45,7 +45,7 @@ else $v_estado_compensa = $arrsubasta['estadosubasta'];
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     date_default_timezone_set("America/Santo_Domingo");
     //------ PARTE SUPERIOR ------
     
@@ -53,9 +53,7 @@ else $v_estado_compensa = $arrsubasta['estadosubasta'];
 ?>
     <!------ CUERPO VARIABLE ------>
     <form name='frm_modal' method='post' id='frm_modal' enctype="multipart/form-data">
-        <input type="hidden" name="retorno" value="<?=$_GET['retorno']?>">
         <input type="hidden" name="subastaid" value="<?=$_GET['subastaid']?>">
-        <input type="hidden" name="estados" value="<?=$_GET['estados']?>">
         <input type="hidden" name="accion">
         <input type="hidden" name="emisor_id" value="<?=$arrsubasta['emisorid']?>">
         <input type="hidden" name="emisor_correo" value="<?=$arrsubasta['emisor_correo']?>">
@@ -68,9 +66,9 @@ else $v_estado_compensa = $arrsubasta['estadosubasta'];
         </ul>
         <ul>
             <li><span class="icon-file-text" style="font-size:25px;color:#1F9A8E;"></span></li>
-            <li style="padding-left:5px;padding-right:5px;margin-left:10px;"><?echo $arrsubasta['facturaid'];?></li>
-            <li style="padding-left:5px;padding-right:5px;margin-left:150px;"><?echo $arrsubasta['facnumero'];?></li>
-            <li style="padding-left:5px;padding-right:5px;margin-left:100px;"><?echo $arrsubasta['cliente'];?></li>
+            <li style="padding-left:5px;padding-right:5px;margin-left:10px;"><?php echo $arrsubasta['facturaid'];?></li>
+            <li style="padding-left:5px;padding-right:5px;margin-left:150px;"><?php echo $arrsubasta['facnumero'];?></li>
+            <li style="padding-left:5px;padding-right:5px;margin-left:100px;"><?php echo $arrsubasta['cliente'];?></li>
             <input type="hidden" name="factura_id" value="<?=$arrsubasta['facturaid']?>">
             <input type="hidden" name="factura_numero" value="<?=$arrsubasta['facnumero']?>">
             <input type="hidden" name="cliente_nombre" value="<?=$arrsubasta['cliente']?>">
@@ -242,7 +240,7 @@ else $v_estado_compensa = $arrsubasta['estadosubasta'];
         ##################### BOTONERA
         ###########################################################-->
         <ul style="margin-top:10px;">
-    <?
+    <?php
         if ($arrsubasta['estadosubastaid'] == 24){  // SUBASTA ACTIVA
             echo '
                 <li><button type="button" id="btn_terminar" class="btn btn-primary" style="font-size:11px;background-color:var(--color-azulv2);border:none;" onclick="terminarSubasta()">

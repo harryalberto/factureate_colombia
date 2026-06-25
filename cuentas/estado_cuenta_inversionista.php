@@ -13,14 +13,14 @@ require("../lib-trans/c_cuentas.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'INVERSIONES';
     require("../lib/valida-acceso.php");
 ?>
     
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $obj_cuentas = new cuentas;
@@ -202,7 +202,7 @@ $v_filtros_print .= '   </select>
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     date_default_timezone_set($_SESSION['user']['zona_horaria']);
     $menu = 'cuentas/estado_cuenta.php';
     //------ PARTE SUPERIOR ------
@@ -219,7 +219,7 @@ $v_filtros_print .= '   </select>
             <input type="hidden" name="cuenta_id" value="<?=$v_cuenta_id?>">
             <input type="hidden" name="moneda" value="<?=$v_moneda?>">
         <ul>
-            <?echo $v_filtros_print;?>
+            <?php echo $v_filtros_print;?>
             <button type="button" class="btn btn-primary" onclick="filtrar()" style="background-color:var(--color-azulv2);"><span class="icon-filter"></span> Filtrar</button>
             <button type="button" class="btn btn-primary" onclick="retornar()" style="background-color:var(--color-amarillo);"><i class="fa-solid fa-backward"></i> Retornar</button>
         </ul>
@@ -227,7 +227,7 @@ $v_filtros_print .= '   </select>
     </div>
     <!-- listado -->
     <div class="frmtransaccion">
-        <?echo $v_relacion_print;?>
+        <?php echo $v_relacion_print;?>
     </div>
     <!------ END CUERPO VARIABLE ------>
 

@@ -10,7 +10,7 @@ require("../lib-trans/factura.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'FINANCIAMIENTO';
     require("../lib/valida-acceso.php");
@@ -18,11 +18,14 @@ require("../lib-trans/factura.php");
     <!-- FUNCIONES DE JS -->
      
 </HEAD>
-<?
+<?php
 /*####################################################
 ########################## LOGICA */
 $obj_finan = new factura;
 $obj_mae = new maestros;
+$vobj_seg = new seguridad;
+
+$varr_permisos = $vobj_seg->get_permisos($_SESSION['user']['perfilid']);
 
 if ($_GET['ffid'] > 0){ 
     $v_arr_finan = $obj_finan->get_financiamiento_detalle($_GET['ffid']);
@@ -56,7 +59,7 @@ if ($_GET['ffid'] > 0){
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     date_default_timezone_set("America/Santo_Domingo");
     //------ PARTE SUPERIOR ------
     
@@ -87,9 +90,9 @@ if ($_GET['ffid'] > 0){
                     <li style="font-weight: bold;width:200px;">PAGADOR</li>
                 </ul>
                 <ul>
-                    <li style="margin-left:10px;width:180px;"><?echo $v_arr_finan['factura_id'];?></li>
-                    <li style="width:290px;"><?echo $v_arr_finan['emisor_nombre'];?></li>
-                    <li style="width:200px;"><?echo $v_arr_finan['cliente_nombre'];?></li>
+                    <li style="margin-left:10px;width:180px;"><?php echo $v_arr_finan['factura_id'];?></li>
+                    <li style="width:290px;"><?php echo $v_arr_finan['emisor_nombre'];?></li>
+                    <li style="width:200px;"><?php echo $v_arr_finan['cliente_nombre'];?></li>
                     <input type="hidden" name="cliente_nombre" id="cliente_nombre" value="<?=$v_arr_finan['cliente_nombre']?>">
                     <input type="hidden" name="emisor_nombre" id="emisor_nombre" value="<?=$v_arr_finan['emisor_nombre']?>">
                 </ul>
@@ -113,10 +116,10 @@ if ($_GET['ffid'] > 0){
         </ul>
         <ul>
             <li style="margin-left:5px;width:150px;"><input type="text" name="factura_nro" id="factura_nro" value="<?=$v_arr_finan['factura_numero']?>" class="frminput_text_off" style="text-align:center;" readonly></li>
-            <li style="margin-left:5px;width:205px;"><input type="text" name="monto_factura_view" id="monto_factura_view" size="30" value="<?echo $v_arr_finan['simbolo'].' '.number_format($v_arr_finan['monto_factura'],2,'.',',');?>" class="frminput_text_off" style="text-align:right;" readonly></li>
+            <li style="margin-left:5px;width:205px;"><input type="text" name="monto_factura_view" id="monto_factura_view" size="30" value="<?php echo $v_arr_finan['simbolo'].' '.number_format($v_arr_finan['monto_factura'],2,'.',',');?>" class="frminput_text_off" style="text-align:right;" readonly></li>
             <li style="margin-left:5px;width:130px;"><input type="date" name="f_vencimiento" id="f_vencimiento" size="15" value="<?=$v_arr_finan['fpago']?>" class="frminput_text_off" style="text-align:center;margin-right:20px;" readonly></li>
             <li style="margin-left:5px;width:135px;"><input type="text" name="factura_id" size="15" value="<?=$v_fconfirmacion?>" class="frminput_text_off" style="text-align:center;" readonly></li>
-    <?
+    <?php
         if ($v_dias_xvencer == 0) 
             echo '
             <li style="width:80px;background-color: #b30a1f;color:#ffffff;text-align:center;">VENCE HOY</li>';
@@ -171,7 +174,7 @@ if ($_GET['ffid'] > 0){
                     <th scope="col">COMUNICACION</th>
                 </tr></thead>
                 <tbody>
-        <?
+        <?php
         if (count($v_arr_com) == 0) echo '
                     <tr>
                         <td colspan="4" style="border: 1px solid;padding:5px;text-align:center;">No hay registros</td>
@@ -212,24 +215,31 @@ if ($_GET['ffid'] > 0){
         <ul>
             <li><input type="text" name="nro_operacion" id="nro_operacion" placeholder="# operacion banco" class="frminput_text"></li>
             <li><input type="text" name="moneda" id="moneda" value="<?=$v_arr_finan['moneda']?>" class="frminput_text_off" readonly></li>
-            <li><input type="number" name="monto_pago" id="monto_pago" value="<?=$v_monto_pendiente?>" class="frminput_text" style="text-align:right;"></li>
+            <li><input type="text" name="monto_pago_view" id="monto_pago_view" value="<?=number_format($v_monto_pendiente,2,'.',',')?>" class="frminput_text" style="text-align:right;" onkeyup="allCalculations_monto_pago()"></li>
             <li><input type="date" name="fecha_pago" id="fecha_pago" value="<?=$v_fhoy_en?>" class="frminput_text"></li>
             <li><input type="text" name="hora_pago" id="hora_pago" value="00:00:00" class="frminput_text" style="text-align:center" size="10"></li>
             <input type="hidden" name="moneda_id" id="moneda_id" value="<?=$v_arr_finan['moneda_id']?>">
+            <input type="hidden" name="monto_pago" id="monto_pago" value="<?=$v_monto_pendiente?>">
         </ul>
 
-    <?
+    <?php
     //============== BOTONERA
     if ($v_arr_finan['estado_finan_id'] == 27){     // EN PROCESO
     ?>
         <hr>
         <ul style="margin-top:10px;">
             <button type="button" class="btn btn-primary" style="background-color:var(--color-azulv2);" onclick="registraAcuerdo('acuerdo')"><span class="icon-point-up"></span> Acuerdo</button>
+<?php
+        if ($obj_mae->busca_arreglo_bidi($varr_permisos, 'codigo', 'LIQFIN')){
+?>
             <button type="button" class="btn btn-primary" style="background-color:var(--color-azulv2);" onclick="registraPago('pago')"><i class="fa-solid fa-credit-card"></i> RegPago</button>
             <button type="button" class="btn btn-primary" style="background-color:var(--color-azulv2);" onclick="registraLiquidar('liquidar')"><span class="icon-coin-dollar"></span> Liquidar</button>
             <button type="button" class="btn btn-primary" style="background-color:var(--color-azulv2);" onclick="registraCobranza('cobranza')"><span class="icon-point-down"></span> Cobranza</button>
+<?php
+        }
+?>
         </ul>
-    <?
+    <?php
     } elseif($v_arr_finan['estado_finan_id'] == 51){    // PRE LIQUIDADA
         if ($_SESSION['user']['perfilid'] == 14 || $_SESSION['user']['perfilid'] == 15){        //CFO o CEO
     ?>            
@@ -238,13 +248,15 @@ if ($_GET['ffid'] > 0){
             <button type="button" class="btn btn-primary" style="background-color:var(--color-azulv2);" onclick="registraLiquidar('liquidar')"><span class="icon-coin-dollar"></span> Liquidar</button>
             <button type="button" class="btn btn-primary" style="background-color:var(--color-azulv2);" onclick="registraCobranza('cobranza')"><span class="icon-point-down"></span> Cobranza</button>
     <?php
-        } else{
+        }// else{
     ?>
+    <!--
             <button type="button" class="btn btn-primary" style="background-color:var(--color-azulv2);" onclick="registraAcuerdo('acuerdo')"><span class="icon-point-up"></span> Acuerdo</button>
             <button type="button" class="btn btn-primary" style="background-color:var(--color-azulv2);" onclick="registraPago('pago')"><i class="fa-solid fa-credit-card"></i> RegPago</button>
             <button type="button" class="btn btn-primary" style="background-color:var(--color-azulv2);" onclick="registraCobranza('cobranza')"><span class="icon-point-down"></span> Cobranza</button>
+    -->
     <?php
-        }
+        //}
     }
     ?>
     </div>
@@ -334,7 +346,7 @@ if ($_GET['ffid'] > 0){
             var v_facturaid=$('#facturaid').val();
             var v_operacion=$('#nro_operacion').val();
             var v_monedaid=$('#moneda_id').val();
-            var v_monto_pago=$('#monto_pago').val();
+            var v_monto_pago=Number($('#monto_pago').val());
             var v_fecha_pago=$('#fecha_pago').val();
             var v_hora_pago=$('#hora_pago').val();
 
@@ -344,16 +356,37 @@ if ($_GET['ffid'] > 0){
             var v_estado_finan_id=$('#estado_finan_id').val();
             var v_perfil_id=$('#perfil_id').val();
             var v_no_cumple, v_liquidar;
+            var v_procede = 1;
 
-            if ((v_monto_factura * v_diferencia_porc) > v_monto_pagado) v_no_cumple = 1;
-            else v_no_cumple = 0;
+            // VALIDAR SI SE VA A REGISTRAR UN PAGO
+            if (v_monto_pago > 0){
+                if (v_operacion != ''){
+                    if ((v_monto_pago + v_monto_pagado) > v_monto_factura){
+                        alert('El monto pagado mas el monto que desea registrar supera el valor de la factura, verifique');
+                        v_procede = 0;
+                    }
+                } else{
+                    alert('Si va a registrar un monto debe ingresar el numero de operacion bancaria, caso contrario el monto debe estar en cero');
+                    v_procede = 0;
+                }
+            }
 
-            if (v_perfil_id == 14 || v_perfil_id == 15){
-                if (confirm("El monto pagado es menor al permitido, aun asi esta seguro de continuar con la liquidación?") == true) v_liquidar = 1;
-                else v_liquidar = 0;
-            } else{
-                if (confirm("Esta tratando de liquidar una operacion por un monto menor al permitido, si continua la operacion quedara PRE LIQUIDADA y el CFO debe aprobar la liquidacion, desea continuar?") == true) v_liquidar = 1;
-                else v_liquidar = 0;
+            if (v_procede == 1){
+                if ((v_monto_factura * v_diferencia_porc) > (v_monto_pagado + v_monto_pago)) v_no_cumple = 1;
+                else {
+                    v_liquidar = 1;
+                    v_no_cumple = 0;
+                }
+
+                if (v_no_cumple == 1){
+                    if (v_perfil_id == 14 || v_perfil_id == 15){
+                        if (confirm("El monto pagado es menor al permitido, aun asi esta seguro de continuar con la liquidación?") == true) v_liquidar = 1;
+                        else v_liquidar = 0;
+                    } else{
+                        if (confirm("Esta tratando de liquidar una operacion por un monto menor al permitido, si continua la operacion quedara PRE LIQUIDADA y el CFO debe aprobar la liquidacion, desea continuar?") == true) v_liquidar = 1;
+                        else v_liquidar = 0;
+                    }
+                }
             }
 
             if (v_liquidar > 0){
@@ -367,13 +400,15 @@ if ($_GET['ffid'] > 0){
                             "moneda_id":v_monedaid,
                             "monto_pago":v_monto_pago,
                             "fecha_pago":v_fecha_pago,
-                            "hora_pago":v_hora_pago
-                        },
-                        success:function(data,status){
-                            $('#myModal').fadeIn(1000).html(data);
-                            $('#myModal').modal('hide');
-                            filtrar();
+                            "hora_pago":v_hora_pago,
+                            "monto_factura": v_monto_factura,
+                            "monto_pagado": v_monto_pagado,
+                            "nocumple_minimo": v_no_cumple
                         }
+                })
+                .done(function(rpta){
+                    alert(rpta);
+                    filtrar();
                 });
             }
         }
@@ -433,6 +468,22 @@ if ($_GET['ffid'] > 0){
                     });
                 }
             }
+        }
+
+        function allCalculations_monto_pago(){
+            var v_monto_pago;
+            var v_monto_pago_view = document.getElementById("monto_pago_view").value.replace(/[^0-9\.]/g, "");
+            
+            var v_count_ocurrencias = v_monto_pago_view.split('.').length - 1;
+            
+            if (v_count_ocurrencias > 1){
+                var varr_monto_pago_view = v_monto_pago_view.split('.');
+                v_monto_pago = varr_monto_pago_view[0]+'.'+varr_monto_pago_view[1];
+            } else v_monto_pago = v_monto_pago_view;
+
+            v_monto_pago_view = v_monto_pago.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            document.getElementById("monto_pago_view").value = v_monto_pago_view;
+            document.getElementById("monto_pago").value = v_monto_pago;
         }
     </script>
 </BODY>

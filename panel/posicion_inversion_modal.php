@@ -13,14 +13,14 @@ require("../lib-trans/c_cuentas.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'INVERSIONES';
     require("../lib/valida-acceso.php");
 ?>
     
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $obj_factura = new factura;
@@ -47,7 +47,8 @@ $dvenc = new DateTime($arrsubasta['fvencimiento']);
 $dif = $dhoy->diff($dvenc);
 $dias = $dif->days;
 
-$finicio = date('d-m-Y',strtotime($arrobpago['finicio']));
+if (is_null($arrobpago['finicio'])) $finicio = 'EMPTY';
+else $finicio = date('d-m-Y',strtotime($arrobpago['finicio']));
 
 if ($_GET['pid'] != 0){     // YA EXISTE UNA PROPUESTA
     $arrposicion = $objsubasta->get_posicion($_GET['subastaid'],$_SESSION['user']['usuarioid'],$_SESSION['user']['empresaid']);
@@ -121,7 +122,7 @@ if ($_GET['pid'] == 0) $tia = $v_tea_minima;
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     date_default_timezone_set($_SESSION['user']['zona_horaria']);
     //------ PARTE SUPERIOR ------
     
@@ -131,9 +132,7 @@ if ($_GET['pid'] == 0) $tia = $v_tea_minima;
     <form name='frm_modal' method='post' id='frm_modal' enctype="multipart/form-data">
         <input type="hidden" name="propuestaid" id="propuestaid" value="<?=$propuestaid?>">
         <input type="hidden" name="factura_id" value="<?=$_GET['fid']?>">
-        <input type="hidden" name="retorno" id="retorno" value="<?=$_GET['retorno']?>">
-        <input type="hidden" name="pagina" value="<?=$_GET['pagina']?>">
-        <input type="hidden" name="rowcount" value="<?=$_GET['rowcount']?>">
+
         <input type="hidden" name="subasta_id" id="subasta_id" value="<?=$_GET['subastaid']?>">
         <input type="hidden" name="accion">
         <input type="hidden" name="montofin" value="<?=$arrsubasta['montofin']?>">
@@ -175,37 +174,37 @@ if ($_GET['pid'] == 0) $tia = $v_tea_minima;
         <ul style="font-weight:bold;">
             <li><span class="icon-star-full" style="font-size:20px;color:var(--color-amarillo);"></span></li>
             <li style="font-size:16px;margin-top:5px;">MONTO DISPONIBLE PARA INVERTIR: </li>
-            <li style="font-size:16px;margin-top:5px;"><?echo $arrsubasta['simbolo_moneda'].' '.number_format($v_saldo_disponible,2,'.',',');?></li>
+            <li style="font-size:16px;margin-top:5px;"><?php echo $arrsubasta['simbolo_moneda'].' '.number_format($v_saldo_disponible,2,'.',',');?></li>
             <input type="hidden" name="saldo_disponible" id="saldo_disponible" value="<?=$v_saldo_disponible?>">
         </ul>
 
         <div style="overflow:hidden;background-color:#555555;height:1px;"></div>
         <ul style="margin-top:10px;">
             <li style="font-weight:bold;width:120px;padding-left:5px;padding-right:5px;">ID FACTURA:</li>
-            <li style="padding-left:5px;padding-right:5px;width:75px;"><?echo $arrsubasta['facturaid'];?></li>
+            <li style="padding-left:5px;padding-right:5px;width:75px;"><?php echo $arrsubasta['facturaid'];?></li>
             <li style="font-weight:bold;padding-left:5px;padding-right:5px;">MONTO A FINANCIAR:</li>
-            <li style="padding-left:5px;padding-right:5px;"><?echo number_format($arrsubasta['montofin'],2,'.',',').' '.$arrsubasta['moneda'];?></li>
+            <li style="padding-left:5px;padding-right:5px;"><?php echo number_format($arrsubasta['montofin'],2,'.',',').' '.$arrsubasta['moneda'];?></li>
             <input type="hidden" name="monto_financia" id="monto_financia" value="<?=$arrsubasta['montofin']?>">
         </ul>
         <ul>
             <li style="font-weight:bold;width:120px;padding-left:5px;padding-right:5px;">FECHA DE PAGO:</li>
-            <li style="padding-left:5px;padding-right:5px;width:75px;"><?echo date('d-m-Y',strtotime($arrsubasta['fvencimiento']));?></li>
+            <li style="padding-left:5px;padding-right:5px;width:75px;"><?php echo date('d-m-Y',strtotime($arrsubasta['fvencimiento']));?></li>
             <li style="font-weight:bold;padding-left:5px;padding-right:5px;">DIAS x VENCER:</li>
-            <li style="padding-left:5px;padding-right:5px;"><?echo $dias.' d&iacute;as';?></li>
+            <li style="padding-left:5px;padding-right:5px;"><?php echo $dias.' d&iacute;as';?></li>
             <input type="hidden" name="dias" value="<?=$dias?>">
         </ul>
         <div style="overflow:hidden;background-color:#555555;height:1px;"></div>
         <ul style="margin-top:10px;">
             <li style="font-weight:bold;width:300px;padding-left:5px;padding-right:5px;">CALIFICACION DEL PAGADOR (SCORE):</li>
-            <li style="padding-left:5px;padding-right:5px;background-color:#<?=$arrsubasta['colorscore']?>"><?echo '[ '.$arrsubasta['calificacionscore'].' ] '.$arrsubasta['riesgoscore'];?></li>
+            <li style="padding-left:5px;padding-right:5px;background-color:#<?=$arrsubasta['colorscore']?>"><?php echo '[ '.$arrsubasta['calificacionscore'].' ] '.$arrsubasta['riesgoscore'];?></li>
         </ul>
         <ul>
             <li style="font-weight:bold;width:300px;padding-left:5px;padding-right:5px;">CALIFICACION DEL PAGADOR (FACTUREATE):</li>
-            <li style="padding-left:5px;padding-right:5px;background-color:#<?=$arrsubasta['color']?>"><?echo '[ '.$arrsubasta['calificacion'].' ] '.$arrsubasta['riesgo'];?></li>
+            <li style="padding-left:5px;padding-right:5px;background-color:#<?=$arrsubasta['color']?>"><?php echo '[ '.$arrsubasta['calificacion'].' ] '.$arrsubasta['riesgo'];?></li>
         </ul>
         <div style="overflow:hidden;background-color:#555555;height:1px;"></div>
         <ul style="margin-top:10px;">
-            <li style="font-weight:bold;">PROPUESTA (<?echo $arrsubasta['moneda'];?>): <?php echo $v_alerta_preliminar;?></li>
+            <li style="font-weight:bold;">PROPUESTA (<?php echo $arrsubasta['moneda'];?>): <?php echo $v_alerta_preliminar;?></li>
         </ul>
     <?php
     $varr_parametros = $obj_mae->get_parametros();
@@ -264,12 +263,12 @@ if ($_GET['pid'] == 0) $tia = $v_tea_minima;
                 <details>
                     <summary style="font-size: 14px;font-weight: bold;"><i class="fa-solid fa-diagram-successor"></i> Detalle del Obligado al Pagador</summary>
                     <p style="font-size:12px;max-width:600px;">
-                        <b style="color:#064677;">RNC:</b> <?echo $arrobpago['identificacion'];?><br>
-                        <b style="color:#064677;">Nombre:</b> <?echo $arrobpago['nombre'];?><br>
-                        <b style="color:#064677;">Sector Econ&oacute;mico:</b> <?echo $arrobpago['sectoreconomico'];?><br>
-                        <b style="color:#064677;">Descripci&oacute;n de la empresa:</b> <?echo $arrobpago['actividad'];?><br>
-                        <b style="color:#064677;">Fecha de fundaci&oacute;n:</b> <?echo $finicio;?><br>
-                        <b style="color:#064677;">Pagina Web:</b> <?echo $arrobpago['paginaweb'];?>
+                        <b style="color:#064677;">RNC:</b> <?php echo $arrobpago['identificacion'];?><br>
+                        <b style="color:#064677;">Nombre:</b> <?php echo $arrobpago['nombre'];?><br>
+                        <b style="color:#064677;">Sector Econ&oacute;mico:</b> <?php echo $arrobpago['sectoreconomico'];?><br>
+                        <b style="color:#064677;">Descripci&oacute;n de la empresa:</b> <?php echo $arrobpago['actividad'];?><br>
+                        <b style="color:#064677;">Fecha de fundaci&oacute;n:</b> <?php echo $finicio;?><br>
+                        <b style="color:#064677;">Pagina Web:</b> <?php echo $arrobpago['paginaweb'];?>
                     </p>
                 </details>
             </li>
@@ -278,7 +277,7 @@ if ($_GET['pid'] == 0) $tia = $v_tea_minima;
             <li>
                 <details>
                     <summary style="font-size: 14px;font-weight: bold;"><i class="fa-solid fa-diagram-successor"></i> Riesgos de la Factura y del Obligado al Pago</summary>
-                    <?
+                    <?php
                     if ($arrfacturariesgo['riesgoid'] != 0){
                         echo '<p style="font-size:12px;max-width:600px;color:#064677;font-weight: bold;">Riesgo Factura</p>
                                 <p style="font-size:12px;max-width:600px;">['.$arrfacturariesgo['calificacion_riesgo'].'] '.$arrfacturariesgo['nombre_riesgo'].'</p>
@@ -302,7 +301,7 @@ if ($_GET['pid'] == 0) $tia = $v_tea_minima;
             <li>
                 <details>
                     <summary style="font-size: 14px;font-weight: bold;"><i class="fa-solid fa-diagram-successor"></i> Historial de Negociaci&oacute;n</summary>
-                    <?
+                    <?php
                     if ($arrhistoria['noperaciones'] > 0){
                         echo '<p style="font-size:12px;max-width:600px;">El obligado al pago cuenta con el siguiente historial de negociaci&oacute;n:</p>
                             <p style="font-size:12px;max-width:600px;"><b>Nro TOTAL de operaciones:</b>'.$arrhistoria['noperaciones'].'<br>
@@ -328,7 +327,7 @@ if ($_GET['pid'] == 0) $tia = $v_tea_minima;
         ##################### BOTONERA
         ###########################################################-->
         <ul style="margin-top:10px;">
-    <?
+    <?php
         if ($propuestaid != 0){     // YA EXISTE LA PROPUESTA
     ?>
             <button type="button" class="btn btn-primary" style="font-size:11px;background-color:var(--color-azulv2);border:none;" onclick="Grabar()">
@@ -348,6 +347,17 @@ if ($_GET['pid'] == 0) $tia = $v_tea_minima;
     </form>
     <!------ END CUERPO VARIABLE ------>
     <!-- FUNCIONES DE LOS BOTONES -->
+
+    <!-- div para el spinner de loadgin -->
+    <div id="loadingModal" class="loading-overlay">
+        <div class="loading-box">
+            <div class="spinner"></div>
+            <div class="loading-title">Procesando </div>
+            <div class="loading-subtitle">............................</div>
+        </div>
+    </div>
+    <!-- fin del spinner loading -->
+
     <script>
         //==== CALCULO DE LA GANANCIA 
         document.addEventListener("DOMContentLoaded", validapropuesta('tia'));
@@ -554,6 +564,18 @@ if ($_GET['pid'] == 0) $tia = $v_tea_minima;
             monto_invertir = monto_invertir.toLocaleString('en-US',{minimumFractionDigits:2, maximumFractionDigits:2});
             document.frm_modal.monto_label.value = monto_invertir;
         }
+
+        //==== FUNCIONES DEL SPINNER LOADING
+
+        function mostrarLoading() {
+            document.getElementById("loadingModal").style.display = "flex";
+        }
+
+        function ocultarLoading() {
+            document.getElementById("loadingModal").style.display = "none";
+        }
+
+        //======================================
     </script>
 </BODY>
 </HTML>

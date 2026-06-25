@@ -1,4 +1,4 @@
-<?
+<?php
 if(isset($_GET['page'])){
     // cuando cambia de pagina
     require("../conn/conn_db_trans.inc");
@@ -9,6 +9,8 @@ if(isset($_GET['page'])){
     $rowcount = $_GET['rowcount'];
 } else{
     $rowcount = -1; // significa que se debe llamar al query
+    $seconomicoid = 0;
+    $triesgoid = 0;
 }
 
 $objsubasta = new subasta;
@@ -103,7 +105,7 @@ if ($rowcount > 0){
             <td data-label="MONEDA">'.$arrsubastas[$i]['moneda'].'</td>
             <td data-label="DIAS x COBRAR">'.$dias.'</td>
             <td data-label="F VENCIMIENTO">'.$v_fvencimiento_l.'</td>
-            <td data-label="RIESGO" style="background-color:#'.$arrsubastas[$i]['color'].';color:#'.$arrsubastas[$i]['color_fuente'].';">['.$arrsubastas[$i]['calificacion'].'] '.$arrsubastas[$i]['riesgo'].'</td>
+            <td data-label="RIESGO" style="background-color:#'.$arrsubastas[$i]['color'].';color:#fff;">['.$arrsubastas[$i]['calificacion'].'] '.$arrsubastas[$i]['riesgo'].'</td>
             <td data-label="ACCION" style="color:#064677;font-size:12px;">'.$v_detalle.'</td>
             <td data-label="M" style="color:#b30a1f;">'.$v_marca.'</td>
             </tr>';

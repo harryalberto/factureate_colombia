@@ -366,7 +366,7 @@ class seguridad{
             $varr_result = array('sec' => 0);
         }
 
-        $conn->close(); $conn2->close(); $conn3->close();
+        //$conn->close(); $conn2->close(); $conn3->close();
 
         return $varr_result;
     }

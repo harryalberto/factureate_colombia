@@ -1,4 +1,4 @@
-<?
+<?php
 if(isset($_GET['page'])){
     // cuando cambia de pagina
     require("../conn/conn_db_trans.inc");
@@ -7,6 +7,7 @@ if(isset($_GET['page'])){
     $rowcount = $_GET['rowcount'];
 } else{
     $rowcount = -1; // significa que se debe llamar al query
+    $varr_fitros = '';
 }
 
 $obj_cuentas = new cuentas;

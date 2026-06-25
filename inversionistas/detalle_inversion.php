@@ -13,29 +13,34 @@ require("../lib-trans/c_cuentas.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'INVERSIONES';
     require("../lib/valida-acceso.php");
 ?>
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $obj_inversiones = new inversiones;
 
 $v_arr_inv = $obj_inversiones->get_detalle_inversion($_GET['pid'],$_GET['fid']);
-$v_finversion_t = strtotime($v_arr_inv['fregistro']);
-$v_finversion = date('d-m-Y',$v_finversion_t);
 
-$v_fpago_t = strtotime($v_arr_inv['f_pago_factura']);
-$v_fpago = date('d-m-Y',$v_fpago_t);
+if (is_null($v_arr_inv['fregistro'])) $v_finversion = '';
+else {
+    $v_finversion_t = strtotime($v_arr_inv['fregistro']);
+    $v_finversion = date('d-m-Y',$v_finversion_t);
+}
+
+if (is_null($v_arr_inv['f_pago'])) $v_fpago = '';
+else {
+    $v_fpago_t = strtotime($v_arr_inv['f_pago_factura']);
+    $v_fpago = date('d-m-Y',$v_fpago_t);
+}
+
 $v_fvencimiento = date('d-m-Y',strtotime($v_arr_inv['f_vencimiento']));
 
 if ($v_fpago != $v_fvencimiento) $v_fpago = '<i class="fa-solid fa-circle-exclamation" style="color:var(--color-amarillo);font-size:18px;"></i> '.$v_fpago;
-
-if (is_null($v_arr_inv['fregistro'])) $v_finversion = '';
-if (is_null($v_arr_inv['f_pago'])) $v_fpago = '';
 
 if ($v_arr_inv['e_subasta_id'] != 26){  // subasta no liquidada
     $v_estado = $v_arr_inv['e_subasta'];
@@ -58,10 +63,13 @@ if ($v_arr_inv['e_subasta_id'] != 26){  // subasta no liquidada
             break;
     }
 }
+
+if (is_null($v_arr_inv['dias_inversion'])) $v_dias_inversion = 0;
+else $v_dias_inversion = $v_arr_inv['dias_inversion'];
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     date_default_timezone_set("America/Santo_Domingo");
     //------ PARTE SUPERIOR ------
     
@@ -74,15 +82,15 @@ if ($v_arr_inv['e_subasta_id'] != 26){  // subasta no liquidada
             <span class="icon-coin-dollar" style="font-size:30px;color:#1F9A8E;margin-right: 10px;"></span></li>
             <div class="formulario_grupo_row" style="width:100px;">
                 <label>ID OPERACION</label>
-                <label><?echo $_GET['fid']?></label>
+                <label><?php echo $_GET['fid']?></label>
             </div>
             <div class="formulario_grupo_row" style="width:200px;">
                 <label>PAGADOR</label>
-                <label><?echo $v_arr_inv['cliente'];?></label>
+                <label><?php echo $v_arr_inv['cliente'];?></label>
             </div>
             <div class="formulario_grupo_row" style="width:100px;">
                 <label>F PAGO</label>
-                <label><?echo $v_fpago;?></label>
+                <label><?php echo $v_fpago;?></label>
             </div>
         </div>
 
@@ -99,7 +107,7 @@ if ($v_arr_inv['e_subasta_id'] != 26){  // subasta no liquidada
             </div>
             <div class="formulario_grupo_row" style="width:60px;">
                 <label for="dias">DIAS INV</label>
-                <input type="text" id="dias" class="formulario_control" value="<?=number_format($v_arr_inv['dias_inversion'],0,'.',',')?>" readonly>
+                <input type="text" id="dias" class="formulario_control" value="<?=number_format($v_dias_inversion,0,'.',',')?>" readonly>
             </div>
             <div class="formulario_grupo_row" style="width:100px;">
                 <label for="estado">ESTADO</label>
@@ -129,7 +137,7 @@ if ($v_arr_inv['e_subasta_id'] != 26){  // subasta no liquidada
         <div class="contenedor_formulario_column">
             <div class="contenedor_formulario_column">
                 <label for="notas" style="margin-right:15px;">NOTAS</label>
-                <textarea id="notas" class="formulario_control" rows="4" cols="60" readonly><?echo $v_estado_desc;?></textarea>
+                <textarea id="notas" class="formulario_control" rows="4" cols="60" readonly><?php echo $v_estado_desc;?></textarea>
             </div>
         </div>
     </div>

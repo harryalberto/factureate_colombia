@@ -9,7 +9,7 @@ require("../lib-trans/maestros.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'FINANCIAMIENTO';
     require("../lib/valida-acceso.php");
@@ -41,15 +41,16 @@ require("../lib-trans/maestros.php");
         }
     </script>
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
+$total_paginas = 0;
 
 date_default_timezone_set("America/Santo_Domingo");
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     //date_default_timezone_set("America/Santo_Domingo");
     $menu = 'maestros/ordenes_transferencia.php';
     //------ PARTE SUPERIOR ------
@@ -62,9 +63,9 @@ date_default_timezone_set("America/Santo_Domingo");
         Relaci&oacute;n de Ordenes de Transferencia
     </div>
 
-    <div id="content2"><? require('ordenes_transferencia_page.php'); ?></div>
+    <div id="content2"><?php require('ordenes_transferencia_page.php'); ?></div>
     <!-- ############## paginacion ################ -->
-    <?
+    <?php
     if ($total_paginas > 1) {
         echo '<div class="pagination">';
         echo '  <ul>';

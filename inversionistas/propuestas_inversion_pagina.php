@@ -1,4 +1,4 @@
-<?
+<?php
 if(isset($_GET['page'])){
     //-------------- cuando cambia de pagina
     require("../conn/conn_db_trans.inc");

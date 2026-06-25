@@ -13,7 +13,7 @@ require("../lib-trans/c_cuentas.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'INVERSIONES';
     require("../lib/valida-acceso.php");
@@ -73,8 +73,7 @@ require("../lib-trans/c_cuentas.php");
             if (accion == 'envio_contrato'){
                 if (document.frm.link_envio.value == '') alert('Debe ingresar la referencia del envio del contrato al vendedor');
                 else{
-                    /*var btn_envio = document.getElementById('btn_enviar_contrato');
-                    btn_envio.disabled = "true";*/
+                    /*var btn_envio = getElementById('');*/
                     document.frm.action = 'subasta_gestion_proceso.php';
                     document.frm.submit();
                 }
@@ -121,15 +120,15 @@ require("../lib-trans/c_cuentas.php");
                 location.href = 'subastas.php?estados='+estados;
             }
         }
-        
     </script>
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $obj_factura = new factura;
 $obj_mae = new maestros;
 $objsubasta = new subasta;
+$vobj_seg = new seguridad;
 
 $arrsubasta = $objsubasta->get_subasta($_GET['subastaid']);
 $arrpropuestas = $objsubasta->get_subasta_posiciones($_GET['subastaid']);
@@ -138,7 +137,7 @@ $varr_parametros = $obj_mae->get_parametros();
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     date_default_timezone_set("America/Lima");
     //------ PARTE SUPERIOR ------
     
@@ -153,7 +152,6 @@ $varr_parametros = $obj_mae->get_parametros();
         <input type="hidden" name="grupowin" id="grupowin" value="<?=$arrsubasta['grupowinid']?>">
         <input type="hidden" name="accion">
         <input type="hidden" name="cliente_id" id="cliente_id" value="<?=$arrsubasta['clienteid']?>">
-        
     <div class="frmtransaccion" style="font-size:12px;">
         <ul>
             <li style="margin-left:32px;font-weight: bold;width:300px;">ID OPERACION</li>
@@ -162,9 +160,9 @@ $varr_parametros = $obj_mae->get_parametros();
         </ul>
         <ul>
             <li><span class="icon-file-text" style="font-size:25px;color:#1F9A8E;"></span></li>
-            <li style="padding-left:5px;padding-right:5px;margin-left:10px;"><?echo $arrsubasta['facturaid'];?></li>
-            <li style="padding-left:5px;padding-right:5px;margin-left:300px;"><?echo $arrsubasta['facnumero'];?></li>
-            <li style="padding-left:5px;padding-right:5px;margin-left:100px;"><?echo $arrsubasta['cliente'];?></li>
+            <li style="padding-left:5px;padding-right:5px;margin-left:10px;"><?php echo $arrsubasta['facturaid'];?></li>
+            <li style="padding-left:5px;padding-right:5px;margin-left:300px;"><?php echo $arrsubasta['facnumero'];?></li>
+            <li style="padding-left:5px;padding-right:5px;margin-left:100px;"><?php echo $arrsubasta['cliente'];?></li>
             <input type="hidden" name="factura_id" value="<?=$arrsubasta['facturaid']?>">
             <input type="hidden" name="factura_numero" value="<?=$arrsubasta['facnumero']?>">
             <input type="hidden" name="cliente_nombre" value="<?=$arrsubasta['cliente']?>">
@@ -174,7 +172,7 @@ $varr_parametros = $obj_mae->get_parametros();
             <li style="font-weight:bold;">DATOS DEL EMISOR:</li>
         </ul>
         <ul>
-            <li style="font-weight:bold;width:115px;padding-left:5px;padding-right:5px;">NIT EMISOR:</li>
+            <li style="font-weight:bold;width:115px;padding-left:5px;padding-right:5px;">RNC EMISOR:</li>
             <li style="font-weight:bold;padding-left:5px;padding-right:5px;width:280px;">EMISOR:</li>
             <li style="font-weight:bold;padding-left:5px;padding-right:5px;width:210px;">EMAIL:</li>
             <li style="font-weight:bold;padding-left:5px;padding-right:5px;">TELEFONO:</li>
@@ -264,7 +262,9 @@ $varr_parametros = $obj_mae->get_parametros();
             <li style="font-weight:bold;">DATOS DE LA LIQUIDACION DE LA SUBASTA:</li>
         </ul>
     <?php
-        if ($_SESSION['user']['perfilid'] == 12 || $_SESSION['user']['perfilid'] == 13 || $_SESSION['user']['perfilid'] == 1){  //CLO
+        $varr_permisos = $vobj_seg->get_permisos($_SESSION['user']['perfilid']);
+
+        if ($obj_mae->busca_arreglo_bidi($varr_permisos, 'codigo', 'COMP-LEG')){
             if ($arrsubasta['estado_compensa_id'] == 40){  // contrato x enviar
                 echo '
             <ul>
@@ -291,24 +291,9 @@ $varr_parametros = $obj_mae->get_parametros();
                 <li style="font-weight:bold;width:200px;padding-left:5px;padding-right:5px;">CONTRATO FIRMADO:</li>
                 <li><a href="'.$arrsubasta['path_contrato'].'" style="text-decoration:none;color:#064677;" target="_blank"><span class="icon-link"></span> Ver Contrato Firmado</a></li>
             </ul>';
-            //@@@@@@@@@@@@ COLOMBIA
-                if ($arrsubasta['estado_compensa_id'] == 44){
-                    echo '
-            <ul>
-                <li style="font-weight:bold;width:200px;padding-left:5px;padding-right:5px;">ADJUNTAR ENDOSO RADIAN:</li>
-                <li><input type="file" name="endoso"></li>
-            </ul>';
-                } else{
-                    echo '
-            <ul>
-                <li style="font-weight:bold;width:200px;padding-left:5px;padding-right:5px;">LINK ENDOSO RADIAN:</li>
-                <li><a href="'.$arrsubasta['transferenciapath'].'" style="text-decoration:none;color:#064677;" target="_blank"><span class="icon-link"></span> Ver Endoso</a></li>
-            </ul>';
-                }
-            //@@@@@@@@@@@@@@@@@@@@@@
             }
         }
-        if ($_SESSION['user']['perfilid'] == 10 || $_SESSION['user']['perfilid'] == 14 || $_SESSION['user']['perfilid'] == 1){   //  ANALISTA FINANCIERO / CFO / CLEVEL
+        if ($obj_mae->busca_arreglo_bidi($varr_permisos, 'codigo', 'COMP-FINAN')){   //  ANALISTA FINANCIERO / CFO / CLEVEL
             if ($arrsubasta['estado_compensa_id'] == 45){   //ENDOSADO
                 $varr_emisor = $obj_mae->get_datos_emisor_full($arrsubasta['emisorid']);
                 
@@ -330,6 +315,7 @@ $varr_parametros = $obj_mae->get_parametros();
                 <li style="margin-right:50px;"><input type="text" name="monto_transferencia" size="15" value="'.number_format($arrsubasta['montofin'],2,'.',',').'" class="frminput_text_off" readonly></li>
                 <li><input type="text" name="moneda_transferencia" size="15" value="'.$arrsubasta['moneda'].'" class="frminput_text_off" readonly></li>
             </ul>';
+            
             }
         }
     ?>
@@ -338,8 +324,8 @@ $varr_parametros = $obj_mae->get_parametros();
         ##################### BOTONERA
         ###########################################################-->
         <ul style="margin-top:10px;">
-    <?
-        if ($_SESSION['user']['perfilid'] == 12 || $_SESSION['user']['perfilid'] == 13 || $_SESSION['user']['perfilid'] == 1){      //CLO
+    <?php
+        if ($obj_mae->busca_arreglo_bidi($varr_permisos, 'codigo', 'COMP-LEG')){
             if ($arrsubasta['estado_compensa_id'] == 40)    // CONTRATO PENDIENTE DE ENVIAR AL EMISOR
             echo '
                 <li> <button type="button" class="btn btn-primary" style="font-size:11px;background-color:var(--color-azulv2);border:none;" onclick="enviarContrato()" id="btn_enviar_contrato">
@@ -348,11 +334,8 @@ $varr_parametros = $obj_mae->get_parametros();
             echo '
                 <li> <button type="button" class="btn btn-primary" style="font-size:11px;background-color:var(--color-azulv2);border:none;" onclick="recibirContrato()" id="btn_recibir_contrato">
                 <i class="fa-solid fa-file-invoice"></i> Recibir Contrato Emisor</button></li>';
-            if ($arrsubasta['estado_compensa_id'] == 44)    // CONTRATO RECIBIDO Y FIRMADO POR EL EMISOR
-            echo '
-                <li> <button type="button" class="btn btn-primary" style="font-size:11px;background-color:var(--color-azulv2);border:none;" onclick="Endosar()" id="btn_endoso">
-                <i class="fa-solid fa-angles-right"></i> Endoso RADIAN</button></li>';
         }
+        
     ?>
         </ul>
     </div>
@@ -381,16 +364,6 @@ $varr_parametros = $obj_mae->get_parametros();
             }
         }
         
-        function Endosar(){
-            if (document.frm.endoso.value == '') alert('Debe agregar el archivo de Endoso');
-            else{
-                var btn_endoso = document.getElementById('btn_endoso');
-                btn_endoso.disabled = "true";
-                document.frm.accion.value = 'endoso';
-                document.frm.action = 'subasta_gestion_proceso.php';
-                document.frm.submit();
-            }
-        }
     </script>
 </BODY>
 </HTML>

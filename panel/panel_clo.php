@@ -12,7 +12,7 @@ require("../lib-trans/c_inversiones.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'PCLO';
     require("../lib/valida-acceso.php");
@@ -118,43 +118,43 @@ else $v_empresa_sineval_alert = '---';
                 <tbody>
                     <tr>
                         <td data-label="AREA">INVERSORES</td>
-                        <td data-label="ALERTA">Pendiente de aprobar con menos de <?echo $varr_max_dias_aprob_inversor['valornum'];?> dias</td>
-                        <td data-label="ESTADO"><?echo $v_qinversor_alert;?></td>
+                        <td data-label="ALERTA">Pendiente de aprobar con menos de <?php echo $varr_max_dias_aprob_inversor['valornum'];?> dias</td>
+                        <td data-label="ESTADO"><?php echo $v_qinversor_alert;?></td>
                     </tr>
                     <tr>
                         <td data-label="AREA">INVERSORES</td>
-                        <td data-label="ALERTA">Pendiente de aprobar con mas de <?echo $varr_max_dias_aprob_inversor['valornum'];?> dias</td>
-                        <td data-label="ESTADO"><?echo $v_qinversor_max;?></td>
+                        <td data-label="ALERTA">Pendiente de aprobar con mas de <?php echo $varr_max_dias_aprob_inversor['valornum'];?> dias</td>
+                        <td data-label="ESTADO"><?php echo $v_qinversor_max;?></td>
                     </tr>
                     <tr>
                         <td data-label="AREA">INVERSORES</td>
                         <td data-label="ALERTA">Analisis PLAFT por vencer</td>
-                        <td data-label="ESTADO"><?echo $v_plaft_alert;?></td>
+                        <td data-label="ESTADO"><?php echo $v_plaft_alert;?></td>
                     </tr>
                     <tr>
                         <td data-label="AREA">INVERSORES</td>
                         <td data-label="ALERTA">Analisis PLAFT vencidos</td>
-                        <td data-label="ESTADO"><?echo $v_plaft_vencido;?></td>
+                        <td data-label="ESTADO"><?php echo $v_plaft_vencido;?></td>
                     </tr>
                     <tr>
                         <td data-label="AREA">OPERACIONES</td>
-                        <td data-label="ALERTA">Pendiente de envio de contrato con menos de <?echo $varr_max_dias_xenviar_contrato['valornum'];?> dias</td>
-                        <td data-label="ESTADO"><?echo $v_contrato_xenviar_alert;?></td>
+                        <td data-label="ALERTA">Pendiente de envio de contrato con menos de <?php echo $varr_max_dias_xenviar_contrato['valornum'];?> dias</td>
+                        <td data-label="ESTADO"><?php echo $v_contrato_xenviar_alert;?></td>
                     </tr>
                     <tr>
                         <td data-label="AREA">OPERACIONES</td>
-                        <td data-label="ALERTA">Pendiente de envio de contrato con mas de <?echo $varr_max_dias_xenviar_contrato['valornum'];?> dias</td>
-                        <td data-label="ESTADO"><?echo $v_contrato_xenviar_max;?></td>
+                        <td data-label="ALERTA">Pendiente de envio de contrato con mas de <?php echo $varr_max_dias_xenviar_contrato['valornum'];?> dias</td>
+                        <td data-label="ESTADO"><?php echo $v_contrato_xenviar_max;?></td>
                     </tr>
                     <tr>
                         <td data-label="AREA">OPERACIONES</td>
-                        <td data-label="ALERTA">Contratos en espera de firma con menos de <?echo $varr_max_dias_firmar_contrato['valornum'];?> dias</td>
-                        <td data-label="ESTADO"><?echo $v_contrato_sinfirma_alert;?></td>
+                        <td data-label="ALERTA">Contratos en espera de firma con menos de <?php echo $varr_max_dias_firmar_contrato['valornum'];?> dias</td>
+                        <td data-label="ESTADO"><?php echo $v_contrato_sinfirma_alert;?></td>
                     </tr>
                     <tr>
                         <td data-label="AREA">OPERACIONES</td>
-                        <td data-label="ALERTA">Contratos en espera de firma con mas de <?echo $varr_max_dias_firmar_contrato['valornum'];?> dias</td>
-                        <td data-label="ESTADO"><?echo $v_contrato_sinfirma_max;?></td>
+                        <td data-label="ALERTA">Contratos en espera de firma con mas de <?php echo $varr_max_dias_firmar_contrato['valornum'];?> dias</td>
+                        <td data-label="ESTADO"><?php echo $v_contrato_sinfirma_max;?></td>
                     </tr>
                     <!--APLICA SOLO PARA COLOMBIA
                         <tr>
@@ -164,13 +164,13 @@ else $v_empresa_sineval_alert = '---';
                     </tr>-->
                     <tr>
                         <td data-label="AREA">EMPRESAS</td>
-                        <td data-label="ALERTA">Empresas pendientes de evaluacion legal con menos de <?echo $varr_max_dias_sineval['valornum'];?> dias</td>
-                        <td data-label="ESTADO"><?echo $v_empresa_sineval_alert;?></td>
+                        <td data-label="ALERTA">Empresas pendientes de evaluacion legal con menos de <?php echo $varr_max_dias_sineval['valornum'];?> dias</td>
+                        <td data-label="ESTADO"><?php echo $v_empresa_sineval_alert;?></td>
                     </tr>
                     <tr>
                         <td data-label="AREA">EMPRESAS</td>
-                        <td data-label="ALERTA">Empresas pendientes de evaluacion legal con mas de <?echo $varr_max_dias_sineval['valornum'];?> dias</td>
-                        <td data-label="ESTADO"><?echo $v_empresa_sineval_alert;?></td>
+                        <td data-label="ALERTA">Empresas pendientes de evaluacion legal con mas de <?php echo $varr_max_dias_sineval['valornum'];?> dias</td>
+                        <td data-label="ESTADO"><?php echo $v_empresa_sineval_alert;?></td>
                     </tr>
                 </tbody>
             </table>
@@ -229,11 +229,11 @@ else $v_empresa_sineval_alert = '---';
       new Chart(ctx, {
         type: 'pie',
         data: {
-          labels: [<?echo $v_labels_empdist;?>],
+          labels: [<?php echo $v_labels_empdist;?>],
           datasets: [{
             label: '# empresas',
-            data: [<?echo $v_q_empdist;?>],
-            backgroundColor: [<?echo $v_color_empdist;?>],
+            data: [<?php echo $v_q_empdist;?>],
+            backgroundColor: [<?php echo $v_color_empdist;?>],
           }]
         },
         options: {
@@ -280,12 +280,12 @@ else $v_empresa_sineval_alert = '---';
       new Chart(ctx2, {
         type: 'bar',
         data: {
-          labels: [<?echo $v_labels_tipoinver;?>],
+          labels: [<?php echo $v_labels_tipoinver;?>],
           datasets: [{
             label: '# inversores',
-            data: [<?echo $v_q_tipoinver;?>],
-            borderColor: [<?echo $v_bcolor_tipoinver;?>],
-            backgroundColor: [<?echo $v_bgcolor_tipoinver;?>],
+            data: [<?php echo $v_q_tipoinver;?>],
+            borderColor: [<?php echo $v_bcolor_tipoinver;?>],
+            backgroundColor: [<?php echo $v_bgcolor_tipoinver;?>],
           }]
         },
         options: {
@@ -324,16 +324,16 @@ else $v_empresa_sineval_alert = '---';
       new Chart(ctx3, {
         type: 'bar',
         data: {
-          labels: [<?echo $v_labels_plaft;?>],
+          labels: [<?php echo $v_labels_plaft;?>],
           datasets: [{
             label: 'activos:',
-            data: [<?echo $v_q_activos;?>],
-            backgroundColor: [<?echo $v_bgcolor_activos;?>],
+            data: [<?php echo $v_q_activos;?>],
+            backgroundColor: [<?php echo $v_bgcolor_activos;?>],
           },
           {
             label: 'no activos:',
-            data: [<?echo $v_q_inactivos;?>],
-            backgroundColor: [<?echo $v_bgcolor_inactivos;?>],
+            data: [<?php echo $v_q_inactivos;?>],
+            backgroundColor: [<?php echo $v_bgcolor_inactivos;?>],
           },]
         },
         options: {

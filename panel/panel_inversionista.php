@@ -107,6 +107,8 @@ $rowcount = $vobj_subastas->get_subastas_inversor('COUNT', 0, 0, $filtros, '', $
                     <span class="icon-eye" style="color:#000000;font-size: 14px;"></span> En Propuesta
                     </abbr></p>
                 <?php
+                $v_label_propuestas = '';
+
                 if ($v_q_propuestas > 0){
                     $v_label_propuestas = '';
 
@@ -118,10 +120,10 @@ $rowcount = $vobj_subastas->get_subastas_inversor('COUNT', 0, 0, $filtros, '', $
                 }
                 ?>
                 <p style="margin:10px 0px;text-align:left;font-size:16px;color:#000000;font-weight: bold;">
-                    <? echo $v_label_propuestas;?>
+                    <?php echo $v_label_propuestas;?>
                 </p>
                 <p style="margin:10px 0px;text-align:left;color:var(--color-gris-oscuro)">
-                    <? echo '<b>'.$v_q_propuestas.'</b> propuesta(s) activa(s)';?>
+                    <?php echo '<b>'.$v_q_propuestas.'</b> propuesta(s) activa(s)';?>
                 </p>
             </li>
             

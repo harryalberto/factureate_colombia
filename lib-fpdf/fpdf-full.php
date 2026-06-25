@@ -102,11 +102,47 @@ class PDF extends FPDF
         $this->SetLineWidth(.3);
         $this->SetFont('','B');
         // Cabecera
-        $w = array(40, 35, 45, 40);
+        //$w = array(40, 35, 45, 40);
 
-        for($i=0;$i<count($header);$i++)
+        /*for($i=0;$i<count($header);$i++)
             $this->Cell($tamanos_w[$i],5,$header[$i],1,0,'C',true);
+        $this->Ln();*/
+
+        // Cabecera- verifico si tiene doble linea
+        $doble = 0;
+        $segunda_linea = array();
+
+        for($i=0;$i<count($header);$i++){
+            if (strlen($header[$i]) > ($tamanos_w[$i] / 2.5)) $doble = 1;
+        }
+
+        // Cabecera - pinto la cabecera
+        for($i=0;$i<count($header);$i++){
+            if (strlen($header[$i]) > ($tamanos_w[$i] / 2.5)){
+                $palabras = explode(" ", $header[$i]);
+
+                if (count($palabras) > 1){
+                    $this->Cell($tamanos_w[$i],5,$palabras[0],1,0,'C',true);
+                    $segunda_linea[$i] = $palabras[1];
+                } else {
+                    $this->Cell($tamanos_w[$i],5,$header[$i],1,0,'C',true);
+                    $segunda_linea[$i] = '';
+                }
+            } else {
+                $this->Cell($tamanos_w[$i],5,$header[$i],1,0,'C',true);
+
+                if ($doble == 1) $segunda_linea[$i] = '';
+            }
+        }
         $this->Ln();
+
+        if ($doble == 1){
+            for ($i=0; $i<count($segunda_linea); $i++){
+                $this->Cell($tamanos_w[$i],5,$segunda_linea[$i],1,0,'C',true);
+            }
+
+            $this->Ln();
+        }
 
         // Restauración de colores y fuentes
         $this->SetFillColor(204,204,204);

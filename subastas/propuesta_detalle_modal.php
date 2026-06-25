@@ -400,7 +400,7 @@ if ($_GET['pid'] == 0) $tia = $v_tea_minima;
                         contentType: false,
                         cache: false,
                         processData: false,
-                        success:function(data){alert(data);
+                        success:function(data){
                             if (propuestaid == 0) alert('Se generó la posición de su inversión');
                             else alert('Se actualizó la posición de su inversión');
 

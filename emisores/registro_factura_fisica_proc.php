@@ -51,25 +51,27 @@ if (isset($_POST['numeroemisor'])){
         'impuestoventa' => $_POST['impuestoventa'],
         'otroscargos' => $_POST['otroscargos'],
         'otrostributos' => $_POST['otrostributos'],
-        'total' => $_POST['total'],
         'tipofinanciamiento' => $_POST['tipofinanciamiento'],
         'conmaxdescuento' => $v_conmaxdcto,
         'maxdescuento' => $v_maxdcto,
         'xmlpath' => $xml_path,
-        'tipo_factura' => $_POST['tipo_factura']
+        'tipo_factura' => $_POST['tipo_factura'],
+        'retenciones' => $_POST['retenciones']
         );
+
+    if (isset($_POST['total_neto'])){
+        $arrfactura['total'] = $_POST['total_neto'];
+        $arrfactura['gran_total'] = $_POST['total'];
+    } else {
+        $arrfactura['total'] = $_POST['total'];
+        $arrfactura['gran_total'] = $_POST['gran_total'];
+    }
 
     $tipo_archivo = $_FILES['facturafile']['type'];
     $tamano_archivo = $_FILES['facturafile']['size'];
     $nombre_archivo = $_FILES['facturafile']['name'];
     $var_formato_permitido = array('pdf','jpg','jpeg','png');
 
-    // verifica si tiene limite de descuento
-    /*if ($_POST['conmaxdescuento'] != 1){
-        $arrfactura['conmaxdescuento'] = 0;
-        $arrfactura['maxdescuento'] = 0;
-    }*/
-    
     // verifica si adjunto o no el pdf
     if (!isset($_FILES['facturafile'])){ 
         $arrfactura['pdfpath'] = '';
@@ -77,14 +79,12 @@ if (isset($_POST['numeroemisor'])){
         $var_extension = pathinfo($nombre_archivo, PATHINFO_EXTENSION);
         
         if ((in_array($var_extension,$var_formato_permitido)) && ($tamano_archivo < 1000000)){
-            $var_path_carpeta = '../pdf/'.'EMI'.$_SESSION['user']['empresaid'];
-            
+            $var_path_carpeta = '../pdf/'.'EMP_'.$_POST['emisor'].'_'.$_POST['numeroemisor'].'/facturas';
             if (!is_dir($var_path_carpeta)) mkdir($var_path_carpeta, 0777, true);
             
-            $arrfactura['pdfpath'] = '../pdf/'.'EMI'.$_SESSION['user']['empresaid'].'/'.$arrfactura['nrofactura'].'-'.$nombre_archivo;
+            $arrfactura['pdfpath'] = $var_path_carpeta.'/'.$arrfactura['nrofactura'].'-'.$nombre_archivo;
             
             move_uploaded_file($_FILES['facturafile']['tmp_name'],  $arrfactura['pdfpath']);
-            //else echo 'ocurrio un error '.$_FILES['facturafile']['error'];
         } else {
             $arrfactura['pdfpath'] = '';
             $error = 10002;
@@ -93,15 +93,21 @@ if (isset($_POST['numeroemisor'])){
 
     //TRATAMIENTO DEL XML
     if (isset($_POST['xml_path'])){
-        rename('../pdf/'.'EMI'.$_SESSION['user']['empresaid'].'/temp/'.$_POST['nombre_xml'], '../pdf/'.'EMI'.$_SESSION['user']['empresaid'].'/'.$_POST['nombre_xml']);
-        $xml_path = '../pdf/'.'EMI'.$_SESSION['user']['empresaid'].'/'.$_POST['nombre_xml'];
+        $v_carpeta_xml = '../pdf/'.'EMP_'.$_POST['emisor'].'_'.$_POST['numeroemisor'].'/xml';
+        if (!is_dir($v_carpeta_xml)) mkdir($v_carpeta_xml, 0777, true);
+
+        rename('../pdf/'.'EMP_'.$_POST['emisor'].'_'.$_POST['numeroemisor'].'/temp/'.$_POST['nombre_xml'], $v_carpeta_xml.'/'.$_POST['nombre_xml']);
+        $xml_path = $v_carpeta_xml.'/'.$_POST['nombre_xml'];
     } else $xml_path = '';
 
     $arrfactura['xmlpath'] = $xml_path;
 
     if ($tipoaccion == 'new' || $tipoaccion == 'xml'){
         // verificacion de existencia del cliente
-        $arrfactura['clienteid'] = $emp->registro_express_cliente($arrfactura['numerocliente'],$arrfactura['cliente']);
+        $varr_cliente_express = array('identificacion' => $arrfactura['numerocliente'], 'nombre' => $arrfactura['cliente'], 'cliente_correo' => $_POST['cliente_correo'],
+                                        'cliente_direccion' => $_POST['cliente_direccion'], 'cliente_contacto' => $_POST['cliente_contacto']);
+
+        $arrfactura['clienteid'] = $emp->registro_express_cliente_arr($varr_cliente_express);
         // llamada a la grabacion de la factura
         $arrfactura['accion'] = 'insert';
         

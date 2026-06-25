@@ -10,7 +10,7 @@ require("../lib-trans/c_subasta.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'SUBASTAS COMP';
     require("../lib/valida-acceso.php");
@@ -42,14 +42,14 @@ require("../lib-trans/c_subasta.php");
         }
     </script>
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $objmaestro = new maestros;
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     date_default_timezone_set("America/Lima");
     $menu = 'subastas/subastas_comp.php';
     //------ PARTE SUPERIOR ------
@@ -62,7 +62,7 @@ $objmaestro = new maestros;
         Relaci&oacute;n de Subastas Compensadas
     </div>
     
-    <div id="content2"><? require('pagina_subastas_comp.php'); ?></div>
+    <div id="content2"><?php require('pagina_subastas_comp.php'); ?></div>
     <!------ END CUERPO VARIABLE ------>
     <!--#####################################################
     ########### ZONA MODAL 

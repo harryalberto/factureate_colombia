@@ -149,6 +149,14 @@ $fvencimiento = date('d-m-Y',$fvencimiento_t);
                         <input type="text" class="formulario_control" id="otrostributos" name="otrostributos" value="<?=number_format($arrfactura['otrostributos'],2,'.',',')?>" style="text-align: right;" readonly>
                     </div>
                     <div class="formulario_grupo_row" style="width:100px;">
+                        <label for="gran_total">GRAN TOTAL</label>
+                        <input type="text" class="formulario_control" id="gran_total" name="gran_total" value="<?=number_format($arrfactura['gran_total'],2,'.',',')?>" style="text-align: right;" readonly>
+                    </div>
+                    <div class="formulario_grupo_row" style="width:100px;">
+                        <label for="retenciones">RETENCIONES</label>
+                        <input type="text" class="formulario_control" id="retenciones" name="retenciones" value="<?=number_format($arrfactura['retenciones'],2,'.',',')?>" style="text-align: right;" readonly>
+                    </div>
+                    <div class="formulario_grupo_row" style="width:100px;">
                         <label for="total">TOTAL</label>
                         <input type="text" class="formulario_control" id="total" name="total" value="<?=number_format($arrfactura['total'],2,'.',',')?>" style="text-align: right;" readonly>
                     </div>

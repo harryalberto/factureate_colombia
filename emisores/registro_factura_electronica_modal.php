@@ -165,6 +165,11 @@ $v_dias_min = $v_dias_min.' días';
         <input type="hidden" name="porc_comision" id="porc_comision" value="<?=$v_comi_fact_emi?>">
         <input type="hidden" name="porc_financia" id="porc_financia" value="<?=$v_porc_adelanto?>">
 
+        <!-- DATOS DEL CLIENTE -->
+        <input type="hidden" name="cliente_correo" id="cliente_correo" value="<?=$varr_factura_temp['cliente_correo']?>">
+        <input type="hidden" name="cliente_direccion" id="cliente_direccion" value="<?=$varr_factura_temp['cliente_direccion']?>">
+        <input type="hidden" name="cliente_contacto" id="cliente_contacto" value="<?=$varr_factura_temp['cliente_contacto']?>">
+
         <input type="hidden" name="numeroclienteold" value="<?=$numerocliente?>">
         <input type="hidden" name="clienteid" value="<?=$clienteid?>">
         <input type="hidden" name="f_hoy" id="f_hoy" value="<?=$hoy?>">
@@ -621,19 +626,14 @@ $v_dias_min = $v_dias_min.' días';
                     ocultarLoading();
 
                     if (rpta > 0){
-                        if (rpta == 1){
-                            alert('Su factura ha sido enviada para la evaluación de nuestros analistas, inmediatamente supere la evaluación le enviaremos un correo de confirmación');
-                            refresh_page();
-                        } else{
-                            alert('Se registro la factura Nro '+rpta+', recuerde que puede solicitar financiamiento presionando el boton abajo');
-                            btn_enviar.disabled = false;
+                        alert('Se registro la factura Nro '+rpta+', recuerde que puede solicitar financiamiento presionando el boton abajo');
+                        btn_enviar.disabled = false;
                             
-                            document.frm_factura_modal.factura_id.value = rpta;
-                            document.frm_factura_modal.facturaid.value = rpta;
-                            document.frm_factura_modal.tipoaccion.value = 'upd';
-                            getData();
-                            cambia_modal_factura(rpta);
-                        }
+                        document.frm_factura_modal.factura_id.value = rpta;
+                        document.frm_factura_modal.facturaid.value = rpta;
+                        document.frm_factura_modal.tipoaccion.value = 'upd';
+                        getData();
+                        cambia_modal_factura(rpta);
                     } else {
                         if (rpta == -1){
                             alert('Ocurrio un error al guardar la Factura');

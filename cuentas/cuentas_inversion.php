@@ -10,7 +10,7 @@ require("../lib-trans/c_cuentas.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'CUENTAS';
     require("../lib/valida-acceso.php");
@@ -41,7 +41,7 @@ require("../lib-trans/c_cuentas.php");
         }
     </script>
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $objmaestro = new maestros;
@@ -54,7 +54,7 @@ else $v_estado_id = 27; // en proceso
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     date_default_timezone_set("America/Lima");
     $menu = 'cuentas/cuentas_inversion.php';
     //------ PARTE SUPERIOR ------
@@ -66,7 +66,7 @@ else $v_estado_id = 27; // en proceso
     <div style="overflow:hidden;text-align:center;font-size: 18px;font-weight: bold;color:#064677;padding:10px;">
         Relación de Cuentas de Inversores
     </div>
-    <div id="content2"><? require('pagina_cuentas_inversion.php'); ?></div>
+    <div id="content2"><?php require('pagina_cuentas_inversion.php'); ?></div>
     <!------ END CUERPO VARIABLE ------>
     <!--#####################################################
     ########### ZONA MODAL 

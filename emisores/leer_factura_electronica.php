@@ -69,6 +69,9 @@ if(isset($_FILES['xml'])){
             if (isset($encabezado->Comprador->DireccionComprador)) $v_dir_cliente = $encabezado->Comprador->DireccionComprador;
             else $v_dir_cliente = '';
 
+            if (isset($encabezado->Comprador->ContactoComprador)) $v_nombre_contacto_cliente = $encabezado->Comprador->ContactoComprador;
+            else $v_nombre_contacto_cliente = '';
+
             //TOTALES
             $v_monto_total = (float)$encabezado->Totales->MontoTotal;
             $v_itbis = (float)$encabezado->Totales->TotalITBIS;
@@ -140,20 +143,21 @@ if(isset($_FILES['xml'])){
             //GUARDA DATOS DEL XML
             if ($v_procede == 1){
                 // GUARDO EL XML
-                $v_carpeta = '../pdf/'.'EMI'.$_SESSION['user']['empresaid'];
+                $v_carpeta = '../pdf/'.'EMP_'.$varr_emisor['nombre'].'_'.$varr_emisor['identificacion'];
                 if (!is_dir($v_carpeta)) mkdir($v_carpeta, 0777, true);
 
-                $v_carpeta = '../pdf/'.'EMI'.$_SESSION['user']['empresaid'].'/temp';
+                $v_carpeta = '../pdf/'.'EMP_'.$varr_emisor['nombre'].'_'.$varr_emisor['identificacion'].'/temp';
                 if (!is_dir($v_carpeta)) mkdir($v_carpeta, 0777, true);
 
-                $v_xml_path = '../pdf/'.'EMI'.$_SESSION['user']['empresaid'].'/temp/'.$v_nro_doc.'-'.$_FILES['xml']['name'];
+                $v_xml_path = $v_carpeta.'/'.$v_nro_doc.'-'.$_FILES['xml']['name'];
                 move_uploaded_file($_FILES['xml']['tmp_name'],  $v_xml_path);
                 $v_xml_name = $v_nro_doc.'-'.$_FILES['xml']['name'];
 
                 $varr_datos = array('nro_factura' => $v_nro_doc, 'moneda_id' => $v_moneda_id, 'cliente_doc' => $v_cliente_rnc, 'cliente_nom' => $v_cliente_nom,
                                     'f_emision' => $v_femision_eng, 'f_vencimiento' => $v_fvencimiento_eng, 'subtotal' => $v_subtotal, 'anticipos' => $v_monto_adelanto,
                                     'descuentos' => 0, 'valor_venta' => $v_valor_venta, 'itbis' => $v_itbis, 'otros' => $v_otros_impuestos, 'total' => $v_monto_total,
-                                    'xml_path' => $v_xml_path, 'xml_name' => $v_xml_name, 'retenciones' => $v_total_retenciones);
+                                    'xml_path' => $v_xml_path, 'xml_name' => $v_xml_name, 'retenciones' => $v_total_retenciones,
+                                    'cliente_correo' => $v_email_cliente, 'cliente_direccion' => $v_dir_cliente, 'cliente_contacto' => $v_nombre_contacto_cliente);
 
                 $v_ft_id = $vobj_factura_proc->registra_factura_temp($varr_datos);
 

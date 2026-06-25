@@ -26,7 +26,7 @@ class cuentas{
             $obj = $conn->next_record();
         }
 
-        $conn->close();
+        //$conn->close();
 
         return $arr_cuentas;
     }
@@ -53,7 +53,7 @@ class cuentas{
 
             $arr_movimientos[$i] = array('movimiento_id'=>$obj->r_movimiento_id,'f_movimiento'=>$obj->r_f_movimiento,
 
-                                    'monto' => $obj->r_monto, 'tipo_movimiento' => $obj->r_tipo_movimiento,
+                                    'monto' => $obj->r_monto, 'tipo_movimiento' => $obj->t_tipo_movimiento,
 
                                     'movimiento' => $obj->r_movimiento, 'subasta_id' => $obj->r_subasta_id,
 
@@ -67,7 +67,7 @@ class cuentas{
 
 
 
-        $conn->close();
+        //$conn->close();
 
         return $arr_movimientos;
 
@@ -101,7 +101,7 @@ class cuentas{
 
 
 
-        $conn->close();
+        //$conn->close();
 
         return $arr_saldos;
 
@@ -123,7 +123,7 @@ class cuentas{
 
                 
 
-        $conn->close();
+        //$conn->close();
 
     }
 
@@ -143,7 +143,7 @@ class cuentas{
 
                 
 
-        $conn->close();
+        //$conn->close();
 
     }
 
@@ -152,6 +152,7 @@ class cuentas{
         $conn = new db_param_trans;
 
         $conn->connect();
+        $arr_saldo_detalle = array();
 
 
 
@@ -179,7 +180,7 @@ class cuentas{
 
 
 
-        $conn->close();
+        //$conn->close();
 
         return $arr_saldo_detalle;
 
@@ -191,7 +192,7 @@ class cuentas{
 
         $conn->connect();
 
-
+        $arr_transito = array();
 
         $idqry = $conn->query("select * from CTA_GET_SALDOS_TRANSITO(0)");
 
@@ -221,7 +222,7 @@ class cuentas{
 
 
 
-        $conn->close();
+        //$conn->close();
 
         return $arr_transito;
 
@@ -237,7 +238,7 @@ class cuentas{
             $obj = $conn->next_record();
         }
 
-        $conn->close();
+        //$conn->close();
     }
 
     function agregar_saldo_manual($parr_datos){
@@ -256,7 +257,7 @@ class cuentas{
 
 
 
-        $conn->close();
+        //$conn->close();
 
 
 
@@ -302,7 +303,7 @@ class cuentas{
 
 
 
-        $conn->close();
+        //$conn->close();
 
         return $arr_cuentas;
 
@@ -366,7 +367,7 @@ class cuentas{
 
 
 
-        $conn->close(); $conn2->close();
+        //$conn->close(); $conn2->close();
 
         return $varr_saldo;
 
@@ -410,7 +411,7 @@ class cuentas{
 
 
 
-        $conn->close();
+        //$conn->close();
 
         return $arr_movimientos;
 
@@ -469,6 +470,8 @@ class cuentas{
             } else{
 
                 $arr_result[$i]['inversionista_id'] = $obj->inversionistaid;
+                $arr_result[$i]['nombre'] = '';
+                $arr_result[$i]['identificacion'] = '';
 
                 
 
@@ -520,9 +523,9 @@ class cuentas{
 
 
 
-        $conn->close();
+        //$conn->close();
 
-        $conn_seg->close();
+        //$conn_seg->close();
 
         return $arr_result;
 
@@ -560,17 +563,14 @@ class cuentas{
 
             $arr_result = array();
 
-            $idqry = $conn->query("select cuenta_inversionista.id, cuenta_inversionista.monedaid, cuenta_inversionista.saldo_comprometido, cuenta_inversionista.saldo_disponible, 
-
-                                    cuenta_inversionista.inversionistaid, cuenta_inversionista.empresaid, empresa.nombre, empresa.identificacion, tipos.nombre as moneda, 
-
-                                    cuenta_inversionista.saldo_contable, cuenta_inversionista.saldo_invertido 
-
-                                from (cuenta_inversionista left outer join empresa on cuenta_inversionista.empresaid = empresa.id), tipos
-
-                                where cuenta_inversionista.estado = 1 and tipos.id = cuenta_inversionista.monedaid and cuenta_inversionista.inversionistaid > 0
-
-                                order by cuenta_inversionista.id");
+            $idqry = $conn->query(" select  cuenta_inversionista.id, cuenta_inversionista.monedaid, cuenta_inversionista.saldo_comprometido, cuenta_inversionista.saldo_disponible,
+                                            cuenta_inversionista.inversionistaid, cuenta_inversionista.empresaid, tipos.nombre as moneda,
+                                            cuenta_inversionista.saldo_contable, cuenta_inversionista.saldo_invertido, inversionista.nombre||' '||inversionista.apellido as nombre,
+                                            inversionista.identificacion
+                                    from    cuenta_inversionista, inversionista, tipos
+                                    where   cuenta_inversionista.estado = 1 and tipos.id = cuenta_inversionista.monedaid and cuenta_inversionista.inversionistaid > 0 and
+                                            inversionista.inversor_id = cuenta_inversionista.inversionistaid
+                                    order by cuenta_inversionista.id");
 
             if (!$idqry) echo pg_last_error($conn->Link_ID);
 
@@ -582,11 +582,10 @@ class cuentas{
 
             for($i = 0; $i < $conn->nrows(); $i ++){
 
-                $arr_result[$i] = array('cuenta_id'=>$obj->id,'moneda_id'=>$obj->monedaid,'saldo_comprometido'=>$obj->saldo_comprometido,
-
-                                        'saldo_disponible' => $obj->saldo_disponible, 'moneda' => $obj->moneda, 'empresa_id' => $obj->empresaid,
-
-                                        'saldo_contable' => $obj->saldo_contable, 'saldo_invertido' => $obj->saldo_invertido);
+                $arr_result[$i] = array('cuenta_id'=>$obj->id,      'moneda_id'=>$obj->monedaid,    'saldo_comprometido'=>$obj->saldo_comprometido,
+                                        'saldo_disponible' => $obj->saldo_disponible,               'moneda' => $obj->moneda,       'empresa_id' => $obj->empresaid,
+                                        'saldo_contable' => $obj->saldo_contable,                   'saldo_invertido' => $obj->saldo_invertido,
+                                        'nombre' => $obj->nombre,   'identificacion' => $obj->identificacion);
 
 
 
@@ -658,9 +657,9 @@ class cuentas{
 
 
 
-        $conn->close();
+        //$conn->close();
 
-        $conn_seg->close();
+        //$conn_seg->close();
 
         return $arr_result;
 
@@ -788,11 +787,11 @@ class cuentas{
 
 
 
-        $conn->close();
+        /*$conn->close();
 
         $conn2->close();
 
-        $conn3->close();
+        $conn3->close();*/
 
 
 
@@ -848,9 +847,9 @@ class cuentas{
 
             $varr_result[$i] = array('moneda_id'=>$obj->monedaid, 'saldo_comprometido'=>$obj->saldo_comprometido, 'saldo_contable'=>$obj->saldo_contable, 'saldo_disponible'=>$obj->saldo_disponible,
 
-                                'saldo_invertido'=>$obj->saldo_invertido, 'cuenta_id'=>$obj->id, 'moneda'=>$obj->moneda, 'banco_id'=>$obj->banco_id, 'banco_nombre'=>$obj->nombre_banco,
+                                'saldo_invertido'=>$obj->saldo_invertido, 'cuenta_id'=>$obj->id, 'moneda'=>$obj->moneda, 'banco_id'=>$obj->banco_id,
 
-                                'numero_cuenta'=>$obj->numero_cuenta_banco, 'tcuenta_id'=>$obj->tipo_cuenta_banco, 'tcuenta_nombre'=>$obj->tcuenta_nombre);
+                                'numero_cuenta'=>$obj->numero_cuenta_banco, 'tcuenta_id'=>$obj->tipo_cuenta_banco);
 
             $obj = $conn->next_record();
 
@@ -858,7 +857,7 @@ class cuentas{
 
 
 
-        $conn->close();
+        //$conn->close();
 
         return $varr_result;
 
@@ -904,7 +903,7 @@ class cuentas{
 
 
 
-        $conn->close();
+        //$conn->close();
 
         return $varr_result;
 
@@ -940,7 +939,7 @@ class cuentas{
 
 
 
-        $conn->close();
+        //$conn->close();
 
         return $arr_transito;
 
@@ -978,7 +977,7 @@ class cuentas{
             $rpta = $v_cuenta_id;
         }
 
-        $conn->close(); $conn2->close(); $conn3->close();
+        //$conn->close(); $conn2->close(); $conn3->close();
 
         return $rpta;
     }
@@ -1010,7 +1009,7 @@ class cuentas{
             $obj = $conn->next_record();
         }
 
-        $conn->close();
+        //$conn->close();
 
         return $varr_result;
     }
@@ -1038,7 +1037,7 @@ class cuentas{
                                 'estado_nombre' => $obj->estado_nombre,     'banco_nombre' => $obj->nombre_banco,   'nombre_moneda' => $obj->moneda_nombre,
                                 'cuenta_id' => $obj->id);
 
-        $conn->close();
+        //$conn->close();
 
         return $varr_result;
     }
@@ -1059,7 +1058,7 @@ class cuentas{
 
 
 
-        $conn->close();
+        //$conn->close();
 
         return 1;
 
@@ -1097,7 +1096,7 @@ class cuentas{
 
 
 
-        $conn->close();
+        //$conn->close();
 
         return $varr_result;
 
@@ -1110,10 +1109,10 @@ class cuentas{
 
         $v_sql = "  select  empresa_cuenta_banco.moneda_id, tipos.nombre as moneda_nombre, empresa_cuenta_banco.banco_id, bancos.nombre_banco, empresa_cuenta_banco.nro_cuenta,
                             empresa_cuenta_banco.tcuenta_id, tcuenta.nombre as tcuenta_nombre, empresa_cuenta_banco.estado_id, 
-                            empresa_cuenta_banco.id 
-                    from    empresa_cuenta_banco, tipos, bancos, tipos as tcuenta 
+                            empresa_cuenta_banco.id, estados.nombre as estado_nombre
+                    from    empresa_cuenta_banco, tipos, bancos, tipos as tcuenta, estados
                     where   empresa_cuenta_banco.empresa_id = ".$p_emisor_id." and empresa_cuenta_banco.estado_id > 0 and tipos.id = empresa_cuenta_banco.moneda_id and 
-                            bancos.id = empresa_cuenta_banco.banco_id and tcuenta.id = empresa_cuenta_banco.tcuenta_id";
+                            bancos.id = empresa_cuenta_banco.banco_id and tcuenta.id = empresa_cuenta_banco.tcuenta_id and estados.id = empresa_cuenta_banco.estado_id";
 
         $idqry = $conn->query($v_sql);
         if (!$idqry) echo pg_last_error($conn->Link_ID);
@@ -1126,12 +1125,12 @@ class cuentas{
                                         'banco_id' => $obj->banco_id,            'tcuenta_id' => $obj->tcuenta_id,
                                         'banco_nombre' => $obj->nombre_banco,    'nro_cuenta' => $obj->nro_cuenta, 
                                         'tcuenta_nombre' => $obj->tcuenta_nombre,'estado_id' => $obj->estado_id,
-                                        'id' => $obj->id);
+                                        'id' => $obj->id,                        'estado_nombre' => $obj->estado_nombre);
 
             $obj = $conn->next_record();
         }
 
-        $conn->close();
+        //$conn->close();
 
         return $varr_result;
     }
@@ -1163,7 +1162,7 @@ class cuentas{
         if (!$idqry) echo pg_last_error($conn2->Link_ID);
         $obj2 = $conn2->next_record();
 
-        $conn->close(); $conn2->close();
+        //$conn->close(); $conn2->close();
 
         return $v_rpta;
     }
@@ -1176,7 +1175,7 @@ class cuentas{
 
         $idqry = $conn->query(" update empresa_cuenta_banco 
                                 set banco_id = ".$parr_cuenta['banco_id'].", nro_cuenta = '".$parr_cuenta['nro_cuenta']."', 
-                                    tcuenta_id = ".$parr_cuenta['tcuenta_id']." 
+                                    tcuenta_id = ".$parr_cuenta['tcuenta_id'].", certificado = '".$parr_cuenta['certificado']."'
                                 where empresa_id = ".$parr_cuenta['emisor_id']." and moneda_id = ".$parr_cuenta['moneda_id']." and 
                                     id = ".$parr_cuenta['id']);
 
@@ -1184,7 +1183,7 @@ class cuentas{
 
         $obj = $conn->next_record();
 
-        $conn->close();
+        //$conn->close();
 
         return $v_rpta;
     }
@@ -1201,7 +1200,7 @@ class cuentas{
 
         $obj = $conn->next_record();
 
-        $conn->close();
+        //$conn->close();
     }
 
 
@@ -1218,7 +1217,7 @@ class cuentas{
 
         $varr_result = array('banco_id' => $obj->banco_id, 'nro_cuenta' => $obj->nro_cuenta, 'tcuenta_id' => $obj->tcuenta_id, 'certificado' => $obj->certificado);
 
-        $conn->close();
+        //$conn->close();
 
         return $varr_result;
     }
@@ -1244,7 +1243,7 @@ class cuentas{
                                 'certificado' => $obj->certificado,     'estado_id' => $obj->estado_id,         'tcuenta_nombre' => $obj->tcuenta_nombre,
                                 'estado_nombre' => $obj->estado_nombre, 'banco_nombre' => $obj->nombre_banco,   'nombre_moneda' => $obj->moneda_nombre);
 
-        $conn->close();
+        //$conn->close();
 
         return $varr_result;
     }
@@ -1301,7 +1300,7 @@ class cuentas{
 
 
 
-        $conn->close();
+        //$conn->close();
 
         return $varr_result;
 
@@ -1365,7 +1364,7 @@ class cuentas{
 
 
 
-        $conn->close();
+        //$conn->close();
 
         return $varr_result;
 
@@ -1495,7 +1494,7 @@ class cuentas{
 
 
 
-        $conn->close();
+        //$conn->close();
 
         return $varr_result;
 
@@ -1581,7 +1580,7 @@ class cuentas{
 
 
 
-        $conn->close();
+        //$conn->close();
 
         return $varr_result;
 
@@ -1641,7 +1640,7 @@ class cuentas{
 
 
 
-        $conn->close();
+        //$conn->close();
 
         return $varr_result;
 
@@ -1715,7 +1714,7 @@ class cuentas{
 
 
 
-        $conn->close(); $conn2->close();
+        //$conn->close(); $conn2->close();
 
         return $varr_saldos;
 
@@ -1757,7 +1756,7 @@ class cuentas{
 
         $conn->next_record();
 
-        $conn->close();
+        //$conn->close();
         return $v_retorno;
     }
 
@@ -1816,7 +1815,7 @@ class cuentas{
             }
         }
 
-        $conn->close(); $conn2->close();
+        //$conn->close(); $conn2->close();
 
         return $v_resultado;
     }
@@ -1835,7 +1834,7 @@ class cuentas{
 
         $conn->next_record();
 
-        $conn->close();
+        //$conn->close();
         return $v_retorno;
     }
 
@@ -1853,7 +1852,7 @@ class cuentas{
 
         $conn->next_record();
 
-        $conn->close();
+        //$conn->close();
         return $v_retorno;
     }
 
@@ -1872,13 +1871,14 @@ class cuentas{
         if ($obj->contador > 0){    // EL EMISOR TIENE REGISTRADA SUS CUENTAS BANCARIAS
             $v_sql = "  select count(1) as contador from empresa_cuenta_banco where empresa_id = ".$p_empresa_id." and moneda_id = ".$p_moneda_id." and estado_id = 66";
 
+            $idqry = $conn2->query($v_sql);
             if (!$idqry) echo pg_last_error($conn2->Link_ID);
             $obj2 = $conn2->next_record();
 
             if ($obj->contador == $obj2->contador) $v_resultado = 2;    // RESPONSABILIDAD DEL ANALISTA FINANCIERO
         } else $v_resultado = 3;    // RESPONSABILIDAD DEL EMISOR
 
-        $conn->close(); $conn2->close();
+        //$conn->close(); $conn2->close();
 
         return $v_resultado;
     }
@@ -1899,7 +1899,7 @@ class cuentas{
 
         $v_resultado = $obj->numero;
 
-        $conn->close();
+        //$conn->close();
 
         return $v_resultado;
     }

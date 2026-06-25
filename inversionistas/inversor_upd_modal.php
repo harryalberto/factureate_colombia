@@ -1,4 +1,7 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
 session_start();
 require("../conn/conn_db.inc");
 require("../conn/conn_db_param.inc");
@@ -28,8 +31,10 @@ $vobj_seg = new seguridad;
 
 $varr_inversor = $vobj_mae->get_datos_inversor($_GET['inversor_id']);
 
-if ($_GET['tipo_inv'] == 85) $v_tipo_inv = 'PERSONA NATURAL';
-else $v_tipo_inv = 'PERSONA JURIDICA';
+if (isset($_GET['tipo_inv'])){
+    if ($_GET['tipo_inv'] == 85) $v_tipo_inv = 'PERSONA NATURAL';
+    else $v_tipo_inv = 'PERSONA JURIDICA';
+} else $v_tipo_inv = 'PERSONA NATURAL';
 
 if ($varr_inversor['tipo_registro'] == 111){
     if ($varr_inversor['estado_id'] == 8 || $varr_inversor['estado_id'] == 9 || $varr_inversor['estado_id'] == 10){
@@ -124,6 +129,7 @@ if ($varr_inversor['tipo_registro'] == 111){
                     <label for="categoria">CATEGORIA:</label>
                     <input type="text" name="categoria" id="categoria" class="formulario_control" value="<?=$varr_inversor['categoria']?>" readonly>
                 </div>
+
 <?php
     $v_comision = ($varr_inversor['comision'] * 100).' %';
 ?>
@@ -457,22 +463,29 @@ if ($varr_inversor['tipo_registro'] == 111){
             else {
                 document.frm_modal.accion.value = 'guarda_contrato';
 
-                var formData = new FormData(document.getElementById("frm_modal"));
-                btn_grabar.disabled = true;
-                btn_rechazar.disabled = true;
+                var contrato_file = document.getElementById('contrato_firmado').files[0];
 
-                $.ajax({
-                    url:"inversor_registro_proceso.php",
-                    type:'post',
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    dataType: "html"
-                })
-                .done(function(rpta){
-                    alert('El contrato se guardo, el inversor ya tiene los accesos a la plataforma');
-                    location.href = 'inversores.php';
-                });
+                if (contrato_file && contrato_file.size > 1 * 1024 * 1024) {
+                    alert('El archivo no puede superar los 1 MB');
+                    return;
+                } else {
+                    var formData = new FormData(document.getElementById("frm_modal"));
+                    btn_grabar.disabled = true;
+                    btn_rechazar.disabled = true;
+
+                    $.ajax({
+                        url:"inversor_registro_proceso.php",
+                        type:'post',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        dataType: "html"
+                    })
+                    .done(function(rpta){
+                        alert('El contrato se guardo, el inversor ya tiene los accesos a la plataforma');
+                        location.href = 'inversores.php';
+                    });
+                }
             }
         }
 

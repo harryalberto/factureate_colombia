@@ -9,7 +9,7 @@ require("../lib-trans/maestros.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'EMPRESAS';
     require("../lib/valida-acceso.php");
@@ -60,7 +60,7 @@ $rowcount = $vobj_mae->get_brokers_list('COUNT', 0, 0, $filtros,'');
 ?>
 
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     $menu = 'inversionistas/gestion_brokers.php';
     //$pagina = 'empresas/empresas.php';
     //------ PARTE SUPERIOR ------

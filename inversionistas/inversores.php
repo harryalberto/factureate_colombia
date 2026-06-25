@@ -9,7 +9,7 @@ require("../lib-trans/maestros.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'EMPRESAS';
     require("../lib/valida-acceso.php");
@@ -59,7 +59,7 @@ $rowcount = $vobj_mae->get_inversores_v2('COUNT', 0, 0, $filtros,'');
 ?>
 
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     $menu = 'inversionistas/inversores.php';
     //$pagina = 'empresas/empresas.php';
     //------ PARTE SUPERIOR ------
@@ -157,6 +157,7 @@ $rowcount = $vobj_mae->get_inversores_v2('COUNT', 0, 0, $filtros,'');
         </div>
     </div>
     </div>
+
     <!--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     @@@@@@@@@@@@@@@@@ ZONA SCRIPT -->
     <script type="text/javascript">
@@ -182,7 +183,7 @@ $rowcount = $vobj_mae->get_inversores_v2('COUNT', 0, 0, $filtros,'');
             formaData.append('orderType', orderType)
             formaData.append('rowcount', rowcount)
             formaData.append('filtros', filtros)
-            
+
             fetch("load_inversores.php", {
                     method: "POST",
                     body: formaData

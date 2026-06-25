@@ -11,14 +11,14 @@ require("../lib-trans/c_subasta.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'REGFACT';
     require("../lib/valida-acceso.php");
 ?>
     
 </HEAD>
-<?
+<?php
 //##################################################
 //################ LOGICA NO VISIBLE 
 $v_factura_id = $_GET['id'];
@@ -53,10 +53,12 @@ if ($varr_factura['estadofinanciamiento'] == 18){   // EN SUBASTA
     $bold_financia = 'font-weight: bold;';
     $v_aprox = '';
 }
+
+$readonly = '';
 ?>
 
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     //------ PARTE SUPERIOR ------
     
     //------ PARTE IZQUIERDA ------

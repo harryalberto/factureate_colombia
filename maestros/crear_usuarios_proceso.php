@@ -29,7 +29,10 @@ if ($_POST['usuario_id'] == 0){
 	//==== NOTIFICACION AL USUARIO
 	$varr_mail = array(	'mail_salida' => 'operaciones@factureate.com', 'nombre_salida' => 'Factureate', 'mail_destino' => $_POST['email'], 
 						'subject' => '[FACTUREATE] Se ha creado su acceso a la plataforma Factureate',
-						'body' => 'Hola '.$_POST['nombre'].' '.$_POST['apellido'].', nos complace saludarte y comentarte que se ha creado tu acceso a la plataforma Factureate, los datos de tu acceso son los siguientes, no olvides cambiar el password:<br><br>Plataforma: '.$varr_acceso['valorchar'].'<br>Usuario: '.$_POST['identificacion'].'<br>Password: '.$v_password.'<br><br>Cordialmente,<br><br>FACTUREATE');
+						'body' => "Hola ".$_POST['nombre']." ".$_POST['apellido'].", nos complace saludarte y comentarte que se ha creado tu acceso a la plataforma Factureate,
+						los datos de tu acceso son los siguientes, no olvides cambiar el password:
+						<br><br>Plataforma: <a href='".$varr_acceso['valorchar']."' target='_blank'>PLATAFORMA FACTUREATE</a>
+						<br>Usuario: ".$_POST['identificacion']."<br>Password: ".$varr_resultado['password']."<br><br>Cordialmente,<br><br>FACTUREATE");
 
 	$vobj_mail_proc->enviar_correo($varr_mail);
 

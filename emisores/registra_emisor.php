@@ -1,4 +1,7 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 session_start();
 require("../conn/conn_db.inc");
 require("../conn/conn_db_param.inc");
@@ -97,7 +100,7 @@ if ($v_perfil == 'USER'){
                     <input type="text" name="ruc" id="ruc" class="formulario_control" value="<?=$arr_empresa['identificacion']?>" <?php echo $readonly;?>>
                 </div>
                 <div class="formulario_grupo_row" style="width: 100px;">
-                    <label for="ruc">ESTADO</label>
+                    <label for="estado_nombre">ESTADO</label>
                     <input type="text" name="estado_nombre" id="estado_nombre" class="formulario_control" value="<?=$arr_empresa['estado_nombre']?>" readonly>
                 </div>
                 <div class="formulario_grupo_row" style="width: 150px;">
@@ -193,7 +196,7 @@ if ($v_perfil == 'USER'){
                     <input type="file" name="file_dni" id="file_dni" class="formulario_control" <?php echo $disabled_total;?>>
                 </div>
                 <div class="formulario_grupo_row" style="width: 70px;">
-                    <label for="documento_view">PDF</label>
+                    <label for="docrepre_path">PDF</label>
 <?php
     if ($arr_empresa['docrepre_path'] != '' && !is_null($arr_empresa['docrepre_path']))
         echo '
@@ -209,7 +212,7 @@ if ($v_perfil == 'USER'){
                     <input type="file" name="file_poderes" id="file_poderes" class="formulario_control" <?php echo $disabled_total;?>>
                 </div>
                 <div class="formulario_grupo_row" style="width: 70px;">
-                    <label for="poderes_view">PDF</label>
+                    <label for="poderes_path">PDF</label>
 <?php
     if ($arr_empresa['vigencia_path'] != '' && !is_null($arr_empresa['vigencia_path']))
         echo '
@@ -282,6 +285,7 @@ if ($v_perfil == 'USER'){
                         <th scope="col">TIPO CUENTA</th>
                         <th scope="col">MONEDA</th>
                         <th scope="col">NRO CUENTA</th>
+                        <th scope="col">ESTADO</th>
                         <th scope="col">ELIMINAR</th>
                         <th scope="col">MODIFICAR</th>
                     </tr></thead>

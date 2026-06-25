@@ -13,7 +13,7 @@ require("../lib-trans/c_cuentas.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'CTAEFE';
     require("../lib/valida-acceso.php");
@@ -31,7 +31,7 @@ require("../lib-trans/c_cuentas.php");
         }
     </script>
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $obj_cuenta = new cuentas;
@@ -42,7 +42,7 @@ $arr_transito = $obj_cuenta->get_saldos_transito();
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     date_default_timezone_set($_SESSION['user']['zona_horaria']);
     $menu = 'cuentas/valida_cuenta.php';
     //------ PARTE SUPERIOR ------

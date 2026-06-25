@@ -13,13 +13,13 @@ require("../lib-trans/c_cuentas.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'SUBGESTION';
     require("../lib/valida-acceso.php");
 ?>
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $objsubasta = new subasta;
@@ -31,15 +31,15 @@ $vobj_cuenta_proc = new cuentas;
 if ($_POST['accion'] == 'liquidar'){
     $financiamientoid = $objsubasta->liquidar_subasta($_POST['subastaid']);
     
-    $archivo = '../pdf/SUB'.$_POST['subastaid'];
+    $archivo = $_SERVER['DOCUMENT_ROOT'].'/archivos_operaciones/OP_'.$_POST['factura_id'];
     if (!file_exists($archivo)) mkdir($archivo,0700);
     
     if (isset($_FILES['transferenciafile']) && $_FILES['transferenciafile']['name'] != ''){ //coloco el archivo en el servidor
-        $transferenciapath = '../pdf/'.'SUB'.$_POST['subastaid'].'/transferenciatit-'.$_FILES['transferenciafile']['name'];
+        $transferenciapath = $archivo.'/transferenciatit-'.$_FILES['transferenciafile']['name'];
         move_uploaded_file($_FILES['transferenciafile']['tmp_name'],  $transferenciapath);
     }
     if (isset($_FILES['fondosfile']) && $_FILES['fondosfile']['name'] != ''){ //coloco el archivo en el servidor
-        $fondospath = '../pdf/'.'SUB'.$_POST['subastaid'].'/fondos-'.$_FILES['fondosfile']['name'];
+        $fondospath = $archivo.'/fondos-'.$_FILES['fondosfile']['name'];
         move_uploaded_file($_FILES['fondosfile']['tmp_name'],  $fondospath);
     }
 
@@ -53,15 +53,16 @@ if ($_POST['accion'] == 'liquidar'){
     $v_mensaje = 'La SUBASTA '.$_POST['subastaid'].' fue LIQUIDADA con Nro de liquidaci&oacute;n '.$financiamientoid;
     $v_regresar = 'subastas.php';
 } elseif($_POST['accion'] == 'fondos'){     // REGISTRO MANUAL DE ENVIO DE FONDOS AL EMISOR
-    $archivo = '../pdf/empresa_'.$_POST['emisor_identificacion'].'/OP_'.$_POST['factura_id'];
+    $archivo = $_SERVER['DOCUMENT_ROOT'].'/archivos_operaciones/OP_'.$_POST['factura_id'];
     if (!file_exists($archivo)) mkdir($archivo,0700);
 
     if (isset($_FILES['fondosfile']) && $_FILES['fondosfile']['name'] != ''){ //coloco el archivo en el servidor
         $fondospath = $archivo.'/adelanto-'.$_FILES['fondosfile']['name'];
+        $fondospath_db = '/archivos_operaciones/OP_'.$_POST['factura_id'].'/adelanto-'.$_FILES['fondosfile']['name'];
         move_uploaded_file($_FILES['fondosfile']['tmp_name'],  $fondospath);
     }
     // registro de transferencia de fondos y liquidacion
-    $v_arr_subasta = array('subasta_id'=>$_POST['subastaid'], 'path'=>$fondospath);
+    $v_arr_subasta = array('subasta_id'=>$_POST['subastaid'], 'path'=>$fondospath_db);
     $financiamientoid = $objsubasta->liquidar_subasta($v_arr_subasta);
 
     $arr_inversionistas = $objsubasta->get_inversionistas_xsubasta($_POST['subastaid']);
@@ -101,7 +102,7 @@ if ($_POST['accion'] == 'liquidar'){
 
     if ($v_valida_correo_cli == 0){
     // ENVIA NOTIFICACION A LEGAL Y OPERACIONES QUE FALTA EL CORREO DEL OP
-        $varr_notificacion = array('notificaid' => 31, 'datos_body' => 'OP: '.$_POST['cliente'].'<br><br>FACTUREATE');
+        $varr_notificacion = array('notificaid' => 31, 'datos_body' => 'OP: '.$_POST['cliente_nombre'].'<br><br>FACTUREATE');
         $obj_mail->enviar_correo_xnotificacion($varr_notificacion);
     }
 
@@ -124,15 +125,16 @@ if ($_POST['accion'] == 'liquidar'){
     $v_regresar = 'subastas_comp.php';
 } elseif($_POST['accion'] == 'contrato'){           
 // RECEPCION DEL CONTRATO FIRMADO POR EL EMISOR
-    $archivo = '../pdf/empresa_'.$_POST['emisor_identificacion'].'/contratos';
+    $archivo = $_SERVER['DOCUMENT_ROOT'].'/archivos_operaciones/OP_'.$_POST['factura_id'];
     if (!file_exists($archivo)) mkdir($archivo,0700);
     
     if (isset($_FILES['contrato']) && $_FILES['contrato']['name'] != ''){ //coloco el archivo en el servidor
-        $contrato_path = $archivo.'/operacion-'.$_POST['factura_id'].'-'.$_FILES['contrato']['name'];
+        $contrato_path = $archivo.'/contrato_cesion-'.$_FILES['contrato']['name'];
+        $contrato_path_db = '/archivos_operaciones/OP_'.$_POST['factura_id'].'/contrato_cesion-'.$_FILES['contrato']['name'];
         move_uploaded_file($_FILES['contrato']['tmp_name'],  $contrato_path);
     }
     //############## registro del contrato firmado y GENERA LA ORDEN DE TRANSFERENCIA MANUAL SI NO SE ESTA INTEGRADO AL BANCO
-    $objsubasta->recibe_contrato_firmado($_POST['subastaid'], $contrato_path);
+    $objsubasta->recibe_contrato_firmado($_POST['subastaid'], $contrato_path_db);
     $varr_parametros = $obj_mae->get_parametros();
 
     //==== PREPARANDO CORREO A LA FIDUCIA
@@ -158,8 +160,20 @@ if ($_POST['accion'] == 'liquidar'){
         $obj_mae->registra_orden_transferencia($_POST['factura_id'], $_POST['monto_adelanto'], 100);    // OT PARA ADELANTO AL EMISOR
         //====== CORREO AL ANALISTA FINANCIERO PARA QUE REALICE LA TRANSFERENCIA AL EMISOR
         $varr_emisor = $obj_mae->get_datos_emisor_full($_POST['emisor_id']);
-        $varr_datos_mail = array('notificaid' => 20, 'datos_body' => 'EMISOR: '.$varr_emisor['nombre'].'<br>BANCO: '.$varr_emisor['banco_nombre'].'
-                                                                    <br>TIPO CUENTA: '.$varr_emisor['tcuenta_banco'].'<br>CUENTA NRO: '.$varr_emisor['nro_cuenta_banco'].'
+        $varr_cuenta_emisor = $obj_mae->get_datos_cuenta_emisor($_POST['emisor_id'], $_POST['moneda_id']);
+
+        if ($varr_cuenta_emisor[0]['msg'] == 'VACIO'){
+            $banco_nombre = 'NO ASIGNADO';
+            $tcuenta_nombre = 'NO ASIGNADO';
+            $nro_cuenta = 'NO ASIGNADO';
+        } else {
+            $banco_nombre = $varr_cuenta_emisor[0]['banco_nombre'];
+            $tcuenta_nombre = $varr_cuenta_emisor[0]['tcuenta_nombre'];
+            $nro_cuenta = $varr_cuenta_emisor[0]['nro_cuenta'];
+        }
+
+        $varr_datos_mail = array('notificaid' => 20, 'datos_body' => 'EMISOR: '.$varr_emisor['nombre'].'<br>BANCO: '.$banco_nombre.'
+                                                                    <br>TIPO CUENTA: '.$tcuenta_nombre.'<br>CUENTA NRO: '.$nro_cuenta.'
                                                                     <br>MONEDA: '.$_POST['moneda'].'<br>MONTO A TRANSFERIR: '.number_format($_POST['monto_adelanto'],2,'.',',').'
                                                                     <br><br>FACTUREATE');
         $obj_mail->enviar_correo_xnotificacion($varr_datos_mail);
@@ -239,7 +253,7 @@ if ($_POST['accion'] == 'liquidar'){
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     date_default_timezone_set("America/Lima");
     $menu = 'subastas/subastas.php';
     //------ PARTE SUPERIOR ------
@@ -249,7 +263,7 @@ if ($_POST['accion'] == 'liquidar'){
 ?>
     <!------ CUERPO VARIABLE ------>
     <div style="overflow:hidden;font-size: 12px;margin:30px auto;width:40%;text-align:center;">
-        <?echo '<p>'.$v_mensaje.'</p>';?>
+        <?php echo '<p>'.$v_mensaje.'</p>';?>
         <br><br>
         <p style="width:200px;margin:0px auto;" class="botontransaccion"><a href="<?=$v_regresar?>">Volver</a></p>
     </div>

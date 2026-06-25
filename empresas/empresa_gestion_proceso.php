@@ -30,11 +30,7 @@ if ($_POST['accion'] == 'aprobar_legal_op'){
                         'nrodoc_repre'=>$_POST['nrodoc_repre'], 'telefono_repre'=>$_POST['telefono_repre'], 'informe_legal'=>$v_archivo, 'tempresa'=>'OP');
     $obj_mae->actualiza_emisor($varr_datos,'LEGAL');
 
-    $redireccion = '<script>
-                        alert("Se aprobo legalmente el Obligado al Pago");
-                        setTimeout(function(){location.href = "'.$_POST['previo'].'";},500);
-                    </script>';
-    $mensaje = 'Se aprobo legalmente el obligado al pago!!';
+    echo 'Se aprobo legalmente el obligado al pago!!';
 } elseif ($_POST['accion'] == 'aprobar'){
     $arr_datos = array('accion' => 'aprobar', 'empresaid' => $_POST['empresaid']);
 
@@ -71,7 +67,7 @@ if ($_POST['accion'] == 'aprobar_legal_op'){
         $obj_mae->actualiza_emisor($arr_input_emp,'info_empresa');
         $arr_email = array('perfilid' => 9, 'nombre_salida' => 'FACTUREATE Registro',
                         'subject' => 'Se dio de alta una nueva empresa',
-                        'body' => 'La empresa '.$_POST['nombre_empresa'].' con DOC '.$_POST['ruc'].' a sido dado de alta.<br><br>FACTUREATE');
+                        'body' => 'La empresa '.$_POST['nombre_empresa'].' con DOC '.$_POST['ruc'].' a sido dado de alta.<br><br>FACTUREATE PERU');
         $mensaje = 'La empresa fue aprobada  ...';
     } else{
     // EMISOR 
@@ -133,7 +129,7 @@ if ($_POST['accion'] == 'aprobar_legal_op'){
 } elseif ($_POST['accion'] == 'reg_contrato'){  // REGISTRO DEL CONTRATO DE VINCULACION
     $v_carpeta = '../pdf/empresa_'.$_POST['ruc'].'/legal';
     $v_archivo = $v_carpeta.'/'.$v_hoy.'_'.$_FILES['file_contrato_vinculacion']['name'];
-    //$v_archivo_link = 'https://factureate.com/plataforma-col/pdf/empresa_'.$_POST['ruc'].'/legal/'.$_FILES['file_contrato_vinculacion']['name'];
+    //$v_archivo_link = 'https://factureate.com/plataforma-rd/pdf/empresa_'.$_POST['ruc'].'/legal/'.$_FILES['file_contrato_vinculacion']['name'];
 
     if (!is_dir($v_carpeta)) mkdir($v_carpeta, 0777, true);
 
@@ -150,7 +146,9 @@ if ($_POST['accion'] == 'aprobar_legal_op'){
                             'contactodoc_id'=>$_POST['tdoc_contacto'], 'contactodoc'=>$_POST['nrodoc_contacto'], 'contacto_telf'=>$_POST['telefono_contacto'],
                             'empresa_id'=>$_POST['empresaid']);
 
-        if ($_SESSION['user']['perfilid'] == 11 || $_SESSION['user']['perfilid'] == 6){ // COO, ANALISTA OP
+        $varr_permisos = $obj_seg->get_permisos($_SESSION['user']['perfilid']);
+
+        if ($obj_mae->busca_arreglo_bidi($varr_permisos, 'codigo', 'EMP-UPD-OP')){ // COO, ANALISTA OP
             $obj_mae->update_obligado_pago($varr_datos);
         }
     }
@@ -161,9 +159,7 @@ if ($_POST['accion'] == 'aprobar_legal_op'){
     $obj_mail->enviar_multicorreo_interno(25);      // NOTIFICACION INTERNA DE RECHAZOS
     $obj_mail->enviar_multicorreo_interno(26);      // NOTIFICACION INTERNA DE ACEPTACION
 
-    $redireccion = '<script>
-                        alert("Los datos fueron guardados con exito!!");
-                    </script>';
+    echo 'Informacion operativa guardada';
 }
 //#######################################################################
 ?>

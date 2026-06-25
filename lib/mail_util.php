@@ -178,6 +178,8 @@ class mail_util{
         $conn_noti->connect();
         $conn_delete->connect();
 
+        $v_borrar = '';
+
         $idqry = $conn->query("select * from SEG_VALIDA_NOTIFICACION(".$id_notificacion.")"); //compensado completamente
         if (!$idqry) echo pg_last_error($conn->Link_ID);
         $obj = $conn->next_record();
@@ -217,6 +219,8 @@ class mail_util{
         $conn_delete = new db_param_trans;
         $conn_noti->connect();
         $conn_delete->connect();
+
+        $v_borrar = '';
 
         // notificaciones generadas
         $id_noti = $conn_noti->query("select id, contenido from genera_notificacion where notificacionid = ".$id_notificacion." and usuarioid = ".$id_usuario);

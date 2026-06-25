@@ -10,7 +10,7 @@ require("../lib-trans/c_cuentas.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'CUENTA OMNIBUS';
     require("../lib/valida-acceso.php");
@@ -21,7 +21,7 @@ require("../lib-trans/c_cuentas.php");
         }
     </script>
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $obj_cta = new cuentas;
@@ -29,7 +29,7 @@ $v_arr_detalle_cta = $obj_cta->get_cuenta_omnibus_detalle();
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     date_default_timezone_set("America/Lima");
     $menu = 'cuentas/cuenta_omnibus.php';
     //------ PARTE SUPERIOR ------

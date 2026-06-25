@@ -13,7 +13,7 @@ require("../lib-trans/c_cuentas.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'INVERSIONES';
     require("../lib/valida-acceso.php");
@@ -41,7 +41,7 @@ require("../lib-trans/c_cuentas.php");
         });
     </script>
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $obj_inv = new inversiones;
@@ -84,9 +84,10 @@ if (isset($_POST['check_preliminar'])){
     else $v_solopreliminar = 0;
 } else $v_solopreliminar = 0;
 /*--------------------------------------------------------*/
+$total_paginas = 0;
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     $menu = 'inversionistas/propuestas_inversion.php';
     //------ PARTE SUPERIOR ------
     require("../lib/superior.php");
@@ -133,8 +134,8 @@ if (isset($_POST['check_preliminar'])){
     }
 ?>
 
-    <div id="content2"><? require('propuestas_inversion_pagina.php'); ?></div>
-    <?
+    <div id="content2"><?php require('propuestas_inversion_pagina.php'); ?></div>
+    <?php
     if ($total_paginas > 1) {
         echo '<div class="pagination">';
         echo '  <ul>';

@@ -63,8 +63,8 @@ if ($tipo == 'new'){
     $otrostributos_view = '';
 
     $nrofactura = ''; $numerocliente = ''; $cliente = ''; $nombrepdf = ''; $xmlpath = ''; $pdfpath = ''; $readonly = ''; $v_simbolo = ''; $v_condesc_maximo = '';
-    $monedaid = 0;  $valorventa = 0;  $total = 0; $tfinid = 0; $v_desc_maximo = 0;
-    $total_label = 0;
+    $monedaid = 0;  $valorventa = 0;  $total = 0; $tfinid = 0; $v_desc_maximo = 0; $gran_total = 0; $retenciones = 0;
+    $total_label = 0; $gran_total_label = 0; $retenciones_label = 0;
     $nombrexml = '[SIN XML]';
     $enviar = 'off'; $anular = 'off';
     $estadoid = 11; $estadofinanciamientoid = 14;
@@ -113,6 +113,12 @@ if ($tipo == 'new'){
 
     $total = $arrfactura['total'];
     $total_label = number_format($total, 2,'.', ',');
+
+    $gran_total = $arrfactura['gran_total'];
+    $gran_total_label = number_format($gran_total,2,'.',',');
+    $retenciones = $arrfactura['retenciones'];
+    $retenciones_label = number_format($retenciones,2,'.',',');
+
     $nombrexml = '[ARCHIVO XML]';
     $tfinid = $arrfactura['tipofinanciamiento'];
     $nombrepdf = '<i class="fa-solid fa-file-pdf"></i>';
@@ -341,7 +347,7 @@ $v_dias_min = $v_dias_min.' días';
 
             <div class="contenedor_formulario_column">
                 <div class="formulario_grupo_row" style="width: 100px;">
-                    <label for="numerocliente">NIT:<b style="color:#b30a1f;">[*]</b></label>
+                    <label for="numerocliente">RNC:<b style="color:#b30a1f;">[*]</b></label>
                     <input type="text" name="numerocliente" id="numerocliente" class="formulario_control" value="<?=$numerocliente?>" <?=$readonly?>>
                 </div>
                 <div class="formulario_grupo_row" style="width: 300px;">
@@ -398,11 +404,10 @@ $v_dias_min = $v_dias_min.' días';
 
                     <input type="hidden" name="valorventa" value="<?=$valorventa?>">
                     <input type="hidden" name="impuestoventa" value="<?=$impuestoventa?>">
-                    <input type="hidden" name="total" id="total" value="<?=$total?>">
 
             <div class="contenedor_formulario_column">
                 <div class="formulario_grupo_row" style="width: 120px;">
-                    <label for="impuestoventa_view">IVA:<b style="color:#b30a1f;">[*]</b></label>
+                    <label for="impuestoventa_view">ITBIS:<b style="color:#b30a1f;">[*]</b></label>
                     <input type="text" id="impuestoventa_view" name="impuestoventa_view" placeholder="0.00" class="formulario_control" style="text-align: right;" value="<?= $impuestoventa_view ?>" <?=$readonly?>>
                 </div>
 
@@ -419,8 +424,21 @@ $v_dias_min = $v_dias_min.' días';
                 </div>
 
                 <div class="formulario_grupo_row" style="width: 120px;">
-                    <label for="total_l">IMPORTE TOTAL:</label>
-                    <input type="text" name="total_l" class="formulario_control" style="text-align:right;" value="<?=$total_label?>" readonly>
+                    <label for="gran_total_label">IMPORTE TOTAL:</label>
+                    <input type="text" name="gran_total_label" class="formulario_control" style="text-align:right;" value="<?=$gran_total_label?>" readonly>
+                    <input type="hidden" name="gran_total" id="gran_total" value="<?=$gran_total?>">
+                </div>
+
+                <div class="formulario_grupo_row" style="width: 120px;">
+                    <label for="retenciones_label">RETENCIONES:</label>
+                    <input type="text" name="retenciones_label" id="retenciones_label" placeholder="0.00" class="formulario_control" style="text-align:right;" value="<?=$retenciones_label?>">
+                    <input type="hidden" id="retenciones" name="retenciones" value="<?= $retenciones ?>">
+                </div>
+
+                <div class="formulario_grupo_row" style="width: 120px;">
+                    <label for="total_l">TOTAL NETO:</label>
+                    <input type="text" name="total_l" id="total_l" class="formulario_control" style="text-align:right;" value="<?=$total_label?>" readonly>
+                    <input type="hidden" id="total" name="total" value="<?= $total ?>">
                 </div>
             </div>
 
@@ -846,6 +864,9 @@ $v_dias_min = $v_dias_min.' días';
             var v_ted = Number(document.frm_factura_modal.ted_param.value);
             var v_valorventa_f, v_valorventa_l, v_igv_f, v_igv_l, v_total_f, v_total_l, v_adelanto_l, v_remanente_l, v_totalrecibido_l;
 
+            var retenciones = Number(document.getElementById('retenciones').value);
+            var gran_total;
+
             var obj_subtotal_view = document.getElementById('subtotal_view');
             var obj_femision = document.getElementById('femision');
             var obj_femision_view = document.getElementById('femision_view');
@@ -888,7 +909,15 @@ $v_dias_min = $v_dias_min.' días';
                 v_igv_f = Number(impuestoventa.toFixed(2));
                 v_igv_l = v_igv_f.toLocaleString('en-US');
 
-                total = Number(valorventa + impuestoventa + otroscargos + otrostributos);
+                /*total = Number(valorventa + impuestoventa + otroscargos + otrostributos);
+                v_total_f = Number(total.toFixed(2));
+                v_total_l = v_total_f.toLocaleString('en-US');*/
+
+                gran_total = Number(valorventa + impuestoventa + otroscargos + otrostributos);
+                v_gran_total_f = Number(gran_total.toFixed(2));
+                v_gran_total_l = v_gran_total_f.toLocaleString('en-US');
+
+                total = gran_total - retenciones;
                 v_total_f = Number(total.toFixed(2));
                 v_total_l = v_total_f.toLocaleString('en-US');
 
@@ -913,6 +942,9 @@ $v_dias_min = $v_dias_min.' días';
 
                 document.frm_factura_modal.total_l.value = v_total_l;
                 document.frm_factura_modal.total.value = total;
+
+                document.frm_factura_modal.gran_total_label.value = v_gran_total_l;
+                document.frm_factura_modal.gran_total.value = gran_total;
 
                 calcula_financiamiento();
             }
@@ -1576,6 +1608,58 @@ $v_dias_min = $v_dias_min.' días';
                     limpio = partes[0] + "." + partes[1].slice(0, 2);
                 }
                 
+                // Guardar valor real
+                input_real.value = limpio;
+
+                // Formatear
+                let formateado = formatearNumero(limpio);
+
+                 // Recalcular cursor
+                let nuevoAntesCursor = formateado.slice(0, cursor);
+                let comasDespues = (nuevoAntesCursor.match(/,/g) || []).length;
+
+                let nuevaPos = cursor + (comasDespues - comasAntes);
+
+                input.value = formateado;
+                input.setSelectionRange(nuevaPos, nuevaPos);
+
+                // RECALCULO DE TOTALES
+                calculatotales(0);
+            });
+
+            //RETENCIONES
+            document.getElementById("retenciones_label").addEventListener("input", function (e) {
+                const input = document.getElementById("retenciones_label");
+                const input_real = document.getElementById("retenciones");
+
+                const teclasPermitidas = [
+                    "Backspace", "Tab", "ArrowLeft", "ArrowRight", "Delete"
+                ];
+
+                // GUARDAR POSICION DEL CURSOS
+                let valor_original = input.value;
+                let cursor = input.selectionStart;
+
+                // Contar cuántas comas había antes del cursor
+                let antesCursor = valor_original.slice(0, cursor);
+                let comasAntes = (antesCursor.match(/,/g) || []).length;
+
+                // Limpiar valor
+                let limpio = valor_original.replace(/,/g, "");
+                limpio = limpio.replace(/[^0-9.]/g, "");
+
+                // Evitar múltiples puntos
+                let partes = limpio.split(".");
+                if (partes.length > 2) {
+                    limpio = partes[0] + "." + partes[1];
+                }
+
+                // Limitar decimales
+                partes = limpio.split(".");
+                if (partes[1]) {
+                    limpio = partes[0] + "." + partes[1].slice(0, 2);
+                }
+
                 // Guardar valor real
                 input_real.value = limpio;
 

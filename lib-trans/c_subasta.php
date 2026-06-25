@@ -30,7 +30,7 @@ class subasta{
             $arrsubastas = $obj->contador;
         }
 
-        $conector->close();
+        //$conector->close();
         return $arrsubastas;
     }
     function get_propuesta_xinversionista($subastaid,$usuarioid, $empresaid){
@@ -41,7 +41,7 @@ class subasta{
         $obj = $conector->next_record();
         $resultado = $obj->contador;
 
-        $conector->close();
+        //$conector->close();
         return $resultado;
     }
     function get_subasta($subastaid){
@@ -80,7 +80,7 @@ class subasta{
                                     'simbolo_moneda'=>$obj->r_simbolo_moneda, 'condesc_maximo' => $obj->r_condesc_maximo, 'desc_maximo' => $obj->r_desc_maximo
                             );
                 
-        $conector->close();
+        //$conector->close();
         return $arrsubasta;
     }
     function get_subasta_posiciones($subastaid){
@@ -104,7 +104,7 @@ class subasta{
             $obj = $conector->next_record();
         }
                 
-        $conector->close();
+        //$conector->close();
         return $arrsubasta;
     }
     function genera_propuesta($arrpropuesta){
@@ -116,7 +116,7 @@ class subasta{
         $obj = $conector->next_record();
         $propuestaid = $obj->propuestaid;
         
-        $conector->close();
+        //$conector->close();
         return $propuestaid;
     }
     function get_posicion($subastaid, $usuarioid, $empresaid){
@@ -135,7 +135,7 @@ class subasta{
                             );
         }
                 
-        $conector->close();
+        //$conector->close();
         return $arrposicion;
     }
     function anula_propuesta($propuestaid){
@@ -147,7 +147,7 @@ class subasta{
         $obj = $conector->next_record();
         $propuestaid = $obj->propuestaid;
         
-        $conector->close();
+        //$conector->close();
         return $propuestaid;
     }
     function get_subastas_xestado($estadoid,$rows,$rowini,$tipo){
@@ -184,7 +184,7 @@ class subasta{
             $arrsubastas = $obj->contador;
         }
 
-        $csub->close();
+        //$csub->close();
         return $arrsubastas;
     }
     function get_subastas_xestado_varios($p_estados,$rows,$rowini,$tipo){
@@ -219,7 +219,7 @@ class subasta{
             $arrsubastas = $obj->contador;
         }
 
-        $csub->close();
+        //$csub->close();
         return $arrsubastas;
     }
 
@@ -269,7 +269,7 @@ class subasta{
             }
         }
 
-        $conn->close();
+        //$conn->close();
         return $arrsubastas;
     }
 
@@ -291,8 +291,8 @@ class subasta{
         $obj = $csub->next_record();
         $resultado = $obj->resultado;
 
-        $csub->close();
-        $conn->close();
+        /*$csub->close();
+        $conn->close();*/
 
         return $resultado;
     }
@@ -323,7 +323,7 @@ class subasta{
             $obj = $csub->next_record();
         }
 
-        $csub->close();
+        //$csub->close();
         return $arr_inversiones;
     }
     function get_inversionistas_xsubasta($p_subasta_id){
@@ -341,7 +341,7 @@ class subasta{
             $obj = $csub->next_record();
         }
 
-        $csub->close();
+        //$csub->close();
         return $arr_inversionistas;
     }
     function termina_subasta ($p_subasta_id){
@@ -352,7 +352,7 @@ class subasta{
         if (!$idqry) echo pg_last_error($csub->Link_ID);
         $obj = $csub->next_record();
 
-        $csub->close();
+        //$csub->close();
         return 1;
     }
 
@@ -365,7 +365,7 @@ class subasta{
         if (!$idqry) echo pg_last_error($conector->Link_ID);
         $obj = $conector->next_record();
 
-        $conector->close();
+        //$conector->close();
 
         return $obj->rpta_anulacion;
     }
@@ -401,7 +401,7 @@ class subasta{
             $arrsubastas = $obj->contador;
         }
 
-        $conector->close();
+        //$conector->close();
         return $arrsubastas;
     }
     function get_subastas_disponibles_riesgo_sector($rows,$rowini,$tipo,$p_sector, $p_riesgo){
@@ -434,7 +434,7 @@ class subasta{
             $arrsubastas = $obj->contador;
         }
 
-        $conector->close();
+        //$conector->close();
         return $arrsubastas;
     }
     function subastas_indicadores($p_tipo){
@@ -511,7 +511,7 @@ class subasta{
             $arr_result = array('count' => $obj->r_cantidad_encompensacion, 'count_alert' => $obj->r_cantidad_alerta, 'monto_alerta' => $obj->r_monto_alerta);
         }
 
-        $conector->close();
+        //$conector->close();
         //$conector2->close();
         return $arr_result;
     }
@@ -529,7 +529,7 @@ class subasta{
         // genera el archivo para el banco y lo transfiere al FTP        
         
 
-        $conector->close();
+        //$conector->close();
         return 1;
     }
     function ordena_transferencia_automatica($p_arreglo){
@@ -545,7 +545,7 @@ class subasta{
             //$obj = $conector->next_record();
         }
 
-        $conector->close();
+        //$conector->close();
         return 1;
     }
     function verifica_transferencia_automatica($parr_datos){
@@ -591,7 +591,7 @@ class subasta{
         
         $obj_mailing->enviar_correo($arr_mail_user);
 
-        $csub->close();
+        //$csub->close();
         return 1;
     }
     function recibe_contrato_firmado($p_subasta_id, $p_path){
@@ -605,7 +605,7 @@ class subasta{
         //$p_arreglo = array("tipo"=>"FINANCIA", "subasta_id"=>$p_subasta_id);
         //$this->ordena_transferencia_automatica($p_arreglo);
 
-        $conector->close();
+        //$conector->close();
         return 1;
     }
     function registra_endoso($p_subasta_id, $p_path){
@@ -619,7 +619,7 @@ class subasta{
         //$p_arreglo = array("tipo"=>"FINANCIA", "subasta_id"=>$p_subasta_id);
         //$this->ordena_transferencia_automatica($p_arreglo);
 
-        $conector->close();
+        //$conector->close();
         return 1;
     }
 
@@ -637,7 +637,7 @@ class subasta{
         if (!$idqry) echo pg_last_error($conector->Link_ID);
         $obj = $conector->next_record();
 
-        $conector->close();
+        //$conector->close();
         return 1;
     }
 
@@ -667,7 +667,7 @@ class subasta{
         $obj = $conector->next_record();
         $v_retorno = $obj->total;
 
-        $conector->close();
+        //$conector->close();
         return $v_retorno;
     }
 
@@ -708,7 +708,7 @@ class subasta{
             $obj = $conector->next_record();
         }
 
-        $conector->close(); $conector2->close();
+        //$conector->close(); $conector2->close();
         return $varr_retorno;
     }
 
@@ -745,7 +745,7 @@ class subasta{
             $obj = $conector->next_record();
         }
 
-        $conector->close();
+        //$conector->close();
         return $varr_result;
     }
 
@@ -976,7 +976,7 @@ class subasta{
             } else $varr_result['propuesta_id'] = 0;
         } else $varr_result['propuesta_id'] = 0;
 
-        $conn->close(); $conn_count->close(); $conn_prop->close();
+        //$conn->close(); $conn_count->close(); $conn_prop->close();
 
         return $varr_result;
     }

@@ -9,7 +9,7 @@ require("../lib-trans/maestros.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'GMENU';
     require("../lib/valida-acceso.php");
@@ -22,16 +22,19 @@ require("../lib-trans/maestros.php");
         }
     </script>
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $obj_mae = new maestros;
 
 if ($_GET['mid'] > 0) $v_arr_menu = $obj_mae->get_menu_acceso_row($_GET['mid']);
+else {
+    $v_arr_menu = array('nombre_back' => '', 'nombre_visual' => '', 'codigo' => '', 'orden' => '', 'pagina' => '');
+}
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     date_default_timezone_set("America/Lima");
     //------ PARTE SUPERIOR ------
     

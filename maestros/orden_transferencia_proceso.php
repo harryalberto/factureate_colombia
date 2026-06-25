@@ -13,13 +13,13 @@ require("../lib/mail_util.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'FINAN';
     require("../lib/valida-acceso.php");
 ?>
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $obj_mae = new maestros;
@@ -30,7 +30,7 @@ $obj_seg = new seguridad;
 if ($_POST['accion'] == 'transferir'){
     if ($_POST['motivo_id'] == 91){     // ENTREGA DE REMANENTE AL EMISOR
         // GUARDO EL COMPROBANTE EN EL SERVER
-        $v_file = '../pdf/empresa_'.$_POST['identificacion'].'/OP_'.$_POST['operacion_id'];
+        $v_file = '../archivos_operaciones//OP_'.$_POST['operacion_id'];
         if (!file_exists($v_file)) mkdir($v_file,0700);
 
         if (isset($_FILES['comprobante']) && $_FILES['comprobante']['name'] != ''){ //coloco el archivo en el servidor
@@ -54,7 +54,7 @@ if ($_POST['accion'] == 'transferir'){
     } elseif ($_POST['motivo_id'] == 100){  
     // ADELANTO AL EMISOR
         // GUARDO COMPROBANTE EN EL SERVER
-        $archivo = '../pdf/empresa_'.$_POST['identificacion'].'/OP_'.$_POST['operacion_id'];
+        $archivo = '../archivos_operaciones/OP_'.$_POST['operacion_id'];
         if (!file_exists($archivo)) mkdir($archivo,0700);
 
         if (isset($_FILES['comprobante']) && $_FILES['comprobante']['name'] != ''){ //coloco el archivo en el servidor
@@ -107,7 +107,7 @@ if ($redireccion != '') echo $redireccion;
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
 
-<?
+<?php
     
     $menu = 'facturas/finan_xestado.php';
     //------ PARTE SUPERIOR ------

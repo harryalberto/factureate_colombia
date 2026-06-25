@@ -85,18 +85,22 @@ if ($_POST['accion'] == 'grabar'){
 } elseif ($_POST['accion'] == 'aprobar') {
 	// GUARDO DOCUMENTOS
 	if ($_FILES['plaft']['name'] != '' && isset($_FILES['plaft']) && $_POST['fideicomiso'] == 0){
-		$carpeta = '../archivos/INV_'.$_POST['nro_doc'].'/vinculacion';
+		// EXISTE EL INFORME PLAFT Y EL FIDEICOMISO NO PARTICIPA DEL MODELO
+		$file_path_db = '';
+		$carpeta = $_SERVER['DOCUMENT_ROOT'].'/archivos/INV_'.$_POST['nombre'].'_'.$_POST['apellido'].'_'.$_POST['nro_doc'];
+		if (!is_dir($carpeta)) mkdir($carpeta, 0777, true);
 
+		$carpeta = $_SERVER['DOCUMENT_ROOT'].'/archivos/INV_'.$_POST['nombre'].'_'.$_POST['apellido'].'_'.$_POST['nro_doc'].'/vinculacion';
         if (!is_dir($carpeta)) mkdir($carpeta, 0777, true);
 
         $file_path = $carpeta.'/doc_inv_'.$v_hoy.'_'.$_FILES['plaft']['name'];
-        move_uploaded_file($_FILES['plaft']['tmp_name'],  $file_path);
+		move_uploaded_file($_FILES['plaft']['tmp_name'],  $file_path);
+        $file_path_db = '../archivos/INV_'.$_POST['nombre'].'_'.$_POST['apellido'].'_'.$_POST['nro_doc'].'/vinculacion/doc_inv_'.$v_hoy.'_'.$_FILES['plaft']['name'];
 	} else $file_path = '';
 
 	// APRUEBA INVERSOR
-	//$vobj_mae_proc->aprobar_inversor($_POST['inversor_id'], $file_path);
-	$varr_fideicomiso_proc = $vobj_mae_proc->get_parametro_detalle(60);
-	$vobj_mae_proc->aprobar_inversor_factureate($_POST['inversor_id'], $file_path, $varr_fideicomiso_proc['valornum']);
+	$varr_param_fideicomiso = $vobj_mae_proc->get_parametro_detalle(60);
+	$v_aprueba = $vobj_mae_proc->aprobar_inversor_factureate($_POST['inversor_id'], $file_path_db, $varr_param_fideicomiso['valornum']);
 
 	// APROBACION DE CUENTAS BANCARIAS
 	if ($_POST['nro_cuentas'] > 0){
@@ -133,15 +137,9 @@ if ($_POST['accion'] == 'grabar'){
 		// INVERSOR
 		$varr_link = $vobj_mae_proc->get_parametro_detalle(53);
 
-		$varr_mail = array('mail_salida' => 'operaciones@factureate.com', 'nombre_salida' => 'Factureate', 'mail_destino' => $_POST['email'], 
+		$varr_mail = array('mail_salida' => 'operaciones@factureate.com', 'nombre_salida' => 'Factureate', 'mail_destino' => $_POST['email'],
 							'subject' => '[FACTUREATE] Enhorabuena!! fuiste aprobado como inversor de Factureate',
-							'body' => 'Hola '.$_POST['nombre'].' '.$_POST['apellido'].', nos complace saludarte y darte la buena noticia que 
-								fuiste admitido como inversor de Factureate, solo falta un paso para puedas empezar a invertir en Factureate, 
-								seguidamente especificamos el link del contrato de vinculacion para que lo puedas firmar e inmediatamente podras 
-								iniciar como inversor.<br><br>LINK DEL CONTRATO: 
-								<a href="'.$_POST['contrato'].'" target="_blank">ACCEDER AL CONTRATO</a>
-								
-								<br><br>Cordialmente,<br><br>FACTUREATE');
+							'body' => 'Hola '.$_POST['nombre'].' '.$_POST['apellido'].', nos complace saludarte y darte la buena noticia que fuiste admitido como inversor de Factureate, solo falta un paso para puedas empezar a invertir en Factureate, seguidamente especificamos el link del contrato de vinculacion para que lo puedas firmar e inmediatamente podras iniciar como inversor.<br><br>LINK DEL CONTRATO: <a href="'.$_POST['contrato'].'" target="_blank">ACCEDER AL CONTRATO</a><br><br>Cordialmente,<br><br>FACTUREATE');
 
 		$vobj_mail_proc->enviar_correo($varr_mail);
 		// INTERNO
@@ -149,20 +147,22 @@ if ($_POST['accion'] == 'grabar'){
 		$vobj_mail_proc->enviar_correo_xnotificacion($varr_mail_interno);
 	}
 
-	echo '1';
+	echo $v_aprueba;
 } elseif ($_POST['accion'] == 'guarda_contrato') {
 	// GUARDA EL ARCHIVO
-	if ($_FILES['contrato_firmado']['name'] != '' && isset($_FILES['contrato_firmado'])){
-		$carpeta = '../archivos/INV_'.$_POST['nro_doc'].'/vinculacion';
+	$file_path_db = '';
 
+	if ($_FILES['contrato_firmado']['name'] != '' && isset($_FILES['contrato_firmado'])){
+		$carpeta = $_SERVER['DOCUMENT_ROOT'].'/archivos/INV_'.$_POST['nombre'].'_'.$_POST['apellido'].'_'.$_POST['nro_doc'].'/vinculacion';
         if (!is_dir($carpeta)) mkdir($carpeta, 0777, true);
 
         $file_path = $carpeta.'/doc_inv_'.$v_hoy.'_'.$_FILES['contrato_firmado']['name'];
         move_uploaded_file($_FILES['contrato_firmado']['tmp_name'],  $file_path);
+        $file_path_db = '/archivos/INV_'.$_POST['nombre'].'_'.$_POST['apellido'].'_'.$_POST['nro_doc'].'/vinculacion/doc_inv_'.$v_hoy.'_'.$_FILES['contrato_firmado']['name'];
 	} else $file_path = '';
 
 	// GUARDANDO EL CONTRATO
-	$vobj_mae_proc->guardar_contrato_inversor($_POST['inversor_id'], $file_path);
+	$vobj_mae_proc->guardar_contrato_inversor($_POST['inversor_id'], $file_path_db);
 
 	if ($_POST['tipo_persona'] == 85){
 		// PERSONA NATURAL
@@ -171,9 +171,9 @@ if ($_POST['accion'] == 'grabar'){
 
 	$varr_link = $vobj_mae_proc->get_parametro_detalle(53);
 	//NOTIFICACION AL INVERSOR
-	$varr_mail = array('mail_salida' => 'operaciones@factureate.com', 'nombre_salida' => 'Factureate', 'mail_destino' => $_POST['email'], 
+	$varr_mail = array('mail_salida' => 'operaciones@factureate.com', 'nombre_salida' => 'Factureate', 'mail_destino' => $_POST['email'],
 						'subject' => '[FACTUREATE] Enhorabuena!! ya puedes empezar a invertir con nosotros',
-						'body' => 'Hola '.$_POST['nombre'].' '.$_POST['apellido'].', nos complace saludarte y darte la buena noticia que ya puedes ingresar a la plataforma y empezar a invertir, los accesos a la plataforma son los siguientes:<br><br>USUARIO: '.$_POST['nro_doc'].'<br>PASSWORD: '.$v_pass.'<br>LINK ACCESO: '.$varr_link['valorchar'].'<br><br>Muchos exitos en tus inversiones.<br><br>Cordialmente,<br><br>FACTUREATE');
+						'body' => 'Hola '.$_POST['nombre'].' '.$_POST['apellido'].', nos complace saludarte y darte la buena noticia que ya puedes ingresar a la plataforma y empezar a invertir, recuerda que opcionalmente en la plataforma puedes especificar tu perfil para recibir con mayor precision las opciones de inversion que mas prefieras, los accesos a la plataforma son los siguientes:<br><br>USUARIO: '.$_POST['nro_doc'].'<br>PASSWORD: '.$v_pass.'<br>LINK ACCESO: '.$varr_link['valorchar'].'<br><br>Muchos exitos en tus inversiones.<br><br>Cordialmente,<br><br>FACTUREATE');
 
 	$vobj_mail_proc->enviar_correo($varr_mail);
 

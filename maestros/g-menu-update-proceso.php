@@ -9,13 +9,13 @@ require("../lib-trans/maestros.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'GMENU';
     require("../lib/valida-acceso.php");
 ?>
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $obj_mae = new maestros;
@@ -34,7 +34,7 @@ if ($redireccion != '') echo $redireccion;
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
 
-<?
+<?php
     date_default_timezone_set("America/Lima");
     
     $menu = 'facturas/facturas.php';

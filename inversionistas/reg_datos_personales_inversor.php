@@ -9,13 +9,13 @@ require("../lib-trans/maestros.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = '';
     require("../lib/valida-acceso.php");
 ?>
 </HEAD>
-<?
+<?php
 
 //------ LOGICA NO VISIBLE ------
 $vobj_modal_mae = new maestros;
@@ -49,14 +49,6 @@ $varr_inversor = $vobj_modal_mae->get_datos_inversor($_GET['inversor_id']);
                 <div class="formulario_grupo_row" style="width: 200px;">
                     <label for="telefono_modal">Telefono:</label>
                     <input type="text" name="telefono_modal" id="telefono_modal" class="formulario_control" value="<?=$varr_inversor['inversor_telefono']?>">
-                </div>
-            </div>
-
-            <!--==== contenedor de direccion ====-->
-            <div class="contenedor_formulario_column">
-                <div class="formulario_grupo_row" style="width: 600px;">
-                    <label for="direccion_modal">Dirección:</label>
-                    <input type="text" name="direccion_modal" id="direccion_modal" class="formulario_control" value="<?=$varr_inversor['direccion']?>">
                 </div>
             </div>
 
@@ -135,7 +127,6 @@ $varr_inversor = $vobj_modal_mae->get_datos_inversor($_GET['inversor_id']);
         var nombre = $('#nombre_modal').val();
         var apellido = $('#apellido_modal').val();
         var telefono = $('#telefono_modal').val();
-        var direccion = $('#direccion_modal').val();
         var tipodoc = $('#tipodoc_modal').val();
         var nrodoc = $('#nrodoc_modal').val();
         var email = $('#email_modal').val();
@@ -145,19 +136,7 @@ $varr_inversor = $vobj_modal_mae->get_datos_inversor($_GET['inversor_id']);
         var user_id = $('#user_id').val();
         var todo_ok = 1;
 
-        if (telefono == ""){
-            alert('Debe ingresar un telefono');
-            $('#telefono_modal').focus();
-            todo_ok = 0;
-        }
-
-        if (direccion == 0 && todo_ok == 1){
-            alert('Debe ingresar una direccion');
-            $('#direccion_modal').focus();
-            todo_ok = 0;
-        }
-
-        if (cond_laboral == 0 && todo_ok == 1){
+        if (cond_laboral == 0){
             alert('Debe seleccionar una condicion laboral');
             $('#cond_laboral_modal').focus();
             todo_ok = 0;
@@ -177,7 +156,6 @@ $varr_inversor = $vobj_modal_mae->get_datos_inversor($_GET['inversor_id']);
             formaData.append('nombre', nombre)
             formaData.append('apellido', apellido)
             formaData.append('telefono', telefono)
-            formaData.append('direccion', direccion)
             formaData.append('tipodoc', tipodoc)
             formaData.append('nrodoc', nrodoc)
             formaData.append('email', email)
@@ -200,10 +178,11 @@ $varr_inversor = $vobj_modal_mae->get_datos_inversor($_GET['inversor_id']);
                 processData: false,
                 success: function(data)
                 {
+                    
                     if (data == 1){
                         cambia_modal_registro('datos_personales',inversor_id,empresa_id);
                     } else {
-                        alert('ocurrio un error');
+                        alert('ocurrio un error'+data);
                     }
                 }
             });

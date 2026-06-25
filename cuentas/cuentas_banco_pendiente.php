@@ -6,6 +6,7 @@ require("../conn/conn_db_trans.inc");
 require("../conn/conn_db_param_trans.inc");
 require("../lib-seg/seguridad-acceso.php");
 require("../lib-trans/maestros.php");
+require("../lib-trans/c_cuentas.php");
 ?>
 <HTML>
 <HEAD>
@@ -20,20 +21,18 @@ require("../lib-trans/maestros.php");
 <?php
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //@@@@@@@@@@@@@@@@@@@ LOGICA
-
-$vobj_mae = new maestros;
+$vobj_cuentas = new cuentas;
 
 //==== CALCULO LOS FILTROS
-$filtros = 'inversionista.estado in (64)';
+$filtros = '';
 
 //==== CALCULO LA CANTIDAD DE REGISTROS CONSIDERANDO FILTROS
-
-$rowcount = $vobj_mae->get_inversores_v2('COUNT', 0, 0, $filtros,'');
+$rowcount = $vobj_cuentas->get_cuentas_banco_pendiente('COUNT', 0, 0, $filtros,'');
 ?>
 
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
 <?php
-    $menu = 'inversionistas/inversores_finanzas.php';
+    $menu = 'cuentas/cuentas_banco_pendiente.php';
     //$pagina = 'empresas/empresas.php';
     //------ PARTE SUPERIOR ------
     require("../lib/superior.php");
@@ -42,27 +41,13 @@ $rowcount = $vobj_mae->get_inversores_v2('COUNT', 0, 0, $filtros,'');
 ?>
     <!--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     @@@@@@@@@@@@@@@@@ ZONA BODY -->
-
     <div style="overflow:hidden;text-align:center;font-size: 18px;font-weight: bold;color:#064677;padding:10px;width:300px;margin:auto;">
-        Relaci&oacute;n de Inversores
+        Cuentas bancarias pendiente de aprobar
     </div>
 
     <!--================================================== 
     ========================== FILTROS -->
-    <div class="frmtransaccion">
-        <form name='frm' method='post' id='frm' action="inversores_finanzas.php">
-            <ul>
-                <li><span class="icon-filter"></span> Nombre:</li>
-            </ul>
-            <ul>
-                <li><input type="text" name="filtro_nombre" id="filtro_nombre" style="width:300px;" class="formulario_control"></li>
-                <li>
-                    <button type="button" class="btn btn-primary" style="font-size:11px;background-color:var(--color-azulv2);border:none;margin-right: 10px;" onclick="filtrar()"><i class="fa-solid fa-filter"></i> Filtrar</button>
-                    <button type="button" class="btn btn-primary" style="font-size:11px;background-color:var(--color-rojo);border:none;margin-right: 10px;" onclick="filtraPendientes()"><i class="fa-solid fa-triangle-exclamation" style="color:var(--color-amarillo);"></i> Con Pendientes</button>
-                </li>
-            </ul>
-        </form>
-    </div>
+    
     <!--==== TABLA HEADER -->
     <div style="overflow:hidden;margin:5px;padding:5px;">
         <div style="overflow:hidden;margin:5px;padding:5px;">
@@ -70,10 +55,9 @@ $rowcount = $vobj_mae->get_inversores_v2('COUNT', 0, 0, $filtros,'');
                 <thead>
                     <tr>
                         <th scope="col" class="sort asc">ID</th>            <th scope="col" class="sort asc">NOMBRE</th>
-                        <th scope="col" class="sort asc">DOCUMENTO</th>     <th scope="col" class="sort asc">EMAIL</th>
-                        <th scope="col" class="sort asc">TELEFONO</th>      <th scope="col" class="sort asc">ESTADO</th>
-                        <th scope="col" class="sort asc">TIPO</th>          <th scope="col" class="sort asc">CATEGORIA</th>
-                        <th scope="col" class="sort asc">CTA BANCO</th>     <th scope="col" class="sort asc">DETALLE</th>
+                        <th scope="col" class="sort asc">TIPO</th>          <th scope="col" class="sort asc">BANCO</th>
+                        <th scope="col" class="sort asc">MONEDA</th>        <th scope="col" class="sort asc">CUENTA</th>
+                        <th scope="col" class="sort asc">DETALLE</th>
                     </tr>
                 </thead>
                 <tbody id="content">
@@ -107,7 +91,7 @@ $rowcount = $vobj_mae->get_inversores_v2('COUNT', 0, 0, $filtros,'');
         <div class="modal-content">
         <div class="modal-header">
             <ul style="list-style:none;overflow:hidden;">
-                <li style="display:block;width:200px;float:left;"><h5 class="modal-title fs-5" id="exampleModalLabel" style="color:#064677;font-weight: bold;">Detalle de la Subasta</h5></li>
+                <li style="display:block;width:200px;float:left;"><h5 class="modal-title fs-5" id="exampleModalLabel" style="color:#064677;font-weight: bold;">Detalle de la Cuenta</h5></li>
                 <li style="display:block;width:50px;float:right;"><button type="button" class="btn btn-default" data-dismiss="modal">X</button></li>
             </ul>
         </div>
@@ -145,7 +129,7 @@ $rowcount = $vobj_mae->get_inversores_v2('COUNT', 0, 0, $filtros,'');
             formaData.append('rowcount', rowcount)
             formaData.append('filtros', filtros)
             
-            fetch("inversores_finanzas_load.php", {
+            fetch("cuentas_banco_pendiente_load.php", {
                     method: "POST",
                     body: formaData
                 })
@@ -194,20 +178,11 @@ $rowcount = $vobj_mae->get_inversores_v2('COUNT', 0, 0, $filtros,'');
     </script>
 
     <script type="text/javascript">
-        function filtrar(){
-            document.frm.submit();
-        }
-
-        function verDetalle(p_inversor, p_tipo_inversor){
-            //if (p_tipo_inversor == 85){
-            //persona natural
-                $('.modal-title').text('DETALLE INVERSOR');
-                $('.modal-body').load('inversor_upd_modal.php?inversor_id='+p_inversor+'&tipo_inv='+p_tipo_inversor,function(){
+        function verDetalle(p_id, p_moneda_id, p_banco_id, p_nro_cta, p_tipo_persona){
+            $('.modal-title').text('DETALLE CUENTA');
+            $('.modal-body').load('cuenta_banco_pendiente_modal.php?id='+p_id+'&moneda_id='+p_moneda_id+'&banco_id='+p_banco_id+'&cta='+p_nro_cta+'&tipo='+p_tipo_persona,function(){
                     $('#InversorDetalle').modal({show:true});
-                });
-            //} else {
-                //persona juridica
-            //}
+            });
         }
     </script>
 </BODY>

@@ -11,7 +11,7 @@ class maestros{
                             'ubi2nombre'=>$obj->ubi2nombre, 'ubi3nombre'=>$obj->ubi3nombre,
                             'estado'=>$obj->estado);
 
-        $conn->close();
+        //$conn->close();
         return $arremisor;
     }
     function get_tipos($tipobase){
@@ -28,7 +28,7 @@ class maestros{
             $obj = $conn->next_record();
         }
         
-        $conn->close();
+        //$conn->close();
         return $arrtipo;
     }
 
@@ -44,7 +44,7 @@ class maestros{
             $obj = $conn->next_record();
         }
         
-        $conn->close();
+        //$conn->close();
         return $arrtipo;
     }
 
@@ -62,7 +62,7 @@ class maestros{
             $obj = $conn->next_record();
         }
         
-        $conn->close();
+        //$conn->close();
         return $arrtipo;
     }
 
@@ -102,7 +102,7 @@ class maestros{
             $obj = $conn->next_record();
         }
         
-        $conn->close();
+        //$conn->close();
         return $parametros;
     }
     function get_parametro_detalle($p_id){
@@ -118,8 +118,7 @@ class maestros{
         return $parametros;
     }
     function registro_express_cliente($identificacion,$nombre){
-        $conn = new db_param_trans;
-        $conn->connect();
+        $conn = new db_param_trans; $conn->connect();
         
         $idqry = $conn->query("select emp_crea_empresa_express('".$identificacion."','".$nombre."') as empresaid");
         if (!$idqry) echo pg_last_error($conn->Link_ID);
@@ -131,9 +130,34 @@ class maestros{
         if (!is_dir('../archivos/empresa_'.$identificacion.'/evaluacion_riesgo')) mkdir('../archivos/empresa_'.$identificacion.'/evaluacion_riesgo', 0777, true);
         //mkdir('../archivos/riesgos_emp_'.$identificacion);
         
-        $conn->close();
+        //$conn->close();
         return $empresaid;
     }
+
+    function registro_express_cliente_arr($parr_datos){
+        $conn = new db_param_trans; $conn->connect();
+        $conn2 = new db_param_trans; $conn2->connect();
+
+        $idqry = $conn->query("select emp_crea_empresa_express('".$parr_datos['identificacion']."','".$parr_datos['nombre']."') as empresaid");
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+        $empresaid = $obj->empresaid;
+
+        //INCLUSION DE DATOS ADICIONALES
+        $v_sql = "update empresa set emailcontacto = '".$parr_datos['cliente_correo']."', direccion = '".$parr_datos['cliente_direccion']."',
+                                    nombrecontacto = '".$parr_datos['cliente_contacto']."' where id = ".$empresaid;
+
+        $idqry = $conn2->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn2->Link_ID);
+        $conn2->next_record();
+
+        //SE CREA LA CARPETA DE LA EMRPESA Y DE LOS RIESGOS POR SER OP
+        if (!is_dir('../archivos/empresa_'.$parr_datos['identificacion'])) mkdir('../archivos/empresa_'.$parr_datos['identificacion'], 0777, true);
+        if (!is_dir('../archivos/empresa_'.$parr_datos['identificacion'].'/evaluacion_riesgo')) mkdir('../archivos/empresa_'.$parr_datos['identificacion'].'/evaluacion_riesgo', 0777, true);
+
+        return $empresaid;
+    }
+
     function valida_factura_existencia($fnumero){
         $conn = new db_param_trans;
         $conn->connect();
@@ -144,7 +168,7 @@ class maestros{
 
         $resultado = $obj->contador;
         
-        $conn->close();
+        //$conn->close();
         return $resultado;
     }
     function gestiona_notificacion($usuarioid){
@@ -163,7 +187,7 @@ class maestros{
             $obj = $conn->next_record();
         }
         
-        $conn->close();
+        ///$conn->close();
         return $arr;
     }
     function get_estado_cliente($clienteid){
@@ -175,7 +199,7 @@ class maestros{
         $obj = $conn->next_record();
         $estado = array('estadoid' => $obj->estado, 'estado' => $obj->nombre);
 
-        $conn->close();
+        //$conn->close();
         return $estado;
     }
     function get_triesgopagador(){
@@ -192,7 +216,7 @@ class maestros{
             $obj = $conn->next_record();
         }
         
-        $conn->close();
+        //$conn->close();
         return $arrtipo;
     }
     function get_datos_obpag($empresaid){
@@ -206,7 +230,7 @@ class maestros{
                             'paginaweb'=>$obj->paginaweb, 'finicio'=>$obj->finicio
                             );
 
-        $conn->close();
+        //$conn->close();
         return $arrobpago;
     }
     function get_riesgo_obpago($empresaid){
@@ -239,12 +263,12 @@ class maestros{
                                         'riesgo_factid' => 0,                           'desc_riesgofact' => '',
                                         'riesgo_scoreid' => 0,                          'desc_riesgoscore' => '');
 
-        $conn->close();
+        //$conn->close();
         return $arrobpagoriesgo;
     }
 
     function get_riesgo_comercial($p_obp_id, $p_emisor_id){
-        $conn->close();
+        //$conn->close();
         $conn = new db_param_trans;
         $conn->connect();
 
@@ -255,14 +279,14 @@ class maestros{
         $arr_riesgo_comercial = array('riesgo_id'=>$obj->riesgoid, 'desc_riesgo'=>$obj->desc_riesgo,
                             'calificacion'=>$obj->calificacion, 'nombre_riesgo'=>$obj->nombre_riesgo);
 
-        $conn->close();
+        //$conn->close();
         return $arr_riesgo_comercial;
     }
     function get_historianeg_obpago($empresaid){
         $conn = new db_param_trans;
         $conn->connect();
 
-        $conn->query("select * from GET_HISTORIANEG_OBPAGO(".$empresaid.")");
+        $idqry = $conn->query("select * from GET_HISTORIANEG_OBPAGO(".$empresaid.")");
         if (!$idqry) echo pg_last_error($conn->Link_ID);
         $obj = $conn->next_record();
         $arrhistoria = array('noperaciones'=>$obj->noperaciones, 'enproceso'=>$obj->enproceso,
@@ -273,7 +297,7 @@ class maestros{
                             'montocobranzaeur' => $obj->montocobranzaeur
                             );
 
-        $conn->close();
+        //$conn->close();
         return $arrhistoria;
     }
     function registro_empresa($arr_datos){
@@ -328,7 +352,7 @@ class maestros{
         if (!$idqry) echo pg_last_error($conn->Link_ID);
         $obj = $conn->next_record();
 
-        $conn->close();
+        //$conn->close();
         return 1;
     }
     function get_datos_emisor_full($emisorid){
@@ -354,7 +378,7 @@ class maestros{
                             'telf_contacto' => $obj->telf_contacto, 'estado_nombre' => $obj->r_estado_nombre
                         );
         
-        $conn->close();
+        //$conn->close();
         return $arremisor;
     }
     function actualiza_emisor($arr_datos, $tipo){
@@ -388,7 +412,7 @@ class maestros{
             }
         }
 
-        $conn->close();
+        //$conn->close();
     }
     function enviar_registro_empresa($empresaid){
         $conn = new db_param_trans;
@@ -397,7 +421,7 @@ class maestros{
         $idqry = $conn->query("select EMP_ENVIAR_REGISTRO(".$empresaid.",".$_SESSION['user']['usuarioid'].") as resultado");
         if (!$idqry) echo pg_last_error($conn->Link_ID);
         
-        $conn->close();
+        //$conn->close();
     }
     function get_empresas_xestado($estado, $rows, $rowini, $tipo, $t_empresa){
         $conn = new db_param_trans;
@@ -427,7 +451,7 @@ class maestros{
             }
         }
         
-        $conn->close();
+        //$conn->close();
         return $resultado;
     }
 
@@ -475,7 +499,7 @@ class maestros{
             }
         }
 
-        $conn->close();
+        //$conn->close();
         return $resultado;
     }
 
@@ -509,7 +533,7 @@ class maestros{
                             'f_informe_legal' => $obj->f_informe_legal, 'contrato_path' => $obj->contrato_path, 'f_firma_contrato' => $obj->f_firma_contrato,
                             'estado_legal' => $obj->r_estado_legal, 'inversor_natural' => $obj->r_inversor_natural);
         
-        $conn->close();
+        //$conn->close();
         return $arremisor;
     }
     function get_datos_empresa_full($empresaid){
@@ -546,7 +570,7 @@ class maestros{
                             'path_informe_score' => $obj->path_informe_score
                         );
         
-        $conn->close();
+        //$conn->close();
         return $arremisor;
     }
     function gestiona_empresa ($arr_input){
@@ -558,7 +582,7 @@ class maestros{
         if (!$idqry) echo pg_last_error($conn->Link_ID);
         $obj = $conn->next_record();
 
-        $conn->close();
+        //$conn->close();
     }
     function empresas_riesgo(){
         $conn = new db_param_trans;
@@ -574,7 +598,7 @@ class maestros{
             $obj = $conn->next_record();
         }
 
-        $conn->close();
+        //$conn->close();
         return $arr_empresas;
     }
     function niveles_riesgo(){
@@ -592,7 +616,7 @@ class maestros{
             $obj = $conn->next_record();
         }
 
-        $conn->close();
+        //$conn->close();
         return $arr_result;
     }
     function registra_riesgos($arr_input){
@@ -607,7 +631,7 @@ class maestros{
         $obj = $conn->next_record();
         $v_resultado = $obj->contador;
         
-        $conn->close();
+        //$conn->close();
 
         return $v_resultado;
     }
@@ -702,7 +726,7 @@ class maestros{
         
         $this->calcula_riesgo_factureate($v_riesgo_id);
 
-        $conn->close(); $conn2->close(); $conn3->close(); $conn4->close();
+        //$conn->close(); $conn2->close(); $conn3->close(); $conn4->close();
 
         return $v_riesgo_id;
     }
@@ -716,7 +740,7 @@ class maestros{
         $obj = $conn->next_record();
         $resultado = $obj->result;
 
-        $conn->close();
+        //$conn->close();
         return $resultado;
     }
 
@@ -728,7 +752,7 @@ class maestros{
         $obj = $conn->next_record();
         $resultado = $obj->result;
 
-        $conn->close();
+        //$conn->close();
         return $resultado;
     }
     function calcula_riesgo_factureate($p_riesgoemp_id){
@@ -747,7 +771,7 @@ class maestros{
         $obj = $conn->next_record();
         $retorno = array('valor' => $obj->valor_num, 'descripcion' => $obj->nombre);
         
-        $conn->close();
+        //$conn->close();
         return $retorno;
     }
     function kpi_op_xvalidar(){
@@ -759,7 +783,7 @@ class maestros{
         $obj = $conn->next_record();
         $retorno['count'] = $obj->contador;
         
-        $conn->close();
+        //$conn->close();
         return $retorno;
     }
     function kpi_op_riesgo_xvencer(){
@@ -785,7 +809,7 @@ class maestros{
         $retorno['count'] = $obj3->contador;
         $retorno['maximo'] = $v_preventivo;
         
-        $conn->close();
+        //$conn->close();
         //$conn2->close();
         //$conn3->close();
 
@@ -807,7 +831,7 @@ class maestros{
         $retorno['count'] = $obj3->contador;
         $retorno['maximo'] = $v_max_dias;
         
-        $conn->close();
+        //$conn->close();
         //$conn3->close();
 
         return $retorno;
@@ -830,7 +854,7 @@ class maestros{
             $obj = $conn->next_record();
         }
 
-        $conn->close();
+        //$conn->close();
 
         return $arr_result;
     }
@@ -858,9 +882,9 @@ class maestros{
         if (!$idqry) echo pg_last_error($conn3->Link_ID);
         $obj3 = $conn3->next_record();
         
-        $conn->close();
+        /*$conn->close();
         $conn2->close();
-        $conn3->close();
+        $conn3->close();*/
 
         return 1;
     }
@@ -877,7 +901,7 @@ class maestros{
         $arr_result = array('id' => $obj->id, 'nombre_visual' => $obj->nombre_visual, 'orden' => $obj->orden,
                             'pagina' => $obj->pagina, 'nombre_back' => $obj->nombre_back, 'codigo'=>$obj->codigo,'acceso_id'=>$obj->acceso_id);
 
-        $conn->close();
+        //$conn->close();
 
         return $arr_result;
     }
@@ -896,8 +920,8 @@ class maestros{
         if (!$idqry) echo pg_last_error($conn2->Link_ID);
         $obj2 = $conn2->next_record();
 
-        $conn->close();
-        $conn2->close();
+        /*$conn->close();
+        $conn2->close();*/
         
         return 1;
     }
@@ -919,7 +943,7 @@ class maestros{
             $obj = $conn->next_record();
         }
 
-        $conn->close();
+        //$conn->close();
 
         return $arr_result;
     }
@@ -956,7 +980,7 @@ class maestros{
             }
         }
 
-        $conn->close();
+        //$conn->close();
 
         return $arr_result;
     }
@@ -978,7 +1002,7 @@ class maestros{
         }
         $obj = $conn->next_record();
 
-        $conn->close();
+        //$conn->close();
         
         return 1;
     }
@@ -990,7 +1014,7 @@ class maestros{
         if (!$idqry) echo pg_last_error($conn->Link_ID);
         $obj = $conn->next_record();
         
-        $conn->close();
+        //$conn->close();
     }
     function validar_cliente ($p_arr_cliente){
         $v_nombre = $this->get_nombre_empresa_xdoc($p_arr_cliente['cliente_nro']);
@@ -1033,7 +1057,7 @@ class maestros{
             $obj = $conn->next_record();
         }
         
-        $conn->close();
+        //$conn->close();
 
         return $arr_result;
     }
@@ -1050,7 +1074,7 @@ class maestros{
         $conn->next_record();
         $this->evalua_accionistas($parr_accionistas[0]['empresa_id']);
 
-        $conn->close();
+        //$conn->close();
 
         return 1;
     }
@@ -1064,7 +1088,7 @@ class maestros{
         $v_obj = $conn->next_record();
         $v_resultado = $v_obj->resultado;
 
-        $conn->close();
+        //$conn->close();
 
         return $v_resultado;
     }
@@ -1106,7 +1130,7 @@ class maestros{
         
         $obj_mailing->enviar_correo($arr_mail_user);
         
-        $conn->close();
+        //$conn->close();
 
         return 1;
     }
@@ -1122,7 +1146,7 @@ class maestros{
         if (!$idqry) echo pg_last_error($conn->Link_ID);
         $conn->next_record();
         // ENVIO DEL CORREO A LA EMPRESA
-        $v_link = 'https://factureate.com/plataforma-rd/';
+        $v_link = 'https://factureate-webapp-cadjdpb8ccb9emg6.eastus-01.azurewebsites.net/';
         $varr_empresa = $this->get_datos_emisor_full($parr_datos['empresa_id']);
         $arr_mail_user = array('mail_salida' => 'pymes@factureate.com', 'nombre_salida' => 'FACTUREATE',
                                 'mail_destino' => $varr_empresa['email_contacto'],
@@ -1140,7 +1164,7 @@ class maestros{
         
         $obj_mailing->enviar_correo($arr_mail_user);
         
-        $conn->close();
+        //$conn->close();
 
         return 1;
     }
@@ -1181,7 +1205,7 @@ class maestros{
                                 'contrato_enviado' => $obj->contrato_enviado,                                       'estado_fiducia' => $obj->estado_fiducia,
                                 'pep' => $obj->pep,                     'ocupacion_nombre' => $obj->ocupacion_nombre);
 
-        $conn->close();
+        //$conn->close();
 
         return $varr_result;
     }
@@ -1197,10 +1221,10 @@ class maestros{
             'qinversor_plaft_vencido' => $obj->r_qinversor_plaft_vencido, 'qcontratos_xenviar' => $obj->r_qcontratos_xenviar,
             'qcontratos_xenviar_alert' => $obj->r_qcontratos_xenviar_alert, 'qcontratos_sinfirma' => $obj->r_qcontratos_sinfirma,
             'qcontratos_sinfirma_alert' => $obj->r_qcontratos_sinfirma_alert, 'qoperaciones_sin_endoso' => $obj->r_operaciones_sinendoso,
-            'qempresas_sineval' => $obj->r_empresas_sineval_legal, 'qempresas_sineval_alert' => $obj->r_empresas_sineval_legal_alert,
+            'qempresas_sineval' => $obj->r_qempresas_sineval_legal, 'qempresas_sineval_alert' => $obj->r_qempresas_sineval_legal_alert,
             'qempresas_conflicto'=>$obj->r_qempresas_conflicto_alert);
 
-        $conn->close();
+        //$conn->close();
 
         return $varr_result;
     }
@@ -1217,7 +1241,7 @@ class maestros{
                              'qdepuracion_pendiente' => $obj->r_qdepuracion_pendiente,  'dias_dd' => $obj->r_dias_dd, 
                              'qdd_pendiente_alert' => $obj->r_qdd_pendiente_alert,      'qdd_pendiente' => $obj->r_qdd_pendiente);
 
-        $conn->close();
+        //$conn->close();
 
         return $varr_result;
     }
@@ -1256,7 +1280,7 @@ class maestros{
             }
         }
 
-        $conn->close();
+        //$conn->close();
         return $varr_result;
     }
 
@@ -1295,8 +1319,8 @@ class maestros{
             $varr_result['cuenta_banco'] = $obj->nro_cuenta;
         }
 
-        $conn->close();
-        $conn2->close();
+        /*$conn->close();
+        $conn2->close();*/
         return $varr_result;
     }
     function transferir_fondos_exterior($parr_datos){
@@ -1307,7 +1331,7 @@ class maestros{
         if (!$idqry) echo pg_last_error($conn->Link_ID);
         $obj = $conn->next_record();
 
-        $conn->close();
+        //$conn->close();
         return 1;
     }
 
@@ -1341,7 +1365,7 @@ class maestros{
             }
         }
         
-        $conn->close();
+        //$conn->close();
         return $resultado;
     }
 
@@ -1353,7 +1377,7 @@ class maestros{
         $obj = $conn->next_record();
         $v_zona = $obj->valor_char;
 
-        $conn->close();
+        //$conn->close();
         return $v_zona;
     }
 
@@ -1364,7 +1388,7 @@ class maestros{
         if (!$idqry) echo pg_last_error($conn->Link_ID);
         $obj = $conn->next_record();
 
-        $conn->close();
+        //$conn->close();
         return 1;
     }
     function termina_orden_transferencia($p_orden_id){
@@ -1374,7 +1398,7 @@ class maestros{
         if (!$idqry) echo pg_last_error($conn->Link_ID);
         $obj = $conn->next_record();
 
-        $conn->close();
+        //$conn->close();
         return 1;
     }
 
@@ -1391,7 +1415,7 @@ class maestros{
             $obj = $conn->next_record();
         }
 
-        $conn->close();
+        //$conn->close();
         return $varr_result;
     }
 
@@ -1423,7 +1447,7 @@ class maestros{
             $obj = $conn->next_record();
         }
 
-        $conn->close();
+        //$conn->close();
         return $varr_result;
     }
 
@@ -1455,7 +1479,7 @@ class maestros{
             $conn->next_record();
         }
 
-        $conn->close();
+        //$conn->close();
         return 1;
     }
 
@@ -1483,7 +1507,7 @@ class maestros{
             $obj = $conn->next_record();
         }
     
-        $conn->close();
+        //$conn->close();
         return $varr_result;
     }
 
@@ -1497,7 +1521,7 @@ class maestros{
         if (!$idqry) echo pg_last_error($conn->Link_ID);
         $obj = $conn->next_record();
 
-        $conn->close();
+        //$conn->close();
     }
 
     function anula_solicitud_anulacion($p_inversor_id){
@@ -1507,7 +1531,7 @@ class maestros{
         if (!$idqry) echo pg_last_error($conn->Link_ID);
         $obj = $conn->next_record();
 
-        $conn->close();
+        //$conn->close();
     }
 
     function get_usuarios_xempresa($p_empresa_id){
@@ -1529,7 +1553,7 @@ class maestros{
             $obj = $conn->next_record();
         }
 
-        $conn->close();
+        //$conn->close();
         return $varr_result;
     }
 
@@ -1543,7 +1567,7 @@ class maestros{
         $obj = $conn->next_record();
         $v_retorno = $obj->retorno;
 
-        $conn->close();
+        //$conn->close();
 
         return $v_retorno;
     }
@@ -1662,7 +1686,7 @@ class maestros{
         if (!$idqry) echo pg_last_error($conn->Link_ID);
         $obj = $conn->next_record();
 
-        $conn->close();
+        //$conn->close();
     }
 
     function get_inversores($p_tipo, $p_rowini, $p_rowcount, $parr_filtros){
@@ -1709,7 +1733,7 @@ class maestros{
             }
         }
 
-        $conn->close();
+        //$conn->close();
 
         return $v_resultado;
     }
@@ -1755,7 +1779,7 @@ class maestros{
             }
         }
 
-        $conn->close();
+        //$conn->close();
 
         return $v_resultado;
     }
@@ -1767,7 +1791,7 @@ class maestros{
         if (!$idqry) echo pg_last_error($conn->Link_ID);
         $obj = $conn->next_record();
 
-        $conn->close();
+        //$conn->close();
     }
 
     function get_inversor_detalle($p_inversor_id){
@@ -1788,7 +1812,7 @@ class maestros{
                             'contrato_enviado' => $obj->contrato_enviado,                               'f_aprueba_factureate' => $obj->f_aprueba_factureate, 
                             'estado_fiducia' => $obj->estado_fiducia,                                   'informe_depuracion_path' => $obj->informe_depuracion_path);
 
-        $conn->close();
+        //$conn->close();
         return $varr_result;
     }
 
@@ -1805,7 +1829,7 @@ class maestros{
         if (!$idqry) echo pg_last_error($conn->Link_ID);
         $obj = $conn->next_record();
 
-        $conn->close();
+        //$conn->close();
     }
 
     function aprobar_inversor($p_inversor_id, $p_plaft){
@@ -1838,8 +1862,8 @@ class maestros{
             $conn->next_record();
         }
 
-        $conn->close();
-        $conn2->close();
+        /*$conn->close();
+        $conn2->close();*/
 
         return 1;
     }
@@ -1898,7 +1922,7 @@ class maestros{
         if (!$idqry) echo pg_last_error($conn->Link_ID);
         $obj = $conn->next_record();
 
-        $conn->close();
+        //$conn->close();
     }
 
     function get_comision_fact_emisor($p_emisor_id, $p_cliente_id){
@@ -1910,7 +1934,7 @@ class maestros{
 
         $v_retorno = $obj->tasa_comision;
 
-        $conn->close();
+        //$conn->close();
         return $v_retorno;
     }
 
@@ -1961,7 +1985,7 @@ class maestros{
         $v_porc_adelanto = $this->get_porc_adelanto_emisor($p_emisor_id, $v_cliente_id);
         $v_result = $v_porc_comision.'+'.$v_porc_adelanto;
 
-        $conn->close(); $conn_count->close();
+        //$conn->close(); $conn_count->close();
         
         return $v_result;
     }
@@ -1974,9 +1998,9 @@ class maestros{
         $obj = $conn->next_record();
 
         if ($obj->email != '') $v_result = 1;
-        else $v_resul = 0;
+        else $v_result = 0;
 
-        $conn->close();
+        //$conn->close();
         return $v_result;
     }
 
@@ -1997,7 +2021,7 @@ class maestros{
             $obj = $conn->next_record();
         }
 
-        $conn->close();
+        //$conn->close();
         return $varr_result;
     }
 
@@ -2019,7 +2043,7 @@ class maestros{
             $obj = $conn->next_record();
         }
 
-        $conn->close();
+        //$conn->close();
         return $varr_result;
     }
 
@@ -2038,7 +2062,7 @@ class maestros{
                 'onu_inactivo_acc' => $obj->r_onu_inactivo_acc, 'cautela_activo_inver' => $obj->r_cautela_activo_inver, 'cautela_inactivo_inver' => $obj->r_cautela_inactivo_inver,
                 'cautela_activo_acc' => $obj->r_cautela_activo_acc, 'cautela_inactivo_acc' => $obj->r_cautela_inactivo_acc);
 
-        $conn->close();
+        //$conn->close();
         return $varr_result;
     }
 
@@ -2056,7 +2080,7 @@ class maestros{
                             'qfinan_xvencer' => $obj->r_qfinan_xvencer, 'qfinan_vencido' => $obj->r_qfinan_vencido, 'qfinan_vencehoy' => $obj->r_qfinan_vencehoy,
                             'qempresas_validacionop' => $obj->r_qempresas_validacionop);
 
-        $conn->close();
+        //$conn->close();
 
         return $varr_result;
     }
@@ -2077,7 +2101,7 @@ class maestros{
             $obj = $conn->next_record();
         }
 
-        $conn->close();
+        //$conn->close();
         return $varr_result;
     }
 
@@ -2121,7 +2145,7 @@ class maestros{
             $obj = $conn->next_record();
         }
 
-        $conn->close(); $conn2->close();
+        //$conn->close(); $conn2->close();
         return $varr_result;
     }
 
@@ -2161,7 +2185,7 @@ class maestros{
             }
         }
 
-        $conn->close();
+        //$conn->close();
 
         return $v_result;
     }
@@ -2174,7 +2198,7 @@ class maestros{
         if (!$idqry) echo pg_last_error($conn->Link_ID);
         $obj = $conn->next_record();
 
-        $conn->close();
+        //$conn->close();
     }
 
     function dd_inversor($p_inversor_id, $p_informe_path){
@@ -2185,7 +2209,7 @@ class maestros{
         if (!$idqry) echo pg_last_error($conn->Link_ID);
         $obj = $conn->next_record();
 
-        $conn->close();
+        //$conn->close();
     }
 
     function kpi_graph_adelantos_mes(){
@@ -2217,7 +2241,7 @@ class maestros{
             $obj = $conn->next_record();
         }
 
-        $conn->close();
+        //$conn->close();
 
         return $varr_result;
     }
@@ -2251,7 +2275,7 @@ class maestros{
             $obj = $conn->next_record();
         }
 
-        $conn->close();
+        //$conn->close();
 
         return $varr_result;
     }
@@ -2285,7 +2309,7 @@ class maestros{
             $obj = $conn->next_record();
         }
 
-        $conn->close();
+        //$conn->close();
 
         return $varr_result;
     }
@@ -2319,7 +2343,7 @@ class maestros{
             $obj = $conn->next_record();
         }
 
-        $conn->close();
+        //$conn->close();
 
         return $varr_result;
     }
@@ -2341,7 +2365,7 @@ class maestros{
             $obj = $conn->next_record();
         }
 
-        $conn->close();
+        //$conn->close();
 
         return $varr_result;
     }
@@ -2394,7 +2418,7 @@ class maestros{
         if (!$idqry) echo pg_last_error($conn->Link_ID);
         $conn->next_record();
 
-        $conn->close();
+        //$conn->close();
         return $v_sql;
     }
 
@@ -2439,7 +2463,7 @@ class maestros{
             else $v_resultado = -2;
         } else $v_resultado = -1;
 
-        $conn->close();
+        //$conn->close();
 
         return $v_resultado;
     }
@@ -2474,8 +2498,8 @@ class maestros{
             $conn->next_record();
         }
 
-        $conn->close();
-        $conn2->close();
+        //$conn->close();
+        //$conn2->close();
 
         return 1;
     }
@@ -2490,7 +2514,7 @@ class maestros{
 
         $varr_result = array('nombre' => $obj->nombre, 'calificacion' => $obj->calificacion, 'nivel' => $obj->nivel);
 
-        $conn->close();
+        //$conn->close();
 
         return $varr_result;
     }
@@ -2528,7 +2552,7 @@ class maestros{
             }
         }
         
-        $conn->close();
+        //$conn->close();
         
         return $resultado;
     }
@@ -2570,7 +2594,7 @@ class maestros{
         if (!$idqry) echo pg_last_error($conn_registro->Link_ID);
         $obj = $conn_registro->next_record();
 
-        $conn->close(); $conn_fecha->close();   $conn_registro->close();
+        //$conn->close(); $conn_fecha->close();   $conn_registro->close();
 
         return 1;
     }
@@ -2612,7 +2636,7 @@ class maestros{
         if (!$idqry) echo pg_last_error($conn_registro->Link_ID);
         $obj = $conn_registro->next_record();
 
-        $conn->close(); $conn_fecha->close();   $conn_registro->close();
+        //$conn->close(); $conn_fecha->close();   $conn_registro->close();
 
         return 1;
     }
@@ -2645,7 +2669,7 @@ class maestros{
             }
         }
 
-        $conn->close(); $conn_seg->close();
+        //$conn->close(); $conn_seg->close();
 
         return $varr_usuario_inversor;
     }
@@ -2677,7 +2701,7 @@ class maestros{
             else $varr_resultado['broker_user'] = $parr_datos['nrodoc'];
         }
 
-        $conn_user->close(); $conn_user2->close();
+        //$conn_user->close(); $conn_user2->close();
 
         return $varr_resultado;
     }
@@ -2715,7 +2739,7 @@ class maestros{
         if (!$idqry) echo pg_last_error($conn2->Link_ID);
         $conn2->next_record();
         
-        $conn->close(); $conn_seg->close();
+        //$conn->close(); $conn_seg->close();
 
         return $arr_datos['inversor_id'];
     }
@@ -2732,7 +2756,7 @@ class maestros{
         if (!$idqry) echo pg_last_error($conn_seg->Link_ID);
         $conn_seg->next_record();
 
-        $conn_seg->close();        
+        //$conn_seg->close();
     }
 
     function get_brokers_list($p_tipo, $p_rows, $p_rowini, $p_filtros, $p_order){
@@ -2775,7 +2799,7 @@ class maestros{
             }
         }
     
-        $conn->close();
+        //$conn->close();
         
         return $varr_result;
     }
@@ -2797,7 +2821,7 @@ class maestros{
                             'estado_activo_id' => $obj->estado, 'tipodoc' => $obj->nombre_doc, 'estado_activo' => $obj->nombre_estado, 'email' => $obj->email,
                             'empresa_id' => $obj->empresaid);
 
-        $conn->close();
+        //$conn->close();
         
         return $varr_result;
     }
@@ -2814,7 +2838,7 @@ class maestros{
 
         $resultado = $obj->contador;
 
-        $conn->close();
+        //$conn->close();
 
         return $resultado;
     }
@@ -2828,7 +2852,7 @@ class maestros{
         if (!$idqry) echo pg_last_error($conn->Link_ID);
         $conn->next_record();
 
-        $conn->close();
+        //$conn->close();
 
         return 1;
     }
@@ -2842,7 +2866,7 @@ class maestros{
         if (!$idqry) echo pg_last_error($conn->Link_ID);
         $conn->next_record();
 
-        $conn->close();
+        //$conn->close();
 
         return 1;
     }
@@ -2898,6 +2922,43 @@ class maestros{
         //$conn->close(); $conn2->close();
 
         return $v_id;
+    }
+
+    function get_datos_cuenta_emisor($p_empresa_id, $p_moneda_id){
+        $conn = new db_param_trans; $conn->connect();
+        $conn2 = new db_param_trans; $conn2->connect();
+
+        $v_qry = "select count(1) as contador from empresa_cuenta_banco where empresa_id = ".$p_empresa_id." and moneda_id = ".$p_moneda_id." and estado_id = 68";
+
+        $idqry = $conn->query($v_qry);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+
+        $varr_result = array();
+
+        if ($obj->contador > 0){
+            $v_qry = "  select  empresa_cuenta_banco.id, empresa_cuenta_banco.banco_id, bancos.nombre_banco, empresa_cuenta_banco.nro_cuenta, empresa_cuenta_banco.tcuenta_id,
+                                tipos.nombre as tcuenta_nombre
+                        from    empresa_cuenta_banco, bancos, tipos
+                        where   empresa_cuenta_banco.empresa_id = ".$p_empresa_id." and empresa_cuenta_banco.moneda_id = ".$p_moneda_id." and empresa_cuenta_banco.estado_id = 68 and
+                                bancos.id = empresa_cuenta_banco.banco_id and tipos.id = empresa_cuenta_banco.tcuenta_id
+                        order by empresa_cuenta_banco.id";
+
+            $idqry = $conn2->query($v_qry);
+            if (!$idqry) echo pg_last_error($conn2->Link_ID);
+            $obj2 = $conn2->next_record();
+
+            for($i = 0; $i < $conn2->nrows(); $i ++){
+                $varr_result[$i] = array(   'msg' => 'CON DATOS', 'banco_id' => $obj2->banco_id, 'banco_nombre' => $obj2->nombre_banco, 'nro_cuenta' => $obj2->nro_cuenta,
+                                            'tcuenta_id' => $obj2->tcuenta_id, 'tcuenta_nombre' => $obj2->tcuenta_nombre);
+
+                $obj2 = $conn2->next_record();
+            }
+        } else {
+            $varr_result[0] = array('msg' => 'VACIO');
+        }
+
+        return $varr_result;
     }
 }
 ?>

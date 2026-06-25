@@ -29,7 +29,7 @@ class inversiones{
             $obj = $csub->next_record();
         }
 
-        $csub->close();
+        //$csub->close();
         return $arr_inversiones;
     }
     function get_inversiones_xusuario($usuarioid,$tipo, $empresaid, $p_rowini, $p_rows){
@@ -62,7 +62,7 @@ class inversiones{
             $obj = $csub->next_record();
         }
 
-        $csub->close();
+        //$csub->close();
         return $arr_inversiones;
     }
     function get_propuesta($propuesta_id){
@@ -81,7 +81,7 @@ class inversiones{
                                 'fondo_disponible' => $obj->r_fondo_disponible, 'propuesta_tia'=>$obj->r_propuesta_tia, 'cliente_nombre'=>$obj->r_cliente_nombre,
                                 'ganancia'=>$obj->r_ganancia, 'fecha_vencimiento'=>$obj->r_fecha_vencimiento);
         
-        $conn_t->close();
+        //$conn_t->close();
         return $arr_propuesta;
     }
     function get_inversion_xusuario_pendiente($usuarioid, $empresaid, $moneda_id){
@@ -102,7 +102,7 @@ class inversiones{
             $obj = $csub->next_record();
         }
 
-        $csub->close();
+        //$csub->close();
         return $arr_inversiones;
     }
     function get_count_inversiones($usuarioid,$tipo, $empresaid){
@@ -112,7 +112,7 @@ class inversiones{
         if (!$idqry) echo pg_last_error($conn->Link_ID);
         $obj = $conn->next_record();
         $resultado = $obj->contador;
-        $conn->close();
+        //$conn->close();
         return $resultado;
     }
     function get_montos_inversion($usuario_id, $tipo, $empresa_id){
@@ -129,7 +129,7 @@ class inversiones{
             $obj = $conn->next_record();
         }
         
-        $conn->close();
+        //$conn->close();
         return $v_arr;
     }
     function get_detalle_inversion($p_propuesta_id, $p_factura_id){
@@ -173,8 +173,8 @@ class inversiones{
         $v_arr_inversion['monto_ganancia'] = $obj_inv->monto_ganancia;
         $v_arr_inversion['monto_inversion'] = $obj_inv->monto_inversion; $v_arr_inversion['f_pago'] = $obj_inv->fpago;
 
-        $conn->close();
-        $conn_inv->close();
+        /*$conn->close();
+        $conn_inv->close();*/
 
         return $v_arr_inversion;
     }
@@ -194,7 +194,7 @@ class inversiones{
             $obj = $conn->next_record();
         }
         
-        $conn->close();
+        //$conn->close();
         return $v_arr;
     }
     function get_pendientes_deposito($usuario_id){
@@ -214,7 +214,7 @@ class inversiones{
             $obj = $conn->next_record();
         }
         
-        $conn->close();
+        //$conn->close();
         return $v_arr;
     }
 
@@ -242,7 +242,7 @@ class inversiones{
             }
         }
 
-        $conn->close();
+        //$conn->close();
         return $v_arr;
     }
 
@@ -270,7 +270,7 @@ class inversiones{
             }
         }
 
-        $conn->close();
+        //$conn->close();
         return $v_arr;
     }
 
@@ -281,7 +281,7 @@ class inversiones{
         if (!$idqry) echo pg_last_error($conn->Link_ID); 
         $conn->next_record();
 
-        $conn->close();
+        //$conn->close();
     }
 
     function get_perfil_inversor($p_inversor_id){
@@ -305,7 +305,7 @@ class inversiones{
                                         'notifica_msg_oport' => $obj->notificacion_msg_oportunidades, 'notifica_cada_oport' => $obj->notificacion_cada_oportunidad, 'count' => $obj2->contador, 'tea_automatica' => $obj->tea_automatica);
         } else $varr_perfil_inversor['count'] = 0;
 
-        $conn->close(); $conn2->close();
+        //$conn->close(); $conn2->close();
         return $varr_perfil_inversor;
     }
     function get_perfil_inversor_detalle($p_inversor_id){
@@ -325,7 +325,7 @@ class inversiones{
                                             'monto_minimo' => $obj->monto_minimo, 'monto_maximo' => $obj->monto_maximo);
         }
 
-        $conn->close();
+        //$conn->close();
         return $varr_perfil_inversor;
     }
 
@@ -355,7 +355,7 @@ class inversiones{
             $obj = $conn2->next_record();
         }
 
-        $conn->close(); $conn2->close(); $conn3->close();
+        //$conn->close(); $conn2->close(); $conn3->close();
     }
 
     function desactivar_perfil_inversor($p_inversor_id){
@@ -366,7 +366,7 @@ class inversiones{
         $obj = $conn->next_record();
         $resultado = $obj->activacion;
 
-        $conn->close();
+        //$conn->close();
         return $resultado;
     }
 
@@ -415,7 +415,7 @@ class inversiones{
             }
         }
 
-        $conn->close();
+        //$conn->close();
         return $varr_result;
     }
 
@@ -659,9 +659,44 @@ class inversiones{
         $varr_param = $vobj_mae_class->get_parametro_detalle(53);
         $v_acceso = $varr_param['valorchar'].'/acceso_rapido_inversion.php?tk='.$obj->certificado.'&fid='.$p_factura_id;
 
-        $conn->close();
+        //$conn->close();
 
         return $v_acceso;
+    }
+
+    function get_liquidacion_mes($p_tipo, $p_filtros, $p_order){
+        $conn = new db_param_trans; $conn->connect();
+        $varr_result = array();
+
+        $v_qry = "select    financiamiento.facturaid, factura.numero, empresa.nombre as cliente_nombre, financiamiento.fregistro,
+                            financiamiento.fpago_efectivo, tmoneda.nombre as moneda_nombre, registro_financiamiento.tia,
+                            registro_financiamiento.dias_efectivo, registro_financiamiento.monto_inversion,
+                            registro_financiamiento.monto_ganancia_e, registro_financiamiento.monto_comision_e,
+                            registro_financiamiento.tasa_comision
+                    from    financiamiento, factura, empresa, tipos as tmoneda, registro_financiamiento, propuestas
+                    where   factura.id = financiamiento.facturaid and empresa.id = factura.clienteid and tmoneda.id = financiamiento.monedaid and
+                            registro_financiamiento.financiamientoid = financiamiento.id and propuestas.id = registro_financiamiento.propuestaid and
+                            financiamiento.estado = 37";
+
+        if ($p_filtros != '') $v_qry .= " and ".$p_filtros;
+        if ($p_order != '') $v_qry .= " order by ".$p_order;
+
+        $idqry = $conn->query($v_qry);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+
+        $obj = $conn->next_record();
+
+        for($i = 0; $i < $conn->nrows(); $i ++){
+            $varr_result[$i] = array(   'factura_id' => $obj->facturaid,            'factura_nro' => $obj->numero,              'cliente_nombre' => $obj->cliente_nombre,
+                                        'f_inversion' => $obj->fregistro,           'f_pago' => $obj->fpago_efectivo,           'moneda' => $obj->moneda_nombre,
+                                        'tia' => $obj->tia,                         'dias_inversion' => $obj->dias_efectivo,
+                                        'monto_inversion' => $obj->monto_inversion, 'monto_ganancia' => $obj->monto_ganancia_e, 'monto_comision' => $obj->monto_comision_e,
+                                        'tasa_comision' => $obj->tasa_comision);
+
+            $obj = $conn->next_record();
+        }
+
+        return $varr_result;
     }
 }
 ?>

@@ -1,4 +1,4 @@
-<?
+<?php
 //require("../lib-trans/maestros.php");
 
 if(isset($_GET['page'])){
