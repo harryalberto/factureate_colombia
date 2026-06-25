@@ -18,7 +18,7 @@ require("../lib-trans/factura.php");
 </HEAD>
 <?php
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-//@@@@@@@@@@@@@@@@@@@ LOGICA
+//@@@@@@@@@@@@@@@@@@@ LOGICA DECOLOMBIA
 $objmaestro = new maestros;
 $vobj_factura = new factura;
 
