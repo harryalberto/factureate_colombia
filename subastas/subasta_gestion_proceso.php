@@ -100,7 +100,7 @@ if ($_POST['accion'] == 'liquidar'){
     
     $v_valida_correo_cli = $obj_mae->valida_correo_op($_POST['cliente_id']);
 
-    if ($v_valida_correo_cli == 0){
+    if ($v_valida_correo_cli == 0 || $v_valida_correo_cli == ''){
     // ENVIA NOTIFICACION A LEGAL Y OPERACIONES QUE FALTA EL CORREO DEL OP
         $varr_notificacion = array('notificaid' => 31, 'datos_body' => 'OP: '.$_POST['cliente_nombre'].'<br><br>FACTUREATE');
         $obj_mail->enviar_correo_xnotificacion($varr_notificacion);
@@ -123,24 +123,48 @@ if ($_POST['accion'] == 'liquidar'){
 
     $v_mensaje = 'Se registro el envio del contrato al vendedor';
     $v_regresar = 'subastas_comp.php';
+} elseif ($_POST['accion'] == 'reenvio_contrato'){
+    $varr_subasta = $objsubasta->get_subasta($_POST['subastaid']);
+    $v_mensaje = 'Se re-envio el link para la firma del contrato del emisor';
+
+    $arr_mail_user = array('mail_salida' => 'operaciones@factureate.com', 'nombre_salida' => 'FACTUREATE',
+                                        'mail_destino' => $_POST['emisor_correo'],
+                                        'subject' => 'CONTRATO DE VENTA DE SU FACTURA',
+                                        'body' => 'Esta todo listo para transferirle el adelanto de su factura, para recibir el adelanto debe firmar electronicamente el contrato en el siguiente link:<br><br>
+                                                            Empresa: '.$_POST['emisor'].'<br>
+                                                            DOC: '.$_POST['emisor_identificacion'].'<br>
+                                                            Cliente: '.$_POST['cliente_nombre'].'<br>
+                                                            Factura: '.$varr_subasta['facnumero'].'<br>
+                                                            ID Operaci&oacute;n: '.$varr_subasta['facturaid'].'<br>
+                                                            Monto Factura: '.number_format($varr_subasta['total'],2,'.',',').' '.$varr_subasta['moneda'].'<br>
+                                                            Monto Adelanto: '.number_format($varr_subasta['montofin'],2,'.',',').' '.$varr_subasta['moneda'].'<br>
+                                                            Posible Remanente: '.number_format($varr_subasta['monto_remanente'],2,'.',',').' '.$varr_subasta['moneda'].'<br><br>
+                                                            Lo siguiente que debe hacer es revisar y firmar el contrato de cesi&oacute;n mediante el siguiente link donde no debe ingresar 
+                                                            ninguna informaci&oacute;n confidencial solo firmar biometricamente, le recomendamos leer el documento antes de firmar en el siguiente link.<br>
+                                                            Todo seguimiento que desee hacer a la operación debe considerar el ID OPERACION.<br>
+                                                            Link de contrato: <a href="'.$_POST['link_envio'].'">CONTRATO DE CESION</a><br><br>
+                                                            FACTUREATE');
+            
+    $obj_mail->enviar_correo($arr_mail_user);
 } elseif($_POST['accion'] == 'contrato'){           
-// RECEPCION DEL CONTRATO FIRMADO POR EL EMISOR
+    //==== RECEPCION DEL CONTRATO FIRMADO POR EL EMISOR
     $archivo = $_SERVER['DOCUMENT_ROOT'].'/archivos_operaciones/OP_'.$_POST['factura_id'];
     if (!file_exists($archivo)) mkdir($archivo,0700);
     
-    if (isset($_FILES['contrato']) && $_FILES['contrato']['name'] != ''){ //coloco el archivo en el servidor
+    if (isset($_FILES['contrato']) && $_FILES['contrato']['name'] != ''){ 
+        //coloco el archivo en el servidor
         $contrato_path = $archivo.'/contrato_cesion-'.$_FILES['contrato']['name'];
-        $contrato_path_db = '/archivos_operaciones/OP_'.$_POST['factura_id'].'/contrato_cesion-'.$_FILES['contrato']['name'];
+        $contrato_path_db = '../archivos_operaciones/OP_'.$_POST['factura_id'].'/contrato_cesion-'.$_FILES['contrato']['name'];
         move_uploaded_file($_FILES['contrato']['tmp_name'],  $contrato_path);
     }
-    //############## registro del contrato firmado y GENERA LA ORDEN DE TRANSFERENCIA MANUAL SI NO SE ESTA INTEGRADO AL BANCO
+
+    //== registro del contrato firmado -> verifica que no necesita endoso ->GENERA LA ORDEN DE TRANSFERENCIA MANUAL SI NO SE ESTA INTEGRADO AL BANCO
     $objsubasta->recibe_contrato_firmado($_POST['subastaid'], $contrato_path_db);
     $varr_parametros = $obj_mae->get_parametros();
 
-    //==== PREPARANDO CORREO A LA FIDUCIA
-    $varr_fiducia = $obj_mae->get_parametro_detalle(60);
-
-    if ($varr_fiducia['valornum'] == 1){
+    //$varr_fiducia = $obj_mae->get_parametro_detalle(60);
+    if ($varr_parametros['CON FIDEICOMISO']['valornum'] == 1){
+        //== PREPARANDO CORREO A LA FIDUCIA
         $varr_inversores = $objsubasta->get_inversores_win_subasta($_POST['subastaid']);
         $v_inversores = '';
 
@@ -153,6 +177,19 @@ if ($_POST['accion'] == 'liquidar'){
         $v_monto_factura = number_format($_POST['monto_factura_orig'],2,'.',',');
 
         $varr_mail_fiducia = array('notificaid' => 36, 'datos_body' => '<br><br>Operacion ID: '.$_POST['factura_id'].'<br>Factura Nro: '.$_POST['factura_numero'].'<br>F Vencimiento: '.$_POST['fvencimiento'].'<br>Vendedor: '.$_POST['emisor'].'<br>Pagador: '.$_POST['cliente_nombre'].'<br>Inversor: '.$v_inversores.'<br>Monto Inversion: '.$v_monto_adelanto.'<br>Monto Factura: '.$v_monto_factura.'<br>Moneda: '.$_POST['moneda'].'<br><br>El Monto Inversion es el monto que se le acaba de transferir como adelanto al vendedor de la factura.<br><br>Cordialmente,<br><br>FACTUREATE');
+    }
+
+    if ($varr_parametros['REQUERIMIENTO DE ENDOSO']['valornum'] == 1){
+        //== guardo el archivo de endoso
+        if (isset($_FILES['endoso']) && $_FILES['endoso']['name'] != ''){ 
+            //coloco el archivo en el servidor
+            $endoso_path = $archivo.'/endoso-'.$_FILES['endoso']['name'];
+            $endoso_path_db = '../archivos_operaciones/OP_'.$_POST['factura_id'].'/endoso-'.$_FILES['endoso']['name'];
+            move_uploaded_file($_FILES['endoso']['tmp_name'],  $endoso_path);
+
+            //== guardo el path del endoso
+            $objsubasta->registra_endoso_path($_POST['subastaid'], $endoso_path_db);
+        }
     }
 
     if($varr_parametros['INTEGRACION CON BANCO']['valornum'] == 0){      // NO HAY INTEGRACION CON EL BANCO, ES MANUAL LA INTERACCION
@@ -179,12 +216,12 @@ if ($_POST['accion'] == 'liquidar'){
         $obj_mail->enviar_correo_xnotificacion($varr_datos_mail);
 
         //==== NOTIFICACION A LA FIDUCIARIA
-        if ($varr_fiducia['valornum'] == 1) $obj_mail->enviar_correo_xnotificacion($varr_mail_fiducia);
+        if ($varr_parametros['CON FIDEICOMISO']['valornum'] == 1) $obj_mail->enviar_correo_xnotificacion($varr_mail_fiducia);
     } else{     // ES AUTOMATICA LA ORDEN DE TRANSFERENCIA AL BANCO
         $objsubasta->ordena_transferencia_automatica($varr_datos);
 
         //==== NOTIFICACION A LA FIDUCIARIA
-        if ($varr_fiducia['valornum'] == 1) $obj_mail->enviar_correo_xnotificacion($varr_mail_fiducia);
+        if ($varr_parametros['CON FIDEICOMISO']['valornum'] == 1) $obj_mail->enviar_correo_xnotificacion($varr_mail_fiducia);
     }
 
     $v_mensaje = 'Se registro el contrato firmado por el vendedor';

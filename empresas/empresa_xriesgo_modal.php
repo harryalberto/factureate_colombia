@@ -28,11 +28,11 @@ $vobj_seg_modal = new seguridad;
 $arr_empresa = $obj_mae->get_datos_empresa($_GET['id']);
 $varr_param_contratoemi = $obj_mae->get_parametro_detalle(27);
 
-if ($_GET['previo'] == 'empresas') $previo = 'empresas.php';
+/*if ($_GET['previo'] == 'empresas') $previo = 'empresas.php';
 elseif ($_GET['previo'] == 'emisores') $previo = 'emisores.php';
 elseif ($_GET['previo'] == 'obligpago') $previo = 'obligados_pago.php';
 elseif ($_GET['previo'] == 'factura') $previo = '../facturas/factura_detalle.php?id='.$_GET['facturaid'];
-elseif ($_GET['previo'] == 'empresas_xriesgo') $previo = 'empresas_xriesgo.php';
+elseif ($_GET['previo'] == 'empresas_xriesgo') $previo = 'empresas_xriesgo.php';*/
 
 if ($arr_empresa['t_empresaid'] == 46 || $arr_empresa['t_empresaid'] == 49 || $arr_empresa['t_empresaid'] == 50 || $arr_empresa['t_empresaid'] == 52){
     $readonly = 'readonly';
@@ -55,9 +55,9 @@ else $v_muestra_estado_legal = '';
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
     <form name='frm_modal' method='post' id='frm_modal' enctype="multipart/form-data">
         <input type="hidden" name="accion" id="accion">
-        <input type="hidden" name="previo" id="previo" value="<?=$previo?>">
+        
         <input type="hidden" name="empresaid" id="empresaid" value="<?=$_GET['id']?>">
-        <input type="hidden" name="u_envioid" value="<?=$arr_empresa['u_envio_id']?>">
+        
         <input type="hidden" name="t_empresaid" value="<?=$arr_empresa['t_empresaid']?>">
         <input type="hidden" name="estado_id" id="estado_id" value="<?=$arr_empresa['e_empresa_id']?>">
 
@@ -108,7 +108,7 @@ else $v_muestra_estado_legal = '';
             <div class="contenedor_formulario_column">
                 <div class="formulario_grupo_row" style="width: 360px;">
                     <label for="direccion">DIRECCION</label>
-                    <input type="text" name="direccion" id="direccion" class="formulario_control" value="<?=$arr_empresa['direccion']?>" <?echo $v_readonly_datos;?>>
+                    <input type="text" name="direccion" id="direccion" class="formulario_control" value="<?=$arr_empresa['direccion']?>" <?php echo $v_readonly_datos;?>>
                 </div>
                 <div class="formulario_grupo_row" style="width: 150px;">
                     <label for="tamano">TAMAÑO DE EMPRESA</label>
@@ -139,7 +139,7 @@ else $v_muestra_estado_legal = '';
                 </div>
                 <div class="formulario_grupo_row" style="width: 200px;">
                     <label for="paginaweb">PAGINA WEB</label>
-                    <input type="text" name="paginaweb" id="paginaweb" class="formulario_control" value="<?=$arr_empresa['paginaweb']?>" <?echo $v_readonly_datos;?>>
+                    <input type="text" name="paginaweb" id="paginaweb" class="formulario_control" value="<?=$arr_empresa['paginaweb']?>" <?php echo $v_readonly_datos;?>>
                 </div>
             </div>
 
@@ -170,7 +170,7 @@ else $v_muestra_estado_legal = '';
                 </div>
                 <div class="formulario_grupo_row" style="width: 300px;">
                     <label for="actividad">DESCRIPCION ACTIVIDAD</label>
-                    <textarea name="actividad" id="actividad" cols="70" rows="5" class="formulario_control" <?echo $v_readonly_datos;?>><?echo $arr_empresa['actividad'];?></textarea>
+                    <textarea name="actividad" id="actividad" cols="70" rows="5" class="formulario_control" <?php echo $v_readonly_datos;?>><?php echo $arr_empresa['actividad'];?></textarea>
                 </div>
             </div>
 
@@ -295,11 +295,11 @@ else $v_muestra_estado_legal = '';
             <div class="contenedor_formulario_column">
                 <div class="formulario_grupo_row" style="width: 250px;">
                     <label for="nombre_contacto">NOMBRE</label>
-                    <input type="text" name="nombre_contacto" id="nombre_contacto" class="formulario_control" value="<?=$arr_empresa['nombre_contacto']?>" <?echo $v_readonly_datos;?>>
+                    <input type="text" name="nombre_contacto" id="nombre_contacto" class="formulario_control" value="<?=$arr_empresa['nombre_contacto']?>" <?php echo $v_readonly_datos;?>>
                 </div>
                 <div class="formulario_grupo_row" style="width: 200px;">
                     <label for="email_contacto">EMAIL</label>
-                    <input type="text" name="email_contacto" id="email_contacto" class="formulario_control" value="<?=$arr_empresa['email_contacto']?>" <?echo $v_readonly_datos;?>>
+                    <input type="text" name="email_contacto" id="email_contacto" class="formulario_control" value="<?=$arr_empresa['email_contacto']?>" <?php echo $v_readonly_datos;?>>
                 </div>
                 <div class="formulario_grupo_row" style="width: 100px;">
                     <label for="tdoc_contacto">TIPO DOC</label>
@@ -307,7 +307,7 @@ else $v_muestra_estado_legal = '';
 <?php
     if ($_SESSION['user']['perfilid'] == 14 || $_SESSION['user']['perfilid'] == 10 || $_SESSION['user']['perfilid'] == 12){    //CFO o ANSLISTA FINANCIERO
         echo '      <input type="text" name="tdoc" id="tdoc" value="'.$arr_empresa['doc_contacto'].'" readonly class="formulario_control"></li>
-                    <input type="hidden" name="tdoc_contacto" id="tdoc_contacto" value="'.$arr_empresa['tdoc_conotacto'].'">';
+                    <input type="hidden" name="tdoc_contacto" id="tdoc_contacto" value="'.$arr_empresa['tdoc_contacto'].'">';
     } else{
         echo '      <select name="tdoc_contacto" class="formulario_control" id="tdoc_contacto">';
 
@@ -325,11 +325,11 @@ else $v_muestra_estado_legal = '';
                 </div>
                 <div class="formulario_grupo_row" style="width: 100px;">
                     <label for="nrodoc_contacto">NRO DOC</label>
-                    <input type="text" name="nrodoc_contacto" id="nrodoc_contacto" class="formulario_control" value="<?=$arr_empresa['nrodoc_contacto']?>" <?echo $v_readonly_datos;?>>
+                    <input type="text" name="nrodoc_contacto" id="nrodoc_contacto" class="formulario_control" value="<?=$arr_empresa['nrodoc_contacto']?>" <?php echo $v_readonly_datos;?>>
                 </div>
                 <div class="formulario_grupo_row" style="width: 100px;">
                     <label for="telefono_contacto">TELEFONO</label>
-                    <input type="text" name="telefono_contacto" id="telefono_contacto" class="formulario_control" value="<?=$arr_empresa['telf_contacto']?>" <?echo $v_readonly_datos;?>>
+                    <input type="text" name="telefono_contacto" id="telefono_contacto" class="formulario_control" value="<?=$arr_empresa['telf_contacto']?>" <?php echo $v_readonly_datos;?>>
                 </div>
             </div>
 
@@ -454,8 +454,26 @@ else $v_muestra_estado_legal = '';
         }
     }
 
+    $mensaje_vencimiento_score = '';
+    $mensaje_vencimiento ='';
+
     if (($arr_empresa['t_empresaid'] == 48 || $arr_empresa['t_empresaid'] == 50 || $arr_empresa['t_empresaid'] == 51 || $arr_empresa['t_empresaid'] == 52) && ($v_encontrado == 'true')){
         $v_arr_riesgos = $obj_mae->get_riesgo_obpago($_GET['id']);
+        
+        if (count($v_arr_riesgos) == 0 || is_null($v_arr_riesgos) || !isset($v_arr_riesgos)){
+            $v_empresa_score_id = 0;
+            $v_path_informe_scrore = '';
+            $v_path_informe_factu = '';
+        } else {
+            if (!isset($v_arr_riesgos['empresa_scoreid'])) $v_empresa_score_id = 0;
+            else $v_empresa_score_id = $v_arr_riesgos['empresa_scoreid'];
+
+            if (!isset($v_arr_riesgos['path_informe_score'])) $v_path_informe_scrore = '';
+            else $v_path_informe_scrore = $v_arr_riesgos['path_informe_score'];
+
+            if (!isset($v_arr_riesgos['path_informe_factu'])) $v_path_informe_factu = '';
+            else $v_path_informe_factu = $v_arr_riesgos['path_informe_factu'];
+        }
         
         if ($v_arr_riesgos['count'] == 0){
             $f_riesgo = '';
@@ -550,13 +568,13 @@ else $v_muestra_estado_legal = '';
         else echo '     <option value="0"><-- Seleccionar --></option>';
 
         for ($i=0; $i<count($arr_emp_riesgos); $i++){
-            if ($arr_emp_riesgos[$i]['id'] == $v_arr_riesgos['empresa_scoreid']) 
+            if ($arr_emp_riesgos[$i]['id'] == $v_empresa_score_id) 
                 echo '  <option value="'.$arr_emp_riesgos[$i]['id'].'" selected>'.$arr_emp_riesgos[$i]['nombre'].'</option>';
             else echo ' <option value="'.$arr_emp_riesgos[$i]['id'].'">'.$arr_emp_riesgos[$i]['nombre'].'</option>';
         }
 ?>
                     </select>
-                    <input type='hidden' name="emp_riesgoid_old" id="emp_riesgoid_old" value="<?=$v_arr_riesgos['empresa_scoreid']?>">
+                    <input type='hidden' name="emp_riesgoid_old" id="emp_riesgoid_old" value="<?=$v_empresa_score_id?>">
                 </div>
                 <div class="formulario_grupo_row" style="width: 250px;">
                     <label for="nivel_score_riesgoid">NIVEL RIESGO</label>
@@ -597,13 +615,13 @@ else $v_muestra_estado_legal = '';
             <div class="contenedor_formulario_column">
                 <div class="formulario_grupo_row" style="width: 450px;">
                     <label for="score_riesgo_justi">JUSTIFICACION</label>
-                    <textarea name="score_riesgo_justi" id="score_riesgo_justi" cols="70" rows="5" class="formulario_control"><?echo $v_arr_riesgos['desc_riesgoscore'];?></textarea>
+                    <textarea name="score_riesgo_justi" id="score_riesgo_justi" cols="70" rows="5" class="formulario_control"><?php echo $v_arr_riesgos['desc_riesgoscore'];?></textarea>
                     <input type='hidden' name="score_riesgo_justi_old" id="score_riesgo_justi_old" value="<?=$v_arr_riesgos['desc_riesgoscore']?>">
                 </div>
 
                 <div class="formulario_grupo_row" style="width: 70px;" id="pdf_buro">
 <?php
-        if ($v_arr_riesgos['path_informe_score'] != ''){
+        if ($v_path_informe_scrore != ''){
             echo '  <label>PDF</label>
                     <label><a href="'.$v_arr_riesgos['path_informe_score'].'" target="_blank"><i class="fa-solid fa-file-pdf" style="font-size:18px;"></i></a></label>';
         }
@@ -613,7 +631,7 @@ else $v_muestra_estado_legal = '';
                 <div class="formulario_grupo_row" style="width: 350px;">
                     <label for="informe_score_file">AGREGAR INFORME</label>
                     <input type="file" name="informe_score_file" id="informe_score_file" class="formulario_control" style="background: #fff;">
-                    <input type="hidden" name="path_score" value="<?=$v_arr_riesgos['path_informe_score']?>">
+                    <input type="hidden" name="path_score" value="<?=$v_path_informe_scrore?>">
                 </div>
             </div>
 
@@ -674,15 +692,15 @@ else $v_muestra_estado_legal = '';
             <div class="contenedor_formulario_column">
                 <div class="formulario_grupo_row" style="width: 450px;">
                     <label for="factureate_riesgo_justi">JUSTIFICACION</label>
-                    <textarea class="formulario_control" name="factureate_riesgo_justi" id="factureate_riesgo_justi" cols="70" rows="5"><?echo $v_arr_riesgos['desc_riesgofact'];?></textarea>
+                    <textarea class="formulario_control" name="factureate_riesgo_justi" id="factureate_riesgo_justi" cols="70" rows="5"><?php echo $v_arr_riesgos['desc_riesgofact'];?></textarea>
                     <input type='hidden' name="factureate_riesgo_justi_old" value="<?=$v_arr_riesgos['desc_riesgofact']?>">
                 </div>
 
                 <div class="formulario_grupo_row" style="width: 70px;" id="pdf_factu">
 <?php
-        if ($v_arr_riesgos['path_informe_factu'] != ''){
+        if ($v_path_informe_factu != ''){
             echo '  <label>PDF</label>
-                    <label><a href="'.$v_arr_riesgos['path_informe_factu'].'" target="_blank"><i class="fa-solid fa-file-pdf" style="font-size:18px;"></i></a></label>';
+                    <label><a href="'.$v_path_informe_factu.'" target="_blank"><i class="fa-solid fa-file-pdf" style="font-size:18px;"></i></a></label>';
         }
 ?>
                 </div>
@@ -690,7 +708,7 @@ else $v_muestra_estado_legal = '';
                 <div class="formulario_grupo_row" style="width: 350px;">
                     <label for="informe_score_file">AGREGAR INFORME</label>
                     <input type="file" name="informe_factu_file" id="informe_factu_file" class="formulario_control" style="background: #fff;">
-                    <input type="hidden" name="path_factu" value="<?=$v_arr_riesgos['path_informe_factu']?>">
+                    <input type="hidden" name="path_factu" value="<?=$v_path_informe_factu?>">
                 </div>
             </div>
             

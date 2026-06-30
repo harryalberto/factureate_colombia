@@ -563,34 +563,41 @@ class subasta{
     function envia_contrato ($p_subasta_id, $p_referencia, $parr_datos){
         $csub = new db_param_trans;
         $obj_mailing = new mail_util;
+        $cobj_mae = new maestros;       // verificar que maestros esta antes
 
         $csub->connect();
 
         $idqry = $csub->query("select SUB_ENVIA_CONTRATO(".$p_subasta_id.",'".$p_referencia."') as resultado");
         if (!$idqry) echo pg_last_error($csub->Link_ID);
         $obj = $csub->next_record();
-        //######## ENVIO CORREO AL EMISOR PARA LA FIRMA
-        $varr_subasta = $this->get_subasta($p_subasta_id);
-        $arr_mail_user = array('mail_salida' => 'operaciones@factureate.com', 'nombre_salida' => 'FACTUREATE',
-                                'mail_destino' => $parr_datos['emisor_correo'],
-                                'subject' => 'CONTRATO DE VENTA DE SU FACTURA',
-                                'body' => 'Esta todo listo para transferirle el adelanto de su factura, para recibir el adelanto debe firmar electronicamente el contrato en el siguiente link:<br><br>
-                                            Empresa: '.$parr_datos['emisor_nombre'].'<br>
-                                            DOC: '.$parr_datos['emisor_identificacion'].'<br>
-                                            Cliente: '.$parr_datos['cliente'].'<br>
-                                            Factura: '.$varr_subasta['facnumero'].'<br>
-                                            ID Operaci&oacute;n: '.$varr_subasta['facturaid'].'<br>
-                                            Monto Factura: '.number_format($varr_subasta['total'],2,'.',',').' '.$varr_subasta['moneda'].'<br>
-                                            Monto Adelanto: '.number_format($varr_subasta['montofin'],2,'.',',').' '.$varr_subasta['moneda'].'<br>
-                                            Posible Remanente: '.number_format($varr_subasta['monto_remanente'],2,'.',',').' '.$varr_subasta['moneda'].'<br><br>
-                                            Lo siguiente que debe hacer es revisar y firmar el contrato de cesi&oacute;n mediante el siguiente link donde no debe ingresar 
-                                            ninguna informaci&oacute;n confidencial solo firmar biometricamente, le recomendamos leer el documento antes de firmar en el siguiente link.<br>
-                                            Todo seguimiento que desee hacer a la operación debe considerar el ID OPERACION.<br>
-                                            Link de contrato: <a href="'.$p_referencia.'">CONTRATO DE CESION</a><br><br>
-                                            FACTUREATE');
-        
-        $obj_mailing->enviar_correo($arr_mail_user);
 
+        //==== verifico  proceso con el proveedor de firma
+        $varr_subasta = $this->get_subasta($p_subasta_id);  //estado_compensa_id
+        $varr_param = $cobj_mae->get_parametro_detalle(78);     // parametro de envio de contrato
+
+        if ($varr_param['valornum'] == 0){
+            //== no hay proveedor y debemos enviar el mail con el contrato
+            //######## ENVIO CORREO AL EMISOR PARA LA FIRMA
+            $arr_mail_user = array('mail_salida' => 'operaciones@factureate.com', 'nombre_salida' => 'FACTUREATE',
+                                    'mail_destino' => $parr_datos['emisor_correo'],
+                                    'subject' => 'CONTRATO DE VENTA DE SU FACTURA',
+                                    'body' => 'Esta todo listo para transferirle el adelanto de su factura, para recibir el adelanto debe firmar electronicamente el contrato en el siguiente link:<br><br>
+                                                Empresa: '.$parr_datos['emisor_nombre'].'<br>
+                                                DOC: '.$parr_datos['emisor_identificacion'].'<br>
+                                                Cliente: '.$parr_datos['cliente'].'<br>
+                                                Factura: '.$varr_subasta['facnumero'].'<br>
+                                                ID Operaci&oacute;n: '.$varr_subasta['facturaid'].'<br>
+                                                Monto Factura: '.number_format($varr_subasta['total'],2,'.',',').' '.$varr_subasta['moneda'].'<br>
+                                                Monto Adelanto: '.number_format($varr_subasta['montofin'],2,'.',',').' '.$varr_subasta['moneda'].'<br>
+                                                Posible Remanente: '.number_format($varr_subasta['monto_remanente'],2,'.',',').' '.$varr_subasta['moneda'].'<br><br>
+                                                Lo siguiente que debe hacer es revisar y firmar el contrato de cesi&oacute;n mediante el siguiente link donde no debe ingresar 
+                                                ninguna informaci&oacute;n confidencial solo firmar biometricamente, le recomendamos leer el documento antes de firmar en el siguiente link.<br>
+                                                Todo seguimiento que desee hacer a la operación debe considerar el ID OPERACION.<br>
+                                                Link de contrato: <a href="'.$p_referencia.'">CONTRATO DE CESION</a><br><br>
+                                                FACTUREATE');
+            
+            $obj_mailing->enviar_correo($arr_mail_user);
+        }
         //$csub->close();
         return 1;
     }
@@ -979,6 +986,18 @@ class subasta{
         //$conn->close(); $conn_count->close(); $conn_prop->close();
 
         return $varr_result;
+    }
+
+    function registra_endoso_path($p_subasta_id, $path){
+        $conn = new db_param_trans; $conn->connect();
+
+        $v_sql = "update subasta set transferenciapath = '".$path."' where id = ".$p_subasta_id;
+
+         $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $conn->next_record();
+
+        return 1;
     }
 }
 ?>

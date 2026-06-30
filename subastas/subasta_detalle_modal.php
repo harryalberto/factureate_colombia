@@ -133,6 +133,7 @@ $vobj_seg = new seguridad;
 $arrsubasta = $objsubasta->get_subasta($_GET['subastaid']);
 $arrpropuestas = $objsubasta->get_subasta_posiciones($_GET['subastaid']);
 $varr_parametros = $obj_mae->get_parametros();
+$varr_factura = $obj_factura->get_datos_factura($arrsubasta['facturaid']);
 
 /*--------------------------------------------------------*/
 ?>
@@ -152,6 +153,9 @@ $varr_parametros = $obj_mae->get_parametros();
         <input type="hidden" name="grupowin" id="grupowin" value="<?=$arrsubasta['grupowinid']?>">
         <input type="hidden" name="accion">
         <input type="hidden" name="cliente_id" id="cliente_id" value="<?=$arrsubasta['clienteid']?>">
+        <input type="hidden" name="estado_compensa" id="estado_compensa" value="<?= $arrsubasta['estado_compensa_id'] ?>">
+        <input type="hidden" name="con_endoso" id="con_endoso" value="<?= $varr_parametros['REQUERIMIENTO DE ENDOSO']['valornum'] ?>">
+
     <div class="frmtransaccion" style="font-size:12px;">
         <ul>
             <li style="margin-left:32px;font-weight: bold;width:300px;">ID OPERACION</li>
@@ -270,17 +274,32 @@ $varr_parametros = $obj_mae->get_parametros();
             <ul>
                 <li style="font-weight:bold;width:200px;padding-left:5px;padding-right:5px;">LINK DEL CONTRATO ENDOSO:</li>
                 <li><input type="text" name="link_envio" size="80" class="frminput_text"></li>
+                <li> <button type="button" class="btn btn-primary" style="font-size:11px;background-color:var(--color-azulv2);border:none;" onclick="enviarContrato()" id="btn_enviar_contrato">
+                    <i class="fa-solid fa-floppy-disk"></i> Save Link Contrato</button></li>
             </ul>';
             } elseif ($arrsubasta['estado_compensa_id'] == 43){    // contrato enviado
                 echo '
             <ul>
                 <li style="font-weight:bold;width:200px;padding-left:5px;padding-right:5px;">LINK DEL CONTRATO ENDOSO:</li>
                 <li><a href="'.$arrsubasta['ref_envio_contrato'].'" style="text-decoration:none;color:#064677;" target="_blank"><span class="icon-link"></span> Ver Contrato Emisor</a></li>
+                <li> <button type="button" class="btn btn-primary" style="font-size:11px;background-color:var(--color-azulv2);border:none;" onclick="enviarContrato()" id="btn_enviar_contrato">
+                    <i class="fa-solid fa-share"></i> Re-enviar Contrato</button>
+                    <input type="hidden" name="link_envio" id="link_envio" value="'.$arrsubasta['ref_envio_contrato'].'">
+                </li>
             </ul>
             <ul>
                 <li style="font-weight:bold;width:200px;padding-left:5px;padding-right:5px;">ADJUNTAR CONTRATO FIRMADO:</li>
-                <li><input type="file" name="contrato"></li>
+                <li><input type="file" name="contrato" id="contrato"></li>
             </ul>';
+
+                //== verifico si necesita endoso
+                if ($varr_parametros['REQUERIMIENTO DE ENDOSO']['valornum'] == 1){
+                    echo '
+            <ul>
+                <li style="font-weight:bold;width:200px;padding-left:5px;padding-right:5px;">ADJUNTAR ENDOSO:</li>
+                <li><input type="file" name="endoso" id="endoso"></li>
+            </ul>';
+                }
             } elseif ($arrsubasta['estado_compensa_id'] == 44 || $arrsubasta['estado_compensa_id'] == 45){    // contrato recibido o firmado    / ENDOSADO
                 echo '
             <ul>
@@ -291,6 +310,15 @@ $varr_parametros = $obj_mae->get_parametros();
                 <li style="font-weight:bold;width:200px;padding-left:5px;padding-right:5px;">CONTRATO FIRMADO:</li>
                 <li><a href="'.$arrsubasta['path_contrato'].'" style="text-decoration:none;color:#064677;" target="_blank"><span class="icon-link"></span> Ver Contrato Firmado</a></li>
             </ul>';
+
+                // verificacion si se necesita endoso
+                if ($varr_parametros['REQUERIMIENTO DE ENDOSO']['valornum'] == 1){
+                    echo '
+            <ul style="margin:0px;padding:0px;">
+                <li style="font-weight:bold;width:200px;padding-left:5px;padding-right:5px;">ENDOSO:</li>
+                <li><a href="'.$varr_factura['acpath'].'" style="text-decoration:none;color:#064677;" target="_blank"><i class="fa-solid fa-paperclip"></i> Ver Endoso</a></li>
+            </ul>';
+                }
             }
         }
         if ($obj_mae->busca_arreglo_bidi($varr_permisos, 'codigo', 'COMP-FINAN')){   //  ANALISTA FINANCIERO / CFO / CLEVEL
@@ -326,10 +354,10 @@ $varr_parametros = $obj_mae->get_parametros();
         <ul style="margin-top:10px;">
     <?php
         if ($obj_mae->busca_arreglo_bidi($varr_permisos, 'codigo', 'COMP-LEG')){
-            if ($arrsubasta['estado_compensa_id'] == 40)    // CONTRATO PENDIENTE DE ENVIAR AL EMISOR
+            /*if ($arrsubasta['estado_compensa_id'] == 40)    // CONTRATO PENDIENTE DE ENVIAR AL EMISOR
             echo '
                 <li> <button type="button" class="btn btn-primary" style="font-size:11px;background-color:var(--color-azulv2);border:none;" onclick="enviarContrato()" id="btn_enviar_contrato">
-                <i class="fa-solid fa-paper-plane"></i> Enviar Contrato Emisor</button></li>';
+                <i class="fa-solid fa-paper-plane"></i> Enviar Contrato Emisor</button></li>';*/
             if ($arrsubasta['estado_compensa_id'] == 43)    // CONTRATO ENVIADO AL EMISOR
             echo '
                 <li> <button type="button" class="btn btn-primary" style="font-size:11px;background-color:var(--color-azulv2);border:none;" onclick="recibirContrato()" id="btn_recibir_contrato">
@@ -343,20 +371,50 @@ $varr_parametros = $obj_mae->get_parametros();
     <!------ END CUERPO VARIABLE ------>
     <script>
         function enviarContrato(){
-            if (document.frm.link_envio.value == '') alert('Debe ingresar la referencia del envio del contrato al vendedor');
-            else{
-                var btn_envio = document.getElementById('btn_enviar_contrato');
-                btn_envio.disabled = "true";
-                document.frm.accion.value = 'envio_contrato';
-                document.frm.action = 'subasta_gestion_proceso.php';
-                document.frm.submit();
+            var estado_compensa = document.getElementById('estado_compensa').value;
+
+            if (estado_compensa == 40){     //CONTRATO POR ENVIAR
+                if (document.frm.link_envio.value == '') alert('Debe ingresar la referencia del envio del contrato al vendedor');
+                else{
+                    var btn_envio = document.getElementById('btn_enviar_contrato');
+                    btn_envio.disabled = "true";
+                    document.frm.accion.value = 'envio_contrato';
+                    document.frm.action = 'subasta_gestion_proceso.php';
+                    document.frm.submit();
+                }
+            } else {
+                if (estado_compensa == 43){     // CONTRATO ENVIADO SIRVE PARA REENVIAR
+                    var btn_envio = document.getElementById('btn_enviar_contrato');
+                    btn_envio.disabled = "true";
+                    document.frm.accion.value = 'reenvio_contrato';
+                    document.frm.action = 'subasta_gestion_proceso.php';
+                    document.frm.submit();
+                }
             }
         }
         
         function recibirContrato(){
-            if (document.frm.contrato.value == '') alert('Debe agregar el archivo del contrato con el vendedor');
-            else{
+            var contrato = document.getElementById('contrato').value;
+            var con_endoso = document.getElementById('con_endoso').value;
+            var procede = 1;
+
+            if (contrato == ''){
+                procede = 0;
+                alert('Debe agregar el archivo del contrato con el vendedor');
+            }
+
+            if (procede == 1 && con_endoso == 1){
+                var endoso = document.getElementById('endoso').value;
+
+                if (endoso == ''){
+                    procede = 0;
+                    alert('Debe agregar el comprobante del endoso');
+                }
+            }
+
+            if (procede == 1){
                 var btn_recibe = document.getElementById('btn_recibir_contrato');
+                
                 btn_recibe.disabled = "true";
                 document.frm.accion.value = 'contrato';
                 document.frm.action = 'subasta_gestion_proceso.php';

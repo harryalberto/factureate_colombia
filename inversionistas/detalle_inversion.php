@@ -38,6 +38,12 @@ else {
     $v_fpago = date('d-m-Y',$v_fpago_t);
 }
 
+if (is_null($v_arr_inv['monto_inversion'])) $v_monto_inversion = 0;
+else $v_monto_inversion = $v_arr_inv['monto_inversion'];
+
+if (is_null($v_arr_inv['monto_ganancia'])) $v_monto_ganancia = 0;
+else $v_monto_ganancia = $v_arr_inv['monto_ganancia'];
+
 $v_fvencimiento = date('d-m-Y',strtotime($v_arr_inv['f_vencimiento']));
 
 if ($v_fpago != $v_fvencimiento) $v_fpago = '<i class="fa-solid fa-circle-exclamation" style="color:var(--color-amarillo);font-size:18px;"></i> '.$v_fpago;
@@ -77,7 +83,8 @@ else $v_dias_inversion = $v_arr_inv['dias_inversion'];
     //max-width:700px;
 ?>
     <!------ CUERPO VARIABLE ------>
-    <div class="contenedor_formulario" style="height: 50%;">
+    <div id="principal" style="padding-left: 10px; overflow: hidden;">
+    <!--<div class="contenedor_formulario" style="height: 50%;">-->
         <div class="contenedor_formulario_column">
             <span class="icon-coin-dollar" style="font-size:30px;color:#1F9A8E;margin-right: 10px;"></span></li>
             <div class="formulario_grupo_row" style="width:100px;">
@@ -122,11 +129,11 @@ else $v_dias_inversion = $v_arr_inv['dias_inversion'];
         <div class="contenedor_formulario_column">
             <div class="formulario_grupo_row" style="width:200px;">
                 <label for="inversion">INVERSION</label>
-                <input type="text" id="inversion" class="formulario_control" style="text-align: right;" value="<?=number_format($v_arr_inv['monto_inversion'],2,'.',',')?>" readonly>
+                <input type="text" id="inversion" class="formulario_control" style="text-align: right;" value="<?=number_format($v_monto_inversion,2,'.',',')?>" readonly>
             </div>
             <div class="formulario_grupo_row" style="width:200px;">
                 <label for="ganancia">GANANCIA EST</label>
-                <input type="text" id="ganancia" class="formulario_control" style="text-align: right;" value="<?=number_format($v_arr_inv['monto_ganancia'],2,'.',',')?>" readonly>
+                <input type="text" id="ganancia" class="formulario_control" style="text-align: right;" value="<?=number_format($v_monto_ganancia,2,'.',',')?>" readonly>
             </div>
             <div class="formulario_grupo_row" style="width:100px;">
                 <label for="moneda">MONEDA</label>

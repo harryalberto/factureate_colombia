@@ -41,14 +41,15 @@ class seguridad_trans{
 
             if ($varr_usuario_result['usuarioid'] != -200){
                 //@@@@ PATH DESTINO DE ARCHIVO DE CEDULA
-                //$v_carpeta_destino = '../archivos/INV_'.$parr_datos['nombre'].'_'.$parr_datos['a_paterno'].'_'.$parr_datos['a_materno'].'_'.$parr_datos['nro_doc'];
-                $v_carpeta_destino = $_SERVER['DOCUMENT_ROOT'].'/archivos/INV_'.$parr_datos['nombre'].'_'.$parr_datos['a_paterno'].'_'.$parr_datos['a_materno'].'_'.$parr_datos['nro_doc'];
+                $v_nombre_inversor = $parr_datos['nombre'].'_'.$parr_datos['a_paterno'].'_'.$parr_datos['a_materno'];
+                $v_nombre_inversor_final = str_replace(" ", "_", $v_nombre_inversor);
+
+                $v_carpeta_destino = $_SERVER['DOCUMENT_ROOT'].'/archivos/INV_'.$v_nombre_inversor_final.'_'.$parr_datos['nro_doc'];
                 if (!is_dir($v_carpeta_destino)) mkdir($v_carpeta_destino, 0777, true);
 
                 $v_carpeta_vincula = $v_carpeta_destino.'/vinculacion';
                 if (!is_dir($v_carpeta_vincula)) mkdir($v_carpeta_vincula, 0777, true);
 
-                //$file_path_cedula = $v_carpeta_vincula.'/'.$v_hoy.'_documento_identidad_'.$parr_datos['nro_doc'].'.pdf';
                 $file_path_cedula = '';
 
                 //@@@@ REGISTRO DE INVERSOR
@@ -57,13 +58,18 @@ class seguridad_trans{
                             'documento' => $file_path_cedula, 'inversor_id' => $v_inversor_id, 'tipo_registro' => 112);
                 $vobj_mae_ws->registra_inversor($varr_inversor);
                 $varr_link = $vobj_mae_ws->get_parametro_detalle(53);
+                $varr_docuprovee = $vobj_mae_ws->get_parametro_detalle(78);
+
+                if ($varr_docuprovee['valornum'] == 1) $v_provee_docdig = 'de nuestro proveedor de contratos digitales '.$varr_docuprovee['valorchar'];
+                else $v_provee_docdig = '';
 
                 $varr_mail = array('mail_salida' => 'operaciones@factureate.com', 'nombre_salida' => 'Factureate', 'mail_destino' => $parr_datos['email'], 
                         'subject' => '[FACTUREATE] Tu registro como inversor esta en proceso',
                         'body' => 'Hola '.$parr_datos['nombre'].' '.$parr_datos['apellido'].', nos complace saludarte y agradecer tu interes en invertir con nosotros, tus datos fueron registrados, los siguientes son los pasos a seguir para terminar vuestra vinculacion con FACTUREATE:
                             <br><br>1. Accede a la plataforma Factureate y completa la informacion de registro.
                             <br>2. Nuestra area legal realizara el debido analisis para que puedas invertir con nosotros.
-                            <br>3. Una vez aprobada tu informacion recibiras un correo con dicha aprobacion, desde ese momento podras invertir y experimentar el crecimiento de tus inversiones.
+                            <br>3. Una vez aprobada tu informacion recibiras un correo '.$v_provee_docdig.' con el contrato de vinculalcion, donde se explica la forma de invertir con nosotros.
+                            <br>4. Una vez firmado el contrato de vinculacion digitalmente, desde ese momento podras invertir y experimentar el crecimiento de tus inversiones.
                             <br><br>Acceso a la plataforma:
                             <br>Usuario: '.$parr_datos['nro_doc'].'
                             <br>Password: '.$varr_usuario_result['password'].'
