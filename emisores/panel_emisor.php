@@ -368,13 +368,16 @@ $rowcount = $objfactura->get_facturas_activas_xemisor('COUNT', 0, 0, $filtros,''
                     processData: false,
                     contentType: false
                 })
-                .done(function(rpta){
+                .done(function(rpta){ 
                     if (rpta <= 0){
                         if (rpta == 0) alert('El contenido del archivo no es valido, verifique por favor');
                         if (rpta == -1) alert('Sus datos como Emisor no coinciden con los de la factura');
                         if (rpta == -2) alert('Los datos de su cliente no coincide con los datos que tenemos en nuestra base de datos, comuniquese con operaciones por favor');
                         if (rpta == -3) alert('La factura que intenta cargar no cumple con los minimos de montos minimos de Factureate');
                         if (rpta == -4) alert('El tipo de documento electronico que intenta cargar no es admitido por Factureate');
+                        if (rpta == -5) alert('El indicador de produccion no es el que recomienda la DIAN');
+                        if (rpta == -6) alert('La moneda de la factura no es admitida');
+                        if (rpta == -7) alert('El cliente de la factura debe ser una empresa');
                     } else {
                         $('.modal-title').text('Nueva factura electrónica');
                         $('.modal-body').load('registro_factura_electronica_modal.php?idtemp='+rpta,function(){

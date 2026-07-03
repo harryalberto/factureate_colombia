@@ -227,7 +227,7 @@ $v_moneda_nac_id = $arrparametros['MONEDA NACIONAL']['valornum'];
 
 for ($i=0; $i<count($varr_monedas); $i++){
     if ($varr_monedas[$i]['id'] == $v_moneda_nac_id){
-        $v_monto_minimo_nac = $arrparametros['MONTO MIN FACT DOP']['valornum'];
+        $v_monto_minimo_nac = $arrparametros['MONTO MIN FACT COP']['valornum'];
         $v_moneda_nac = $varr_monedas[$i]['dato1'].' '.number_format($v_monto_minimo_nac,2,'.',',');
     } else {
         $v_monto_minimo_ext = $arrparametros['MONTO MIN FACT DOL']['valornum'];

@@ -2960,5 +2960,45 @@ class maestros{
 
         return $varr_result;
     }
+
+    function valida_contacto_empresa($doc_empresa, $nombre_contacto, $telefono_contacto, $mail_contacto, $direccion_empresa){
+        $conn = new db_param_trans; $conn->connect();
+        $conn_nombre = new db_param_trans; $conn_nombre->connect();
+        $conn_email = new db_param_trans; $conn_email->connect();
+        $conn_telefono = new db_param_trans; $conn_telefono->connect();
+        $conn_direccion = new db_param_trans; $conn_direccion->connect();
+
+        $v_sql = "select    nombrecontacto, telefonocontacto, emailcontacto, direccion from empresa where identificacion = '".$doc_empresa."'";
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+
+        if ($obj->nombrecontacto == '' || is_null($obj->nombrecontacto)){
+            $v_sql = "update empresa set nombrecontacto = '".$nombre_contacto."' where identificacion = '".$doc_empresa."'";
+            $idqry = $conn_nombre->query($v_sql);
+            if (!$idqry) echo pg_last_error($conn_nombre->Link_ID);
+            $conn_nombre->next_record();
+        }
+
+        if ($obj->telefonocontacto == '' || is_null($obj->telefonocontacto)){
+            $v_sql = "update empresa set telefonocontacto = '".$telefono_contacto."' where identificacion = '".$doc_empresa."'";
+            $idqry = $conn_telefono->query($v_sql);
+            if (!$idqry) echo pg_last_error($conn_telefono->Link_ID);
+            $conn_telefono->next_record();
+        }
+
+        if ($obj->emailcontacto == '' || is_null($obj->emailcontacto)){
+            $v_sql = "update empresa set emailcontacto = '".$mail_contacto."' where identificacion = '".$doc_empresa."'";
+            $idqry = $conn_email->query($v_sql);
+            if (!$idqry) echo pg_last_error($conn_email->Link_ID);
+            $conn_email->next_record();
+        }
+
+        $v_sql = "update empresa set direccion = '".$direccion_empresa."' where identificacion = '".$doc_empresa."'";
+        $idqry = $conn_direccion->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn_direccion->Link_ID);
+        $conn_direccion->next_record();
+    }
 }
 ?>

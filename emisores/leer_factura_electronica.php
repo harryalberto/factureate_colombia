@@ -15,6 +15,8 @@ require("../lib/mail_util.php");
 
 $vobj_factura_proc = new factura;
 $vobj_mae_proc = new maestros;
+$v_procede = 1;
+$moneda_id = 0;
 
 if(isset($_FILES['xml'])){
     $tmp = $_FILES['xml']['tmp_name'];
@@ -25,146 +27,204 @@ if(isset($_FILES['xml'])){
     if($xml === false){
         echo 0;
     } else {
-        $encabezado = $xml->Encabezado;
-        $v_procede = 1;
-        $v_encontrado = 0;
+        // obteniendo los namespaces
+        $namespaces = $xml->getNamespaces(true);
 
-        //HEADER
-        $v_tipodoc = (integer)$encabezado->IdDoc->TipoeCF;  // 31 es factura de credito fiscal, 44 acogidas a regimen especial, 45 para ventas al gobierno, 46 exportacion
+        //accediendo al description que contiene el xml que se necesita
+        $description = (string)$xml
+                            ->children($namespaces['cac'])
+                            ->Attachment
+                            ->ExternalReference
+                            ->children($namespaces['cbc'])
+                            ->Description;
 
-        // // validacion del tipo de documento
-        $varr_tipodoc_elec = $vobj_mae_proc->get_parametro_detalle(72);
-        $varr_permitidos = $vobj_mae_proc->get_tipos_documentos_elec($varr_tipodoc_elec['valorchar']);
+        $invoice = simplexml_load_string($description);
 
-        for ($i = 0; $i < count($varr_permitidos); $i++){
-            if ($v_tipodoc == $varr_permitidos[$i]) $v_encontrado = 1;
+        if ($invoice === false) {
+            echo 0;
+        } else {
+            $ns2 = $invoice->getNamespaces(true);
+            $cbc = $invoice->children($ns2['cbc']);
+
+            $ProfileExecutionID = (string)$cbc->ProfileExecutionID;
+
+            // valido si el indicador de factura en ambiente de produccion es correcto
+            if ($ProfileExecutionID != '1') echo -5;
+            else {
+                $facturaID = (string)$cbc->ID;  // numero de la factura
+                $IssueDate = (string)$cbc->IssueDate;   // fecha de emision yyyy-mm-dd
+                $InvoiceTypeCode = (string)$cbc->InvoiceTypeCode;   // tipo de documento
+
+                if ($InvoiceTypeCode != '01') echo -4;      // 01 es factura, 02 es exportacion
+                else {
+                    $DocumentCurrencyCode = (string)$cbc->DocumentCurrencyCode;     // moneda COP, EUR, USD
+                    
+                    if($DocumentCurrencyCode == 'COP') $moneda_id = 20;
+                    elseif ($DocumentCurrencyCode == 'USD') $moneda_id = 21;
+                    elseif ($DocumentCurrencyCode == 'EUR') $moneda_id = 22;
+
+                    //valido la moneda
+                    if ($DocumentCurrencyCode != 'COP' && $DocumentCurrencyCode != 'EUR' && $DocumentCurrencyCode != 'USD') echo -6;
+                    else {
+                        $cac = $invoice->children($ns2['cac']);
+
+                        //datos del emisor
+                        $AccountingSupplierParty = $cac->AccountingSupplierParty;
+                        $cacAccountingSupplierParty = $AccountingSupplierParty->children($ns2['cac']);
+                        $Party = $cacAccountingSupplierParty->Party;
+                        $cacParty = $Party->children($ns2['cac']);
+
+                        $PartyTaxScheme = $cacParty->PartyTaxScheme;
+                        $cbcPartyTaxScheme = $PartyTaxScheme->children($ns2['cbc']);
+
+                        $emisor_RegistrationName = (string)$cbcPartyTaxScheme->RegistrationName;    // nombre del emisor
+                        $emisor_CompanyID = (string)$cbcPartyTaxScheme->CompanyID;      // NIT del emisor
+
+                        $Contact = $cacParty->Contact;
+                        $cbcContact = $Contact->children($ns2['cbc']);
+
+                        $emisor_contacto = (string)$cbcContact->Name;
+                        $emisor_telefono = (string)$cbcContact->Telephone;
+                        $emisor_email = (string)$cbcContact->ElectronicMail;
+
+                        // datos del cliente
+                        $AccountingCustomerParty = $cac->AccountingCustomerParty;
+                        $cbcAccountingCustomerParty = $AccountingCustomerParty->children($ns2['cbc']);
+
+                        $cliente_AdditionalAccountID = (string)$cbcAccountingCustomerParty->AdditionalAccountID;
+
+                        if ($cliente_AdditionalAccountID != '1') echo -7;
+                        else {
+                            $cacAccountingCustomerParty = $AccountingCustomerParty->children($ns2['cac']);
+                            $Party = $cacAccountingCustomerParty->Party;
+                            $cacParty = $Party->children($ns2['cac']);
+
+                            $PartyTaxScheme = $cacParty->PartyTaxScheme;
+                            $cbcPartyTaxScheme = $PartyTaxScheme->children($ns2['cbc']);
+                            $cacPartyTaxScheme = $PartyTaxScheme->children($ns2['cac']);
+
+                            $cliente_RegistrationName = (string)$cbcPartyTaxScheme->RegistrationName;   // nombre del cliente
+                            $cliente_CompanyID = (string)$cbcPartyTaxScheme->CompanyID; // NIT del cliente
+                            $RegistrationAddress = $cacPartyTaxScheme->RegistrationAddress;
+                            $cacRegistrationAddress = $RegistrationAddress->children($ns2['cac']);
+                            $cbcRegistrationAddress = $RegistrationAddress->children($ns2['cbc']);
+
+                            $cliente_CityName = (string)$cbcRegistrationAddress->CityName;  // cliente ciudad
+                            $cliente_CountrySubentity = (string)$cbcRegistrationAddress->CountrySubentity;  // cliente region
+                            $AddressLine = $cacRegistrationAddress->AddressLine;
+                            $cbcAddressLine = $AddressLine->children($ns2['cbc']);
+
+                            $cliente_direccion = (string)$cbcAddressLine->Line;     // cliente direccion
+                            $cliente_direccion .= ' '.$cliente_CityName.' '.$cliente_CountrySubentity;
+                            $cliente_Contact = $cacParty->Contact;
+                            $cbccliente_Contact  = $cliente_Contact->children($ns2['cbc']);
+
+                            $cliente_Name = (string)$cbccliente_Contact->Name;  // cliente nombre contacto
+                            $cliente_Telephone = (string)$cbccliente_Contact->Telephone;    // contacto telefono
+                            $cliente_ElectronicMail = (string)$cbccliente_Contact->ElectronicMail;      // mail contacto cliente
+
+                            $PaymentMeans = $cac->PaymentMeans;
+                            $cbcPaymentMeans = $PaymentMeans->children($ns2['cbc']);
+
+                            $fecha_pago = (string)$cbcPaymentMeans->PaymentDueDate;     // fecha de pago de la factura
+
+                            // anticipos
+                            if (isset($cac->PrepaidPayment)){
+                                $PrepaidPayment = $cac->PrepaidPayment;
+                                $cbcPrepaidPayment = $PrepaidPayment->children($ns2['cbc']);
+
+                                $monto_anticipo = (float)$cbcPrepaidPayment->PaidAmount;
+                            } else $monto_anticipo = 0;
+                            
+                            //retenciones
+                            if (isset($cac->WithholdingTaxTotal)){
+                                $WithholdingTaxTotal = $cac->WithholdingTaxTotal;
+                                $cbcWithholdingTaxTotal = $WithholdingTaxTotal->children($ns2['cbc']);
+
+                                $TaxAmount = (float)$cbcWithholdingTaxTotal->TaxAmount;
+                                $TaxEvidenceIndicator = (string)$cbcWithholdingTaxTotal->TaxEvidenceIndicator;
+
+                                if ($TaxEvidenceIndicator == 'false') $monto_retenciones = 0;       //**** validar esto */
+                                else $monto_retenciones = $TaxAmount;
+                            } else $monto_retenciones = 0;
+                            
+                            // montos
+                            $TaxTotal = $cac->TaxTotal;
+                            $cacTaxTotal = $TaxTotal->children($ns2['cac']);
+
+                            $TaxSubtotal = $cacTaxTotal->TaxSubtotal;
+                            $cbcTaxSubtotal = $TaxSubtotal->children($ns2['cbc']);
+
+                            $iva_TaxAmount = (float)$cbcTaxSubtotal->TaxAmount;     // monto de impuesto del IVA
+
+                            $LegalMonetaryTotal = $cac->LegalMonetaryTotal;
+                            $cbcLegalMonetaryTotal = $LegalMonetaryTotal->children($ns2['cbc']);
+                            $monto_neto = (float)$cbcLegalMonetaryTotal->LineExtensionAmount;       // monto neto
+                            $monto_otros_cargos = (float)$cbcLegalMonetaryTotal->ChargeTotalAmount;     // monto otros cargos
+                            $monto_pagar = (float)$cbcLegalMonetaryTotal->PayableAmount;    // monto a pagar
+
+                            $monto_venta = $monto_neto - $monto_anticipo;
+
+                            //valida datos del emisor
+                            $varr_emisor = $vobj_mae_proc->get_datos_emisor($_SESSION['user']['empresaid']);
+
+                            if ($varr_emisor['identificacion'] != $emisor_CompanyID || $varr_emisor['nombre'] != $emisor_RegistrationName){
+                                $v_procede = 0;
+                                echo -1;
+                            }
+
+                            //valida datos del cliente
+                            $v_nombre_cliente = $vobj_mae_proc->get_nombre_empresa_xdoc($cliente_CompanyID);
+
+                            if ($v_procede == 1 && ($v_nombre_cliente != '')){
+                                if ($v_nombre_cliente != $cliente_RegistrationName){
+                                    $v_procede = 0;
+                                    echo -2;
+                                } else {
+                                    // valida la informacion de contacto del cliente
+                                    $vobj_mae_proc->valida_contacto_empresa($cliente_CompanyID, $cliente_Name, $cliente_Telephone, $cliente_ElectronicMail, $cliente_direccion);
+                                }
+                            }
+
+                            //validacion montos
+                            if ($v_procede== 1){
+                                if ($moneda_id == 20) $varr_monto_minimo = $vobj_mae_proc->get_parametro_detalle(33);
+                                else $varr_monto_minimo = $vobj_mae_proc->get_parametro_detalle(34);
+
+                                if ($varr_monto_minimo['valornum'] > $monto_pagar){
+                                    $v_procede = 0;
+                                    echo -3;
+                                }
+                            }
+
+                            if ($v_procede == 1){
+                                // GUARDO EL XML
+                                $v_carpeta = '../pdf/'.'EMP_'.$varr_emisor['nombre'].'_'.$varr_emisor['identificacion'];
+                                if (!is_dir($v_carpeta)) mkdir($v_carpeta, 0777, true);
+
+                                $v_carpeta = '../pdf/'.'EMP_'.$varr_emisor['nombre'].'_'.$varr_emisor['identificacion'].'/temp';
+                                if (!is_dir($v_carpeta)) mkdir($v_carpeta, 0777, true);
+
+                                $v_xml_path = $v_carpeta.'/'.$facturaID.'-'.$_FILES['xml']['name'];
+                                move_uploaded_file($_FILES['xml']['tmp_name'],  $v_xml_path);
+                                $v_xml_name = $facturaID.'-'.$_FILES['xml']['name'];
+
+                                $varr_datos = array('nro_factura' => $facturaID,    'moneda_id' => $moneda_id,         'cliente_doc' => $cliente_CompanyID, 'cliente_nom' => $cliente_RegistrationName,
+                                                                'f_emision' => $IssueDate,      'f_vencimiento' => $fecha_pago,    'subtotal' => $monto_neto,                  'anticipos' => $monto_anticipo,
+                                                                'descuentos' => 0,                   'valor_venta' => $monto_venta,     'itbis' => $iva_TaxAmount,                     'otros' => $monto_otros_cargos, 
+                                                                'total' => $monto_pagar,        'xml_path' => $v_xml_path,             'xml_name' => $v_xml_name,               'retenciones' => $monto_retenciones,
+                                                                'cliente_correo' => $cliente_ElectronicMail,                                     'cliente_direccion' => $cliente_direccion, 
+                                                                'cliente_contacto' => $cliente_Name);
+
+                                $v_ft_id = $vobj_factura_proc->registra_factura_temp($varr_datos);
+
+                                echo $v_ft_id;
+                            }
+                        }
+                    }
+                }
+            }
         }
-
-        if ($v_encontrado == 0) $v_procede = 0;
-
-        if ($v_procede == 1){
-            // CONTINUACION DE HEADER
-            $v_nro_doc = (string)$encabezado->IdDoc->eNCF;
-            $v_femision = (string)$encabezado->Emisor->FechaEmision; //dd-mm-yyyy
-            $v_fvencimiento = (string)$encabezado->IdDoc->FechaLimitePago;    //dd-mm-yyyy
-
-            $v_femision_dt = DateTime::createFromFormat('d-m-Y', $v_femision);
-            $v_femision_eng = $v_femision_dt->format('Y-m-d');
-            //$v_femision_eng = date("Y-m-d", strtotime(str_replace("-", "/", $v_femision)));
-
-            $v_fvencimiento_dt = DateTime::createFromFormat('d-m-Y', $v_fvencimiento);
-            $v_fvencimiento_eng = $v_fvencimiento_dt->format('Y-m-d');
-
-            //EMISOR
-            $v_emisor_rnc = (string)$encabezado->Emisor->RNCEmisor;
-            $v_emisor_nom = (string)$encabezado->Emisor->RazonSocialEmisor;
-
-            //CLIENTE
-            $v_cliente_rnc =(string)$encabezado->Comprador->RNCComprador;
-            $v_cliente_nom = (string)$encabezado->Comprador->RazonSocialComprador;
-
-            if (isset($encabezado->Comprador->CorreoComprador)) $v_email_cliente = $encabezado->Comprador->CorreoComprador;
-            else $v_email_cliente = '';
-
-            if (isset($encabezado->Comprador->DireccionComprador)) $v_dir_cliente = $encabezado->Comprador->DireccionComprador;
-            else $v_dir_cliente = '';
-
-            if (isset($encabezado->Comprador->ContactoComprador)) $v_nombre_contacto_cliente = $encabezado->Comprador->ContactoComprador;
-            else $v_nombre_contacto_cliente = '';
-
-            //TOTALES
-            $v_monto_total = (float)$encabezado->Totales->MontoTotal;
-            $v_itbis = (float)$encabezado->Totales->TotalITBIS;
-
-            if (isset($encabezado->Totales->MontoImpuestoAdicional)) $v_monto_impadicional = $encabezado->Totales->MontoImpuestoAdicional;
-            else $v_monto_impadicional = 0;
-
-            if (isset($encabezado->Totales->OtrosImpuestosAdicionales)) $v_monto_otrosimpadicional = $encabezado->Totales->OtrosImpuestosAdicionales;
-            else $v_monto_otrosimpadicional = 0;
-
-            $v_otros_impuestos = $v_monto_impadicional + $v_monto_otrosimpadicional;
-
-            if (isset($encabezado->Totales->MontoAvancePago)) $v_monto_adelanto = $encabezado->Totales->MontoAvancePago;
-            else $v_monto_adelanto = 0;
-
-            if (isset($encabezado->Totales->TotalITBISRetenido)) $v_itbis_retenido = $encabezado->Totales->TotalITBISRetenido;
-            else $v_itbis_retenido = 0;
-
-            if (isset($encabezado->Totales->TotalISRRetencion)) $v_isr_retenido = $encabezado->Totales->TotalISRRetencion;
-            else $v_isr_retenido = 0;
-
-            if (isset($encabezado->Totales->TotalITBISPercepcion)) $v_itbis_percepcion = $encabezado->Totales->TotalITBISPercepcion;
-            else $v_itbis_percepcion = 0;
-
-            if (isset($encabezado->Totales->TotalISRPercepcion)) $v_isr_percepcion = $encabezado->Totales->TotalISRPercepcion;
-            else $v_isr_percepcion = 0;
-
-            $v_total_retenciones = $v_itbis_retenido + $v_isr_retenido + $v_itbis_percepcion + $v_isr_percepcion;
-            $v_total_financiar = $v_monto_total - $v_monto_adelanto - $v_total_retenciones;
-            $v_subtotal = $v_monto_total - $v_itbis - $v_otros_impuestos + $v_monto_adelanto;
-            $v_valor_venta = $v_subtotal - $v_monto_adelanto;
-            
-            //MONEDA
-            if (isset($encabezado->OtraMoneda)){
-                if ((string)$encabezado->TipoMoneda == 'USD') $v_moneda_id = 21;
-                if ((string)$encabezado->TipoMoneda == 'EUR') $v_moneda_id = 22;
-            } else $v_moneda_id = 20;
-
-            //VALIDACIONES
-            //VALIDACION DE EMISOR
-            $varr_emisor = $vobj_mae_proc->get_datos_emisor($_SESSION['user']['empresaid']);
-
-            if ($varr_emisor['identificacion'] != $v_emisor_rnc || $varr_emisor['nombre'] != $v_emisor_nom){
-                $v_procede = 0;
-                echo -1;
-            }
-
-            //VALIDACION DE CLIENTE
-            $v_nombre_cliente = $vobj_mae_proc->get_nombre_empresa_xdoc($v_cliente_rnc);
-
-            if ($v_procede == 1 && ($v_nombre_cliente != '')){
-                if ($v_nombre_cliente != $v_cliente_nom){
-                    $v_procede = 0;
-                    echo -2;
-                }
-            }
-
-            //VALIDACION DE MONTO
-            if ($v_procede== 1){
-                if ($v_moneda_id == 20) $varr_monto_minimo = $vobj_mae_proc->get_parametro_detalle(33);
-                else $varr_monto_minimo = $vobj_mae_proc->get_parametro_detalle(34);
-
-                if ($varr_monto_minimo['valornum'] > $v_total_financiar){
-                    $v_procede = 0;
-                    echo -3;
-                }
-            }
-
-            //GUARDA DATOS DEL XML
-            if ($v_procede == 1){
-                // GUARDO EL XML
-                $v_carpeta = '../pdf/'.'EMP_'.$varr_emisor['nombre'].'_'.$varr_emisor['identificacion'];
-                if (!is_dir($v_carpeta)) mkdir($v_carpeta, 0777, true);
-
-                $v_carpeta = '../pdf/'.'EMP_'.$varr_emisor['nombre'].'_'.$varr_emisor['identificacion'].'/temp';
-                if (!is_dir($v_carpeta)) mkdir($v_carpeta, 0777, true);
-
-                $v_xml_path = $v_carpeta.'/'.$v_nro_doc.'-'.$_FILES['xml']['name'];
-                move_uploaded_file($_FILES['xml']['tmp_name'],  $v_xml_path);
-                $v_xml_name = $v_nro_doc.'-'.$_FILES['xml']['name'];
-
-                $varr_datos = array('nro_factura' => $v_nro_doc, 'moneda_id' => $v_moneda_id, 'cliente_doc' => $v_cliente_rnc, 'cliente_nom' => $v_cliente_nom,
-                                    'f_emision' => $v_femision_eng, 'f_vencimiento' => $v_fvencimiento_eng, 'subtotal' => $v_subtotal, 'anticipos' => $v_monto_adelanto,
-                                    'descuentos' => 0, 'valor_venta' => $v_valor_venta, 'itbis' => $v_itbis, 'otros' => $v_otros_impuestos, 'total' => $v_monto_total,
-                                    'xml_path' => $v_xml_path, 'xml_name' => $v_xml_name, 'retenciones' => $v_total_retenciones,
-                                    'cliente_correo' => $v_email_cliente, 'cliente_direccion' => $v_dir_cliente, 'cliente_contacto' => $v_nombre_contacto_cliente);
-
-                $v_ft_id = $vobj_factura_proc->registra_factura_temp($varr_datos);
-
-                echo $v_ft_id;
-            }
-
-        } else echo -4;
     }
 }   //0 no es legible, -1 no corresponde datos del emisor, -2 no corresponde datos del cliente, -3 no cumple el monto minimo, -4 documento no admitido
 /*--------------------------------------------------------*/
