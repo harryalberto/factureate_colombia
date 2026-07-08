@@ -1084,5 +1084,62 @@ class factura{
 
         return $varr_result;
     }
+
+    function get_noti_endosos($p_tipo, $p_rows, $p_rowini, $p_filtros, $p_order){
+        $conn = new db_param_trans; $conn->connect();
+
+        if ($p_tipo == 'COUNT'){
+            $v_sql = "select count(1) as contador from endoso_notifica where id > 0";
+
+            if ($p_filtros != '') $v_sql .= " and ".$p_filtros;
+            $idqry = $conn->query($v_sql);
+            if (!$idqry) echo pg_last_error($conn->Link_ID);
+            $obj = $conn->next_record();
+            $v_result = $obj->contador;
+        } else {
+            $v_sql = "select    endoso_notifica.id, endoso_notifica.factura_id, endoso_notifica.estado_id, estados.nombre as estado_nom,
+                                endoso_notifica.fecha, endoso_notifica.hora, endoso_notifica.tipo_id, tipos.nombre as tipo_nom,
+                                empresa.nombre as op_nombre, financiamiento.fregistro, empresa.emailcontacto,
+                                GET_NOTI_ENDOSOS(endoso_notifica.factura_id) as noti_old
+                        from    endoso_notifica, estados, tipos, factura, empresa, financiamiento
+                        where   estados.id = endoso_notifica.estado_id and tipos.id = endoso_notifica.tipo_id and factura.id = endoso_notifica.factura_id and
+                                empresa.id = factura.clienteid and financiamiento.facturaid = endoso_notifica.factura_id";
+
+            if ($p_filtros != '') $v_sql .= " and ".$p_filtros;
+            if ($p_order != '') $v_sql .= " order by ".$p_order;
+            if ($p_rows > 0) $v_sql .= " LIMIT ".$p_rows." OFFSET ".$p_rowini;
+
+            $idqry = $conn->query($v_sql);
+            if (!$idqry) echo pg_last_error($conn->Link_ID);
+            $obj = $conn->next_record();
+
+            $v_result = array();
+
+            for($i = 0; $i < $conn->nrows(); $i ++){
+                $v_result[$i] = array(  'notifica_id' => $obj->id,          'factura_id' => $obj->factura_id,   'estado_id' => $obj->estado_id,
+                                        'estado_nom' => $obj->estado_nom,   'fecha' => $obj->fecha,             'hora' => $obj->hora,
+                                        'tipo_id' => $obj->tipo_id,         'tipo_nom' => $obj->tipo_nom,       'op_nombre' => $obj->op_nombre,
+                                        'fecha_finan' => $obj->fregistro,   'email_op' => $obj->emailcontacto,  'noti_old' => $obj->noti_old);
+
+                $obj = $conn->next_record();
+            }
+        }
+
+        return $v_result;
+    }
+
+    function get_detalle_noti_endoso($p_factura_id){
+        $conn = new db_param_trans; $conn->connect();
+
+        $v_sql = "select id, estado_id, tipo_id, fecha, hora from endoso_notifica where factura_id = ".$p_factura_id." and estado_id > 0";
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+
+        $varr_result = array('id' => $obj->id, 'estado_id' => $obj->estado_id, 'tipo_id' => $obj->tipo_id, 'fecha' => $obj->fecha, 'hora' => $obj->hora);
+
+        return $varr_result;
+    }
 }
 ?>

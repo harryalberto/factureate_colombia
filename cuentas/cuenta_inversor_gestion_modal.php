@@ -10,7 +10,7 @@ require("../lib-trans/c_cuentas.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'CUENTAS';
     require("../lib/valida-acceso.php");
@@ -33,7 +33,7 @@ require("../lib-trans/c_cuentas.php");
         }
     </script>
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $obj_cuenta = new cuentas;
@@ -42,7 +42,7 @@ $varr_cuenta = $obj_cuenta->get_cuenta_detalle($_GET['cuentaid']);
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     date_default_timezone_set("America/Lima");
     //------ PARTE SUPERIOR ------
     
@@ -62,34 +62,34 @@ $varr_cuenta = $obj_cuenta->get_cuenta_detalle($_GET['cuentaid']);
         </ul>
         <ul>
             <li style="font-weight: bold;width:80px;">INVERSOR:</li>
-            <li style="width:200px;"><?echo $varr_cuenta['HEADER']['inversor_nombre'];?></li>
+            <li style="width:200px;"><?php echo $varr_cuenta['HEADER']['inversor_nombre'];?></li>
             <li style="font-weight: bold;width:50px;">TIPO</li>
-            <li style="width:150px;"><?echo $varr_cuenta['HEADER']['tipo_inversor'];?></li>
+            <li style="width:150px;"><?php echo $varr_cuenta['HEADER']['tipo_inversor'];?></li>
             <input type="hidden" name="inversor_id" value="<?=$varr_cuenta['HEADER']['inversor_id']?>">
             <input type="hidden" name="inversor_tipo_id" value="<?=$varr_cuenta['HEADER']['tipo_inversor_id']?>">
         </ul>
         <ul>
             <li style="font-weight: bold;width:120px;">IDENTIFICACION:</li>
-            <li style="width:150px;"><? echo $varr_cuenta['HEADER']['inversor_tipodoc'].' '.$varr_cuenta['HEADER']['identificacion'];?></li>
+            <li style="width:150px;"><?php echo $varr_cuenta['HEADER']['inversor_tipodoc'].' '.$varr_cuenta['HEADER']['identificacion'];?></li>
             <li style="font-weight: bold;width:70px;">MONEDA:</li>
-            <li style="width:200px;"><?echo $varr_cuenta['HEADER']['moneda'];?></li>
+            <li style="width:200px;"><?php echo $varr_cuenta['HEADER']['moneda'];?></li>
             <input type="hidden" name="moneda_id" value="<?=$varr_cuenta['HEADER']['moneda_id']?>">
         </ul>
         <ul>
             <li style="font-weight: bold;width:150px;">SALDO CONTABLE</li>
-            <li style="padding-left:5px;padding-right:5px;margin-left:10px;"><?echo number_format($varr_cuenta['SALDOS']['saldo_contable'],2,'.',',');?></li>
+            <li style="padding-left:5px;padding-right:5px;margin-left:10px;"><?php echo number_format($varr_cuenta['SALDOS']['saldo_contable'],2,'.',',');?></li>
         </ul>
         <ul>
             <li style="font-weight: bold;width:150px;">SALDO COMPROMETIDO</li>
-            <li style="padding-left:5px;padding-right:5px;margin-left:10px;"><?echo number_format($varr_cuenta['SALDOS']['saldo_comprometido'],2,'.',',');?></li>
+            <li style="padding-left:5px;padding-right:5px;margin-left:10px;"><?php echo number_format($varr_cuenta['SALDOS']['saldo_comprometido'],2,'.',',');?></li>
         </ul>
         <ul>
             <li style="font-weight: bold;width:150px;">SALDO DISPONIBLE</li>
-            <li style="padding-left:5px;padding-right:5px;margin-left:10px;"><?echo number_format($varr_cuenta['SALDOS']['saldo_disponible'],2,'.',',');?></li>
+            <li style="padding-left:5px;padding-right:5px;margin-left:10px;"><?php echo number_format($varr_cuenta['SALDOS']['saldo_disponible'],2,'.',',');?></li>
         </ul>
         <ul>
             <li style="font-weight: bold;width:150px;">SALDO INVERTIDO</li>
-            <li style="padding-left:5px;padding-right:5px;margin-left:10px;"><?echo number_format($varr_cuenta['SALDOS']['saldo_invertido'],2,'.',',');?></li>
+            <li style="padding-left:5px;padding-right:5px;margin-left:10px;"><?php echo number_format($varr_cuenta['SALDOS']['saldo_invertido'],2,'.',',');?></li>
         </ul>
         <div style="overflow:hidden;background-color:#555555;height:1px;"></div>
     <?php
@@ -168,7 +168,7 @@ $varr_cuenta = $obj_cuenta->get_cuenta_detalle($_GET['cuentaid']);
         ##################### BOTONERA
         ###########################################################-->
         <ul style="margin-top:10px;">
-    <?
+    <?php
         echo '
             <li class="botontransaccionazul" style="height:40px;"><a href=javascript:registrar_saldo("saldo")><span class="icon-calculator"></span> Registrar Saldo</a></li>';
     ?>

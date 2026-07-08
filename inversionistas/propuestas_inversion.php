@@ -102,7 +102,10 @@ $total_paginas = 0;
     <!-- verificacion de propuestas preliminares -->
 <?php
     if ($v_monto_preliminar > 0){
+    //=======================================================
         $v_label_pre = '';
+        $varr_botones = array();
+        $v_z = 0;
 
         for ($j=0; $j<count($varr_preliminares); $j++){
             for ($i=0; $i<count($varr_cuentas); $i++){
@@ -113,10 +116,10 @@ $total_paginas = 0;
                 }
             }
 
-            /*if ($j == 0) $v_label_pre .= $varr_preliminares[$j]['simbolo_moneda'].' '.number_format($varr_preliminares[$j]['monto'],2,'.',',');
-            else $v_label_pre .= ' + '.$varr_preliminares[$j]['simbolo_moneda'].' '.number_format($varr_preliminares[$j]['monto'],2,'.',',');*/
-            if ($j == 0) $v_label_pre .= $varr_preliminares[$j]['simbolo_moneda'].' '.number_format($v_pendiente,2,'.',',');
-            else $v_label_pre .= ' + '.$varr_preliminares[$j]['simbolo_moneda'].' '.number_format($v_pendiente,2,'.',',');
+            $varr_botones[$v_z] = array('moneda_id' => $varr_preliminares[$j]['moneda_id'], 'label' => $varr_preliminares[$j]['simbolo_moneda'].' '.number_format($v_pendiente,2,'.',','));
+            $v_z++;
+            /*if ($j == 0) $v_label_pre .= $varr_preliminares[$j]['simbolo_moneda'].' '.number_format($v_pendiente,2,'.',',');
+            else $v_label_pre .= ' + '.$varr_preliminares[$j]['simbolo_moneda'].' '.number_format($v_pendiente,2,'.',',');*/
         }
 
         if ($v_solopreliminar == 1) $v_checked = 'checked="yes"';
@@ -126,11 +129,21 @@ $total_paginas = 0;
     <div class="form-check">
         <input class="form-check-input" type="checkbox" name="check_preliminar" id="check_preliminar" style="margin-left:20px;" value="1" onclick="checkPreliminares()" <?php echo $v_checked;?>>
         <label class="form-check-label" for="check_preliminar">Mostrar solo propuestas preliminares</label>
-        <label style="margin-left:20px;margin-right:10px;font-size:16px;color:var(--color-rojo);">Propuestas preliminares pendiente de saldo: <?php echo $v_label_pre;?></label>
-        <button style="font-size:12px;background-color:var(--color-rojo);border:none;" type="button" class="btn btn-primary"><i class="fa-solid fa-coins" style="font-size:16px;"></i> Cargar Saldo</button>
+        <label style="margin-left:20px;margin-right:10px;font-size:16px;color:var(--color-rojo);">Propuestas preliminares pendiente de saldo: <?php //echo $v_label_pre;?></label>
+
+<?php
+        for ($x = 0; $x < count($varr_botones); $x++){
+            echo '
+        <button style="font-size:12px;background-color:var(--color-rojo);border:none;" type="button" class="btn btn-primary" onclick="cargaSaldoPend('.$varr_botones[$x]['moneda_id'].')">
+            <i class="fa-solid fa-coins" style="font-size:16px;"></i> '.$varr_botones[$x]['label'].'
+        </button>';
+        }
+?>
+
     </div>
     </form>
 <?php
+    //=======================================================
     }
 ?>
 
@@ -173,7 +186,7 @@ $total_paginas = 0;
             </div>
         </div>
     </div>
-    <!-- llamada al modal -->
+    <!--###########################################################-->
     <script>
         $('.openBtn2').on('click',function(){
             var fid = $(this).attr('fid');
@@ -200,6 +213,13 @@ $total_paginas = 0;
 
             document.filtros.action = 'propuestas_inversion.php'
             document.filtros.submit();
+        }
+
+        function cargaSaldoPend(p_moneda_id){
+            $('.modal-title').text('Saldos Pendientes');
+            $('.modal-body').load('pendiente_deposito_modal.php?moneda_id='+p_moneda_id,function(){
+                $('#PropuestaDetalle').modal({show:true});
+            });
         }
     </script>
     <!---=============== end modal ==============--->

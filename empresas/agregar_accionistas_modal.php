@@ -10,13 +10,13 @@ require("../lib-trans/c_cuentas.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'CUENTAS';
     require("../lib/valida-acceso.php");
 ?>
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $obj_cuenta = new cuentas;
@@ -78,7 +78,7 @@ for ($i=0; $i<count($varr_tiposdoc); $i++){
             var v_empresa_id = $('#empresa2_id').val();
 
             $.ajax({
-                url:"empresa_accionistas_procesar.php",
+                url:"../empresas/empresa_accionistas_procesar.php",
                 type:'post',
                 data: formData,
                 contentType: false,

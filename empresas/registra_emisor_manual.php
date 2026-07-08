@@ -10,14 +10,14 @@ require("../lib-trans/c_cuentas.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'REGEMISOR';
     require("../lib/valida-acceso.php");
 ?>
     
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $obj_mae = new maestros;
@@ -26,7 +26,7 @@ $vobj_cuentas = new cuentas;
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     $menu = 'empresas/empresas.php';
     //------ PARTE SUPERIOR ------
     require("../lib/superior.php");

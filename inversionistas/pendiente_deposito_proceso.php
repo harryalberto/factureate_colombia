@@ -10,17 +10,7 @@ require("../libmail/class.phpmailer.php");
 require("../lib/mail_util.php");
 require("../lib-trans/c_inversiones.php");
 require("../lib-trans/c_cuentas.php");
-?>
-<HTML>
-<HEAD>
-<?php
-    require("../lib/head.php");
-    $acceso = '';
-    require("../lib/valida-acceso.php");
-?>
-</HEAD>
 
-<?php
 /*==========================================================
 ========== LOGICA
 ==========================================================*/
@@ -54,10 +44,7 @@ $arr_mail_user = array('mail_salida' => 'operaciones@factureate.com', 'nombre_sa
                                         FACTUREATE');
 $obj_mail->enviar_correo($arr_mail_user);
 
-echo '<script>
-        alert("Se registro el saldo en transito, el cual sera validado por nuestros analistas");
-    </script>';
+echo 1;
 
 //==========================================================
 ?>
-</HTML>

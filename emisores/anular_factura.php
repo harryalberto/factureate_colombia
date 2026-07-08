@@ -10,14 +10,14 @@ require("../lib-trans/factura.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'REGFACT';
     require("../lib/valida-acceso.php");
 ?>
     
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $objfactura = new factura;
@@ -31,7 +31,7 @@ if (isset($_POST['facturaid'])){
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     date_default_timezone_set("America/Lima");
     $menu = 'emisores/panel_emisor.php';
     //------ PARTE SUPERIOR ------
@@ -40,7 +40,7 @@ if (isset($_POST['facturaid'])){
     require("../lib/menu-n1.php");
 ?>
     <!------ CUERPO VARIABLE ------>
-    <?
+    <?php
     echo '<div style="overflow:hidden;text-align:center;font-size: 16px;font-weight: bold;width:50%;padding:30px;">
                 Su factura ha sido ANULADA
             </div>

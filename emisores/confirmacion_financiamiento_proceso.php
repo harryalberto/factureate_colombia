@@ -13,7 +13,7 @@ require("../lib/mail_util.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'PROPUESTA';
     require("../lib/valida-acceso.php");

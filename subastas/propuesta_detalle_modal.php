@@ -552,6 +552,16 @@ if ($_GET['pid'] == 0) $tia = $v_tea_minima;
 
             monto_invertir = monto_invertir.toLocaleString('en-US',{minimumFractionDigits:2, maximumFractionDigits:2});
             document.frm_modal.monto_label.value = monto_invertir;
+
+            //////
+            var tia = Number(document.frm_modal.tia.value);
+            var monto = Number(document.frm_modal.monto.value);
+            var dias = Number(document.frm_modal.dias.value);
+
+            var tim = Number(Math.pow((1 + (tia / 100)),Number(1/12)) - 1);
+            var tid = Number(Math.pow((1 + tim),Number(1/30)) - 1);
+            var ganancia = Number(tid * monto * dias);
+            document.frm_modal.ganancia.value = ganancia.toLocaleString('en-US', {style: 'decimal', maximumFractionDigits: 2});
         }
     </script>
 </BODY>

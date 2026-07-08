@@ -13,7 +13,7 @@ require("../lib-trans/c_cuentas.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'CTAEFE';
     require("../lib/valida-acceso.php");
@@ -29,7 +29,7 @@ require("../lib-trans/c_cuentas.php");
         }
     </script>
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $obj_cuenta = new cuentas;
@@ -39,7 +39,7 @@ $arr_inversiones = $obj_inversion->get_inversion_xusuario_pendiente($_SESSION['u
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     date_default_timezone_set("America/Lima");
     $menu = 'cuentas/estado_cuenta.php';
     //------ PARTE SUPERIOR ------
@@ -57,23 +57,23 @@ $arr_inversiones = $obj_inversion->get_inversion_xusuario_pendiente($_SESSION['u
     <div class="frmtransaccion">
         <ul>
             <li style="font-size:14px;font-weight: bold;">Moneda:</li>
-            <li style="font-size:14px;font-weight: bold;"><?echo $arr_saldos['moneda'];?></li>
+            <li style="font-size:14px;font-weight: bold;"><?php echo $arr_saldos['moneda'];?></li>
         </ul>
         <ul>
             <li style="font-size:12px;font-weight: bold;">Saldo Contable:</li>
-            <li style="font-size:12px;"><?echo number_format($arr_saldos['saldo_contable'],2,'.',',');?></li>
+            <li style="font-size:12px;"><?php echo number_format($arr_saldos['saldo_contable'],2,'.',',');?></li>
             <li style="font-size:12px;font-weight: bold;">Saldo Comprometido:</li>
-            <li style="font-size:12px;"><?echo number_format($arr_saldos['saldo_comprometido'],2,'.',',');?></li>
+            <li style="font-size:12px;"><?php echo number_format($arr_saldos['saldo_comprometido'],2,'.',',');?></li>
             <li style="font-size:12px;font-weight: bold;">Saldo Disponible</li>
-            <?
+            <?php
             if ($arr_saldos['saldo_disponible'] < 0) 
                 echo '<li style="font-size:12px;color:#d42639;">'.number_format($arr_saldos['saldo_disponible'],2,'.',',').'</li>';
             else echo '<li style="font-size:12px;">'.number_format($arr_saldos['saldo_disponible'],2,'.',',').'</li>';
             ?>
             <li style="font-size:12px;font-weight: bold;">Saldo Invertido</li>
-            <li style="font-size:12px;"><?echo number_format($arr_saldos['saldo_invertido'],2,'.',',');?></li>
+            <li style="font-size:12px;"><?php echo number_format($arr_saldos['saldo_invertido'],2,'.',',');?></li>
             <li style="font-size:12px;font-weight: bold;">Saldo Transito</li>
-            <li style="font-size:12px;"><?echo number_format($arr_saldos['saldo_transito'],2,'.',',');?></li>
+            <li style="font-size:12px;"><?php echo number_format($arr_saldos['saldo_transito'],2,'.',',');?></li>
         </ul>
         <ul>
             <li style="font-size:12px;font-weight: bold;">Monto:</li>
@@ -96,7 +96,7 @@ $arr_inversiones = $obj_inversion->get_inversion_xusuario_pendiente($_SESSION['u
             <li style="width:100px;">Factura</li>
             <li style="width:300px;">Pagador</li>
         </ul>
-        <?
+        <?php
         for ($i=0; $i<count($arr_inversiones); $i++){
             $fecha = date('d-m-Y',strtotime($arr_inversiones[$i]['f_creacion']));
             //$monto = $arr_inversiones[$i]['monto'] - $arr_inversiones[$i]['monto_comprometido'];

@@ -13,13 +13,13 @@ require("../lib-trans/c_subasta.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'SUBGESTION';
     require("../lib/valida-acceso.php");
 ?>
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $obj_mae = new maestros;
@@ -76,7 +76,7 @@ if ($_POST['accion'] == 'agregar_saldo'){
     <div id="contenedor_carga">
         <div id="carga"></div>
     </div>
-<?
+<?php
     $menu = 'cuentas/cuentas_inversion.php';
     //------ PARTE SUPERIOR ------
     require("../lib/superior.php");
@@ -85,7 +85,7 @@ if ($_POST['accion'] == 'agregar_saldo'){
 ?>
     <!------ CUERPO VARIABLE ------>
     <div style="overflow:hidden;font-size: 12px;margin:30px auto;width:40%;text-align:center;">
-        <?echo '<p>'.$v_mensaje.'</p>';?>
+        <?php echo '<p>'.$v_mensaje.'</p>';?>
         <br><br>
         <p style="width:200px;margin:0px auto;" class="botontransaccion"><a href="<?=$v_regresar?>">Volver</a></p>
     </div>

@@ -13,7 +13,7 @@ require("../lib-trans/c_cuentas.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'INVERSIONES';
     require("../lib/valida-acceso.php");
@@ -29,7 +29,7 @@ require("../lib-trans/c_cuentas.php");
         }
     </script>
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $obj_factura = new factura;
@@ -45,7 +45,7 @@ $v_fvence_en = date('Y-m-d',$v_fvence_t);
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     date_default_timezone_set("America/Lima");
     //------ PARTE SUPERIOR ------
     
@@ -56,53 +56,53 @@ $v_fvence_en = date('Y-m-d',$v_fvence_t);
     <div class="frmtransaccion" style="color:#000000;">
         <ul style="list-style:none;overflow:hidden;">
             <li style="width:50px;display: block;padding:5px;">Pagador:</li>
-            <li class="frm_input_off" style="width:500px;display: block;"><?echo $v_arr_empresa['nombre'];?></li>
+            <li class="frm_input_off" style="width:500px;display: block;"><?php echo $v_arr_empresa['nombre'];?></li>
             <li style="width:50px;display: block;padding:5px;">RNC:</li>
-            <li class="frm_input_off" style="width:100px;display: block;"><?echo $v_arr_empresa['identificacion'];?></li>
+            <li class="frm_input_off" style="width:100px;display: block;"><?php echo $v_arr_empresa['identificacion'];?></li>
         </ul>
         <ul style="list-style:none;overflow:hidden;">
             <li style="width:50px;display: block;padding:5px;">Direcci&oacute;n:</li>
-            <li class="frm_input_off" style="width:500px;display: block;"><?echo $v_arr_empresa['direccion'];?></li>
+            <li class="frm_input_off" style="width:500px;display: block;"><?php echo $v_arr_empresa['direccion'];?></li>
             <li style="width:50px;display: block;padding:5px;">Web:</li>
-            <li class="frm_input_off" style="width:200px;display: block;"><?echo $v_arr_empresa['paginaweb'];?></li>
+            <li class="frm_input_off" style="width:200px;display: block;"><?php echo $v_arr_empresa['paginaweb'];?></li>
         </ul>
         <ul style="list-style:none;overflow:hidden;">
             <li style="width:50px;display: block;padding:5px;">Sector:</li>
-            <li class="frm_input_off" style="width:300px;display: block;"><?echo $v_arr_empresa['sector'];?></li>
+            <li class="frm_input_off" style="width:300px;display: block;"><?php echo $v_arr_empresa['sector'];?></li>
             <li style="width:50px;display: block;padding:5px;">Actividad:</li>
-            <li class="frm_input_off" style="width:400px;display: block;"><?echo $v_arr_empresa['actividad'];?></li>
+            <li class="frm_input_off" style="width:400px;display: block;"><?php echo $v_arr_empresa['actividad'];?></li>
         </ul>
         <ul style="list-style:none;overflow:hidden;">
             <li style="width:80px;display: block;padding:5px;">Representante:</li>
-            <li class="frm_input_off" style="width:300px;display: block;"><?echo $v_arr_empresa['nombre_repre'];?></li>
+            <li class="frm_input_off" style="width:300px;display: block;"><?php echo $v_arr_empresa['nombre_repre'];?></li>
             <li style="width:50px;display: block;padding:5px;">Email:</li>
-            <li class="frm_input_off" style="width:150px;display: block;"><?echo $v_arr_empresa['email_repre'];?></li>
+            <li class="frm_input_off" style="width:150px;display: block;"><?php echo $v_arr_empresa['email_repre'];?></li>
         </ul>
         <ul style="list-style:none;overflow:hidden;">
             <li style="width:80px;display: block;padding:5px;">Contacto:</li>
-            <li class="frm_input_off" style="width:300px;display: block;"><?echo $v_arr_empresa['nombre_contacto'];?></li>
+            <li class="frm_input_off" style="width:300px;display: block;"><?php echo $v_arr_empresa['nombre_contacto'];?></li>
             <li style="width:50px;display: block;padding:5px;">Email:</li>
-            <li class="frm_input_off" style="width:150px;display: block;"><?echo $v_arr_empresa['email_contacto'];?></li>
+            <li class="frm_input_off" style="width:150px;display: block;"><?php echo $v_arr_empresa['email_contacto'];?></li>
             <li style="width:50px;display: block;padding:5px;">Telefono:</li>
-            <li class="frm_input_off" style="width:100px;display: block;"><?echo $v_arr_empresa['telf_contacto'];?></li>
+            <li class="frm_input_off" style="width:100px;display: block;"><?php echo $v_arr_empresa['telf_contacto'];?></li>
         </ul>
         <!-- datos de la factura -->
         <ul style="list-style:none;overflow:hidden;">
             <li style="width:50px;display: block;padding:5px;">Factura:</li>
-            <li class="frm_input_off" style="width:100px;display: block;"><?echo $v_arr_factura['factura'];?></li>
+            <li class="frm_input_off" style="width:100px;display: block;"><?php echo $v_arr_factura['factura'];?></li>
             <li style="width:80px;display: block;padding:5px;">F. Vencimiento:</li>
-            <li class="frm_input_off" style="width:100px;display: block;"><?echo $v_fvence;?></li>
+            <li class="frm_input_off" style="width:100px;display: block;"><?php echo $v_fvence;?></li>
             <li style="width:50px;display: block;padding:5px;">Moneda:</li>
-            <li class="frm_input_off" style="width:100px;display: block;"><?echo $v_arr_factura['moneda'];?></li>
+            <li class="frm_input_off" style="width:100px;display: block;"><?php echo $v_arr_factura['moneda'];?></li>
             <li style="width:50px;display: block;padding:5px;">Monto:</li>
-            <li class="frm_input_off" style="width:100px;display: block;"><?echo number_format($v_arr_factura['total'],2,'.',',');?></li>
+            <li class="frm_input_off" style="width:100px;display: block;"><?php echo number_format($v_arr_factura['total'],2,'.',',');?></li>
         </ul>
         <!-- comunicaciones -->
         <div style="overflow:hidden;background-color:#555555;height:1px;"></div>
         <ul style="list-style:none;overflow:hidden;">
             <li style="width:50px;display: block;padding:5px;font-size: 12px;font-weight: bold;">Mensajes:</li>
         </ul>
-        <?
+        <?php
         if (count($v_arr_comunica) > 0){
             for ($i=0; $i<count($v_arr_comunica); $i++){
                 $v_fcomu_t = strtotime($v_arr_comunica[$i]['fcomunica']);

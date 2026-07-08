@@ -28,6 +28,8 @@ $obj_mail = new mail_util;
 $obj_seg = new seguridad;
 $vobj_cuenta_proc = new cuentas;
 
+date_default_timezone_set($_SESSION['user']['zona_horaria']);
+
 if ($_POST['accion'] == 'liquidar'){
     $financiamientoid = $objsubasta->liquidar_subasta($_POST['subastaid']);
     
@@ -223,6 +225,58 @@ if ($_POST['accion'] == 'liquidar'){
         //==== NOTIFICACION A LA FIDUCIARIA
         if ($varr_parametros['CON FIDEICOMISO']['valornum'] == 1) $obj_mail->enviar_correo_xnotificacion($varr_mail_fiducia);
     }
+
+    //======= ENVIO DE NOTIFICACION AL OBLIGADO AL PAGO
+    if ($varr_parametros['NOTI OP AUTOM']['valornum'] == 1){
+        $v_tipo_noti = 120;
+        $v_valida_correo_cli = $obj_mae->valida_correo_op($_POST['cliente_id']);
+
+        if ($v_valida_correo_cli == 0 || $v_valida_correo_cli == ''){
+            $v_estado_noti = 73;
+        } else {
+            $varr_subasta = $objsubasta->get_subasta($_POST['subastaid']);
+            $v_estado_noti = 72;
+
+            if ($varr_subasta['monedaid'] == 20){
+                $v_cuenta_factu = $varr_parametros['CUENTA NACIONAL']['valorchar'];
+                $varr_tcuenta_factu = $obj_mae->get_tipo_detalle($varr_parametros['CUENTA NACIONAL']['valornum']);
+                $v_tcuenta_factu = $varr_tcuenta_factu['nombre'];
+                $varr_banco_factu = $obj_mae->get_banco_detalle($varr_parametros['BANCO CTA NACIONAL']['valornum']);
+                $v_banco_factu = $varr_banco_factu['nombre'];
+            } else {
+                $v_cuenta_factu = $varr_parametros['CUENTA DOL']['valorchar'];
+                $varr_tcuenta_factu = $obj_mae->get_tipo_detalle($varr_parametros['CUENTA DOL']['valornum']);
+                $v_tcuenta_factu = $varr_tcuenta_factu['nombre'];
+                $varr_banco_factu = $obj_mae->get_banco_detalle($varr_parametros['BANCO CTA DOL']['valornum']);
+                $v_banco_factu = $varr_banco_factu['nombre'];
+            }
+
+            $arr_mail_user = array('mail_salida' => 'operaciones@factureate.com', 'nombre_salida' => 'FACTUREATE',
+                                    'mail_destino' => $v_valida_correo_cli,
+                                    'subject' => 'ENDOSO DE UNA FACTURA DE SU PROVEEDOR '.$_POST['emisor'],
+                                    'body' => 'Sres. '.$_POST['cliente_nombre'].', los saludamos cordialmente para comunicarle que su proveedor '.$_POST['emisor'].', ha endosado la factura Nro
+                                                '.$varr_subasta['facnumero'].' a favor nuestro, somos '.$varr_parametros['RAZON SOCIAL FACTUREATE']['valorchar'].', empresa dedicada a financiar
+                                                PYMEs mediante sus facturas, lo cual representa que al vencimiento de la factura en mencion debe realizar el pago respectivo en nuestra cuenta
+                                                bancaria:<br>
+                                                - Nro Cuenta: '.$v_cuenta_factu.'<br>
+                                                - Tipo Cuenta: '.$v_tcuenta_factu.'<br>
+                                                - Banco: '.$v_banco_factu.'<br>
+                                                - Moneda: '.$varr_subasta['moneda'].'<br><br>
+                                                Cualquier duda o coordinacion la pueden realizar con nuestro '.$varr_parametros['CARGO PARA OP']['valorchar'].'
+                                                '.$varr_parametros['NOMBRE PARA OP']['valorchar'].' al correo '.$varr_parametros['EMAIL PARA OP']['valorchar'].' o al telefono
+                                                '.$varr_parametros['TELF PARA OP']['valorchar'].'<br><br>
+                                                Cordialmente,<br>
+                                                FACTUREATE');
+
+            $obj_mail->enviar_correo($arr_mail_user);
+        }
+    } else {
+        $v_tipo_noti = 122;
+        $v_estado_noti = 73;
+    }
+
+    $obj_mae->registra_noti_endoso($_POST['factura_id'], $v_estado_noti, $v_tipo_noti);
+    //===================================================
 
     $v_mensaje = 'Se registro el contrato firmado por el vendedor';
     $v_regresar = 'subastas_comp.php';

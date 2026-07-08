@@ -16,7 +16,7 @@ require("../lib-trans/c_cuentas.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'INVERSIONES';
     require("../lib/valida-acceso.php");
@@ -57,12 +57,12 @@ if ($varr_inversor['tipo_registro'] == 111){
             <div class="contenedor_formulario_column">
                 <div class="formulario_grupo_row" style="width: 200px;">
                     <label for="nombre">NOMBRE:</label>
-                    <input type="text" name="nombre" id="nombre" class="formulario_control" value="<?=$varr_inversor['inversor_nombre']?>" <?echo $v_readonly;?>>
+                    <input type="text" name="nombre" id="nombre" class="formulario_control" value="<?=$varr_inversor['inversor_nombre']?>" <?php echo $v_readonly;?>>
                 </div>
             
                 <div class="formulario_grupo_row" style="width: 300px;">
                     <label for="apellido">APELLIDO:</label>
-                    <input type="text" name="apellido" id="apellido" class="formulario_control" value="<?=$varr_inversor['inversor_apellido']?>" <?echo $v_readonly;?>>
+                    <input type="text" name="apellido" id="apellido" class="formulario_control" value="<?=$varr_inversor['inversor_apellido']?>" <?php echo $v_readonly;?>>
                 </div>
             </div>
 
@@ -102,19 +102,19 @@ if ($varr_inversor['tipo_registro'] == 111){
 
                 <div class="formulario_grupo_row" style="width: 200px;">
                     <label for="email">EMAIL:</label>
-                    <input type="email" name="email" id="email" class="formulario_control" value="<?=$varr_inversor['inversor_email']?>" <?echo $v_readonly;?>>
+                    <input type="email" name="email" id="email" class="formulario_control" value="<?=$varr_inversor['inversor_email']?>" <?php echo $v_readonly;?>>
                 </div>
             </div>
 
             <div class="contenedor_formulario_column">
                 <div class="formulario_grupo_row" style="width: 100px;">
                     <label for="telefono">TELEFONO:</label>
-                    <input type="text" name="telefono" id="telefono" class="formulario_control" value="<?=$varr_inversor['telefono']?>" <?echo $v_readonly;?>>
+                    <input type="text" name="telefono" id="telefono" class="formulario_control" value="<?=$varr_inversor['telefono']?>" <?php echo $v_readonly;?>>
                 </div>
 
                 <div class="formulario_grupo_row" style="width: 350px;">
                     <label for="direccion">DIRECCION:</label>
-                    <input type="text" name="direccion" id="direccion" class="formulario_control" value="<?=$varr_inversor['direccion']?>" <?echo $v_readonly;?>>
+                    <input type="text" name="direccion" id="direccion" class="formulario_control" value="<?=$varr_inversor['direccion']?>" <?php echo $v_readonly;?>>
                 </div>
             </div>
 
@@ -168,7 +168,7 @@ if ($varr_inversor['tipo_registro'] == 111){
             <div class="contenedor_formulario_column">
                 <div class="formulario_grupo_row" style="width: 600px;">
                     <label for="explicacion_actividad">EXPLICACION ACTIVIDAD:</label>
-                    <textarea name="explicacion_actividad" id="explicacion_actividad" class="formulario_control" rows="2" cols="80"><?echo $varr_inversor['actividad_descripcion'];?></textarea>
+                    <textarea name="explicacion_actividad" id="explicacion_actividad" class="formulario_control" rows="2" cols="80"><?php echo $varr_inversor['actividad_descripcion'];?></textarea>
                 </div>
             </div>
 <?php

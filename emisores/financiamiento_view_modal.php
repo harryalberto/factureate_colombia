@@ -11,7 +11,7 @@ require("../lib-trans/c_subasta.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'FINANCIAMIENTO';
     require("../lib/valida-acceso.php");
@@ -22,7 +22,7 @@ require("../lib-trans/c_subasta.php");
         }
     </script>
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $obj_factura = new factura;
@@ -36,7 +36,7 @@ $fvencimiento = date('d-m-Y',$fvencimiento_t);
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     //------ PARTE SUPERIOR ------
     
     //------ PARTE IZQUIERDA ------
@@ -49,15 +49,15 @@ $fvencimiento = date('d-m-Y',$fvencimiento_t);
             <span class="icon-coin-dollar" style="font-size:30px;color:var(--color-verde);margin-right: 10px;"></span></li>
             <div class="formulario_grupo_row" style="width:100px;">
                 <label>ID OPERACION</label>
-                <label style="color:var(--color-azulv2);font-size: 12px;"><?echo $_GET['factura_id']?></label>
+                <label style="color:var(--color-azulv2);font-size: 12px;"><?php echo $_GET['factura_id']?></label>
             </div>
             <div class="formulario_grupo_row" style="width:200px;">
                 <label>CLIENTE</label>
-                <label style="color:var(--color-azulv2);font-size: 12px;"><?echo $arr_factura['faccliente'];?></label>
+                <label style="color:var(--color-azulv2);font-size: 12px;"><?php echo $arr_factura['faccliente'];?></label>
             </div>
             <div class="formulario_grupo_row" style="width:200px;">
                 <label>ESTADO</label>
-                <label style="color:var(--color-azulv2);font-size: 12px;"><?echo $arr_factura['e_financiamiento'];?></label>
+                <label style="color:var(--color-azulv2);font-size: 12px;"><?php echo $arr_factura['e_financiamiento'];?></label>
             </div>
         </div>
 
@@ -83,7 +83,7 @@ $fvencimiento = date('d-m-Y',$fvencimiento_t);
                 <input type="text" id="f_vencimiento" class="formulario_control" value="<?=$fvencimiento?>" readonly>
             </div>
             <div class="formulario_grupo_row" style="width:100px;">
-                <label for="f_finan"><?echo $label_fecha;?></label>
+                <label for="f_finan"><?php echo $label_fecha;?></label>
                 <input type="text" id="f_finan" class="formulario_control" value="<?=$f_finan?>" readonly>
             </div>
             <div class="formulario_grupo_row" style="width:100px;">

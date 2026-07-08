@@ -13,13 +13,13 @@ require("../lib/mail_util.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'FACTFACTU';
     require("../lib/valida-acceso.php");
 ?>
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $objfactura = new factura;
@@ -62,7 +62,7 @@ if ($redireccion != '') echo $redireccion;
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
 
-<?
+<?php
     date_default_timezone_set("America/Lima");
     
     $menu = 'facturas/facturas.php';

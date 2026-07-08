@@ -12,7 +12,7 @@ require("../lib/mail_util.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'REGFACT';
     require("../lib/valida-acceso.php");
@@ -23,7 +23,7 @@ require("../lib/mail_util.php");
         }
     </script>
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $objfactura = new factura;
@@ -134,7 +134,7 @@ if (isset($_POST['numeroemisor'])){
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     date_default_timezone_set("America/Lima");
     $menu = 'emisores/panel_emisor.php';
     //------ PARTE SUPERIOR ------
@@ -144,7 +144,7 @@ if (isset($_POST['numeroemisor'])){
     echo $redireccion;
 ?>
     <!------ CUERPO VARIABLE ------>
-    <?
+    <?php
     if ($tipoaccion == 'envia' || $tipoaccion == 'grabaenvia'){
         if ($resultado > 0) //todo ok
         echo '<div style="overflow:hidden;text-align:center;font-size: 16px;font-weight: bold;width:50%;padding:30px;list-style:none;">

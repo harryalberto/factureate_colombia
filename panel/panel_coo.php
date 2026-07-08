@@ -12,13 +12,13 @@ require("../lib-trans/c_inversiones.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'PANELCOO';
     require("../lib/valida-acceso.php");
 ?>
 </HEAD>
-<?
+<?php
 /*######################################################
 ##################### LOGICA */
 $vobj_mae = new maestros;
@@ -95,7 +95,7 @@ else $v_qempresas_sinvalidar = '---';
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     $menu = 'panel/panel_coo.php';
     //------ PARTE SUPERIOR ------
     require("../lib/superior.php");
@@ -124,63 +124,63 @@ else $v_qempresas_sinvalidar = '---';
                 <tbody>
                     <tr>
                         <td data-label="AREA">FACTURAS</td>
-                        <td data-label="ALERTA">Pendiente de aprobar con menos de <?echo $varr_max_dias_aprob_factura['valornum'];?> dias</td>
-                        <td data-label="ESTADO"><?echo $v_qfacturas_ensolicitud_alert;?></td>
+                        <td data-label="ALERTA">Pendiente de aprobar con menos de <?php echo $varr_max_dias_aprob_factura['valornum'];?> dias</td>
+                        <td data-label="ESTADO"><?php echo $v_qfacturas_ensolicitud_alert;?></td>
                     </tr>
                     <tr>
                         <td data-label="AREA">FACTURAS</td>
-                        <td data-label="ALERTA">Pendiente de aprobar con mas de <?echo $varr_max_dias_aprob_factura['valornum'];?> dias</td>
-                        <td data-label="ESTADO"><?echo $v_qfacturas_ensolicitud_max_lb;?></td>
+                        <td data-label="ALERTA">Pendiente de aprobar con mas de <?php echo $varr_max_dias_aprob_factura['valornum'];?> dias</td>
+                        <td data-label="ESTADO"><?php echo $v_qfacturas_ensolicitud_max_lb;?></td>
                     </tr>
                     <tr>
                         <td data-label="AREA">SUBASTAS</td>
-                        <td data-label="ALERTA">Activas con menos de <?echo $varr_max_dias_subasta_activa['valornum'];?> dias</td>
-                        <td data-label="ESTADO"><?echo $v_qsubastas_activas_alert;?></td>
+                        <td data-label="ALERTA">Activas con menos de <?php echo $varr_max_dias_subasta_activa['valornum'];?> dias</td>
+                        <td data-label="ESTADO"><?php echo $v_qsubastas_activas_alert;?></td>
                     </tr>
                     <tr>
                         <td data-label="AREA">SUBASTAS</td>
-                        <td data-label="ALERTA">Activas con mas de <?echo $varr_max_dias_subasta_activa['valornum'];?> dias</td>
-                        <td data-label="ESTADO"><?echo $v_qsubastas_activas_max_lb;?></td>
+                        <td data-label="ALERTA">Activas con mas de <?php echo $varr_max_dias_subasta_activa['valornum'];?> dias</td>
+                        <td data-label="ESTADO"><?php echo $v_qsubastas_activas_max_lb;?></td>
                     </tr>
                     <tr>
                         <td data-label="AREA">SUBASTAS</td>
                         <td data-label="ALERTA">Sin propuestas de compra</td>
-                        <td data-label="ESTADO"><?echo $v_qsubastas_sin_propuestas;?></td>
+                        <td data-label="ESTADO"><?php echo $v_qsubastas_sin_propuestas;?></td>
                     </tr>
                     <tr>
                         <td data-label="AREA">SUBASTAS</td>
                         <td data-label="ALERTA">Sin conseguir el minimo a financiar</td>
-                        <td data-label="ESTADO"><?echo $v_qsubastas_sin_minimo;?></td>
+                        <td data-label="ESTADO"><?php echo $v_qsubastas_sin_minimo;?></td>
                     </tr>
                     <tr>
                         <td data-label="AREA">SUBASTAS</td>
-                        <td data-label="ALERTA">Pendientes de liquidar con menos de <?echo $varr_max_dias_subasta_xliquidar['valornum'];?> dias</td>
-                        <td data-label="ESTADO"><?echo $v_qsubastas_xliquidar_alert;?></td>
+                        <td data-label="ALERTA">Pendientes de liquidar con menos de <?php echo $varr_max_dias_subasta_xliquidar['valornum'];?> dias</td>
+                        <td data-label="ESTADO"><?php echo $v_qsubastas_xliquidar_alert;?></td>
                     </tr>
                     <tr>
                         <td data-label="AREA">SUBASTAS</td>
-                        <td data-label="ALERTA">Pendientes de liquidar con mas de <?echo $varr_max_dias_subasta_xliquidar['valornum'];?> dias</td>
-                        <td data-label="ESTADO"><?echo $v_qsubastas_xliquidar_max_lb;?></td>
+                        <td data-label="ALERTA">Pendientes de liquidar con mas de <?php echo $varr_max_dias_subasta_xliquidar['valornum'];?> dias</td>
+                        <td data-label="ESTADO"><?php echo $v_qsubastas_xliquidar_max_lb;?></td>
                     </tr>
                     <tr>
                         <td data-label="AREA">FINANCIAMIENTO</td>
-                        <td data-label="ALERTA">Financiamientos por vencer en maximo <?echo $varr_max_dias_xvencer_finan['valornum'];?> dias</td>
-                        <td data-label="ESTADO"><?echo $v_qfinan_xvencer;?></td>
+                        <td data-label="ALERTA">Financiamientos por vencer en maximo <?php echo $varr_max_dias_xvencer_finan['valornum'];?> dias</td>
+                        <td data-label="ESTADO"><?php echo $v_qfinan_xvencer;?></td>
                     </tr>
                     <tr>
                         <td data-label="AREA">FINANCIAMIENTO</td>
                         <td data-label="ALERTA">Financiamientos vencidos</td>
-                        <td data-label="ESTADO"><?echo $v_qfinan_vencido;?></td>
+                        <td data-label="ESTADO"><?php echo $v_qfinan_vencido;?></td>
                     </tr>
                     <tr>
                         <td data-label="AREA">FINANCIAMIENTO</td>
                         <td data-label="ALERTA">Financiamientos que vencen el dia de hoy</td>
-                        <td data-label="ESTADO"><?echo $v_qfinan_vencehoy;?></td>
+                        <td data-label="ESTADO"><?php echo $v_qfinan_vencehoy;?></td>
                     </tr>
                     <tr>
                         <td data-label="AREA">EMPRESAS</td>
                         <td data-label="ALERTA">Pendientes de validacion operativa</td>
-                        <td data-label="ESTADO"><?echo $v_qempresas_sinvalidar;?></td>
+                        <td data-label="ESTADO"><?php echo $v_qempresas_sinvalidar;?></td>
                     </tr>
                 </tbody>
             </table>
@@ -259,12 +259,12 @@ else $v_qempresas_sinvalidar = '---';
       new Chart(ctx1, {
         type: 'bar',
         data: {
-          labels: [<?echo $v_labels_graph1;?>],
+          labels: [<?php echo $v_labels_graph1;?>],
           datasets: [{
             label: '# facturas',
-            data: [<?echo $v_data_graph1;?>],
-            backgroundColor: [<?echo $v_bg_graph1;?>],
-            borderColor: [<?echo $v_border_graph1;?>],
+            data: [<?php echo $v_data_graph1;?>],
+            backgroundColor: [<?php echo $v_bg_graph1;?>],
+            borderColor: [<?php echo $v_border_graph1;?>],
             borderWidth: 1
           }]
         },
@@ -315,17 +315,17 @@ else $v_qempresas_sinvalidar = '---';
       new Chart(ctx2, {
         type: 'bar',
         data: {
-          labels: [<?echo $v_labels_graph2;?>],
+          labels: [<?php echo $v_labels_graph2;?>],
           datasets: [{
             label: '# facturas',
-            data: [<?echo $v_dataset_graph2;?>],
-            backgroundColor: [<?echo $v_bg_graph2;?>],
+            data: [<?php echo $v_dataset_graph2;?>],
+            backgroundColor: [<?php echo $v_bg_graph2;?>],
             stack: 'Stack 0',
           },
           {
             label: '# subastas',
-            data: [<?echo $v_dataset2_graph2;?>],
-            backgroundColor: [<?echo $v_bg2_graph2;?>],
+            data: [<?php echo $v_dataset2_graph2;?>],
+            backgroundColor: [<?php echo $v_bg2_graph2;?>],
             stack: 'Stack 0',
           },]
         },

@@ -168,6 +168,7 @@ else $v_muestra_estado_legal = '';
     <!--=== INFORMACION -->
 <?php
     $varr_permisos = $vobj_seg->get_permisos($_SESSION['user']['perfilid']);
+    $v_tabla_accionistas = '';
 
     if ($obj_mae->busca_arreglo_bidi($varr_permisos, 'codigo', 'EMP-UPD-OP')) $v_readonly = ''; else $v_readonly = 'readonly';
 

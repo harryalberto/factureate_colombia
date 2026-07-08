@@ -1,4 +1,4 @@
-<?
+<?php
 require("../lib-trans/factura.php");
 
 if(isset($_GET['page'])){

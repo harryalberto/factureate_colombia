@@ -13,7 +13,7 @@ require("../lib-trans/c_cuentas.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head_v2.php");
     $acceso = 'INVERSIONES';
     require("../lib/valida-acceso.php");
@@ -48,7 +48,7 @@ require("../lib-trans/c_cuentas.php");
         }
     </script>
 </HEAD>
-<?
+<?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 date_default_timezone_set("America/Lima");
@@ -64,8 +64,9 @@ $v_arr_parametros = $obj_maestros->get_parametros();
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
-    if ($_GET['ret'] == 'inversiones') $menu = 'inversionistas/facturas_inversion.php';
+<?php
+    //if ($_GET['ret'] == 'inversiones') $menu = 'inversionistas/facturas_inversion.php';
+    $menu = 'inversionistas/facturas_inversion.php';
     //------ PARTE SUPERIOR ------
     require("../lib/superior.php");
     //------ PARTE IZQUIERDA ------
@@ -98,7 +99,7 @@ $v_arr_parametros = $obj_maestros->get_parametros();
                             <td style="border: 1px solid;padding:5px;text-align:center;"><abbr title="Fecha en que realizo su propuesta para comprar el instrumento">F PROPUESTA</abbr></td>
                             <td style="border: 1px solid;padding:5px;text-align:center;"><abbr title="Horas transcurridas desde que se le informo que debe realizar el deposito">HORAS</abbr></td>
                     </tr>
-        <?
+        <?php
         $v_monto_total_pendiente = 0;
 
         for ($i=0; $i<count($v_arr_pendientes); $i++){

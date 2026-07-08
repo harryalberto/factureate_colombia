@@ -9,7 +9,7 @@ require("../lib-trans/maestros.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'GESTEMP';
     require("../lib/valida-acceso.php");
@@ -67,7 +67,7 @@ require("../lib-trans/maestros.php");
         }
     </script>
 </HEAD>
-<?
+<?php
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @@@@@@@@@@@@@@@@@@@@@@@ LOGICA NO VISIBLE */
 
@@ -78,7 +78,7 @@ if ($_GET['tipo'] == 48) $v_tipo_desc = 'OBLIGADO PAGO';
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     $menu = 'empresas/empresas.php';
     //------ PARTE SUPERIOR ------
     require("../lib/superior.php");

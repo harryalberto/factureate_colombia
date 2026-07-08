@@ -11,13 +11,13 @@ require("../lib/mail_util.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'GESTEMP';
     require("../lib/valida-acceso.php");
 ?>
 </HEAD>
-<?
+<?php
 /*#######################################################################
 ------ LOGICA NO VISIBLE 
 #######################################################################*/

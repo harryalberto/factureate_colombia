@@ -3000,5 +3000,84 @@ class maestros{
         if (!$idqry) echo pg_last_error($conn_direccion->Link_ID);
         $conn_direccion->next_record();
     }
+
+    function get_tipo_detalle($p_id){
+        $conn = new db_param_trans; $conn->connect();
+
+        $v_sql = "select nombre, dato1, dato_num from tipos where id = ".$p_id;
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+
+        $varr_result = array('nombre' => $obj->nombre, 'dato1' => $obj->dato1, 'dato_num' => $obj->dato_num);
+
+        return $varr_result;
+    }
+
+    function get_banco_detalle($p_id){
+        $conn = new db_param_trans; $conn->connect();
+
+        $v_sql = "select nombre_banco where id = ".$p_id;
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+
+        $varr_result = array('nombre' => $obj->nombre_banco);
+
+        return $varr_result;
+    }
+
+    function registra_noti_endoso($p_factura_id, $p_estado_id, $p_tipo_id){
+        $conn = new db_param_trans; $conn->connect();
+        $conn2 = new db_param_trans; $conn2->connect();
+
+        $v_sql = "select nextval('s_noti_endoso') as seq";
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+
+        $v_fecha = date('Y-m-d');
+        $v_hora = date('H:i:s');
+        $v_sql = "insert into endoso_notifica(id,factura_id,estado_id,fecha,hora,tipo_id) values (".$obj->seq.",".$p_factura_id.",".$p_estado_id.",'".$v_fecha."','".$v_hora."',".$p_tipo_id.")";
+
+        $idqry = $conn2->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn2->Link_ID);
+        $conn2->next_record();
+
+        return 1;
+    }
+
+    function envia_noti_endoso($p_id, $p_factura_id,  $p_estado_id, $p_tipo_id,$p_path){
+        $conn = new db_param_trans; $conn->connect();
+
+        $v_estado = 0;
+        $v_registro = 0;
+        $v_fecha = date('Y-m-d');
+        $v_hora = date('H:i:s');
+
+        if ($p_estado_id == 73){
+            //==== no enviado
+            $v_estado = 72;
+            $v_registro = 0;
+        } elseif ($p_estado_id == 72 || $p_estado_id == 74){
+            //==== enviado
+            $v_estado = 74;
+            $v_registro = 1;
+        }
+
+        if ($v_estado == 72) $v_sql = "update endoso_notifica set estado_id = 72, fecha = '".$v_fecha."', hora = '".$v_hora."', tipo_id = ".$p_tipo_id.", path_noti = '".$p_path."' where id = ".$p_id;
+        else $v_sql = "update endoso_notifica set estado_id = 0 where id = ".$p_id;
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $conn->next_record();
+
+        if ($v_registro == 1) $this->registra_noti_endoso($p_factura_id, $v_estado, $p_tipo_id);
+
+        return 1;
+    }
 }
 ?>
