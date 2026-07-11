@@ -1,4 +1,5 @@
 <?php
+session_start();
 require("../conn/conn_db.inc");
 require("../conn/conn_db_param.inc");
 require("../conn/conn_db_trans.inc");
@@ -23,21 +24,22 @@ if ($_POST['accion'] == 'envia'){
 	$varr_parametros = $vobj_mae_noti->get_parametros();
 
 	//=== envio mail al OP
-	$v_mail_op = $vobj_mae_noti->valida_correo_op($varr_factura['clienteid']);
+	//$v_mail_op = $vobj_mae_noti->valida_correo_op($varr_factura['clienteid']);
+    $v_mail_op = $_POST['email'];
 
 	if ($v_mail_op == '' || $v_mail_op == 0) $output = -1;
 	else {
 		if ($varr_factura['monedaid'] == 20){
             $v_cuenta_factu = $varr_parametros['CUENTA NACIONAL']['valorchar'];
-            $varr_tcuenta_factu = $obj_mae->get_tipo_detalle($varr_parametros['CUENTA NACIONAL']['valornum']);
+            $varr_tcuenta_factu = $vobj_mae_noti->get_tipo_detalle($varr_parametros['CUENTA NACIONAL']['valornum']);
             $v_tcuenta_factu = $varr_tcuenta_factu['nombre'];
-            $varr_banco_factu = $obj_mae->get_banco_detalle($varr_parametros['BANCO CTA NACIONAL']['valornum']);
+            $varr_banco_factu = $vobj_mae_noti->get_banco_detalle($varr_parametros['BANCO CTA NACIONAL']['valornum']);
             $v_banco_factu = $varr_banco_factu['nombre'];
         } else {
             $v_cuenta_factu = $varr_parametros['CUENTA DOL']['valorchar'];
-            $varr_tcuenta_factu = $obj_mae->get_tipo_detalle($varr_parametros['CUENTA DOL']['valornum']);
+            $varr_tcuenta_factu = $vobj_mae_noti->get_tipo_detalle($varr_parametros['CUENTA DOL']['valornum']);
             $v_tcuenta_factu = $varr_tcuenta_factu['nombre'];
-            $varr_banco_factu = $obj_mae->get_banco_detalle($varr_parametros['BANCO CTA DOL']['valornum']);
+            $varr_banco_factu = $vobj_mae_noti->get_banco_detalle($varr_parametros['BANCO CTA DOL']['valornum']);
             $v_banco_factu = $varr_banco_factu['nombre'];
         }
 
@@ -64,5 +66,5 @@ if ($_POST['accion'] == 'envia'){
 	}
 }
 
-echo json_encode($output, JSON_UNESCAPED_UNICODE);
+echo $output;
 ?>

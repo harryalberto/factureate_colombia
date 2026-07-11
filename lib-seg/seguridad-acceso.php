@@ -573,5 +573,12 @@ class seguridad{
 
         return $v_pagina_acceso;
     }
+
+    function next_usuario(){
+        $conn = new db_param; $conn->connect();
+        $idqry = $conn->query("select nextval('s_usuario') as usuarioid");
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $conn->next_record();
+    }
 }
 ?>

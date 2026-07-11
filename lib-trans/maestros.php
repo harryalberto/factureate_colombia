@@ -3018,7 +3018,7 @@ class maestros{
     function get_banco_detalle($p_id){
         $conn = new db_param_trans; $conn->connect();
 
-        $v_sql = "select nombre_banco where id = ".$p_id;
+        $v_sql = "select nombre_banco from bancos where id = ".$p_id;
 
         $idqry = $conn->query($v_sql);
         if (!$idqry) echo pg_last_error($conn->Link_ID);
@@ -3078,6 +3078,19 @@ class maestros{
         if ($v_registro == 1) $this->registra_noti_endoso($p_factura_id, $v_estado, $p_tipo_id);
 
         return 1;
+    }
+
+    function registra_noti_fisica($p_factura_id, $noti_path){
+        $conn = new db_param_trans; $conn->connect();
+
+        $v_fecha = date('Y-m-d');
+        $v_hora = date('H:i:s');
+
+        $v_sql = "update endoso_notifica set estado_id = 72, fecha = '".$v_fecha."', hora = '".$v_hora."', tipo_id = 122, path_noti = '".$noti_path."'
+                where factura_id = ".$p_factura_id." and estado_id > 0";
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $conn->next_record();
     }
 }
 ?>

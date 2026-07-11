@@ -266,6 +266,7 @@ class mail_util{
         $conn_noti->connect();
         $conn_noti_base->connect();
         $conn_delete->connect();
+        $v_borrar = 0;
         // notificaciones generadas
         $id_noti = $conn_noti->query("select id, usuarioid, contenido from genera_notificacion where notificacionid = ".$p_notificacion_id);
         if (!$id_noti) echo pg_last_error($conn_noti->Link_ID);

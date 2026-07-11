@@ -15,6 +15,7 @@ require("../lib/mail_util.php");
 $objfactura = new factura;
 $emp = new maestros;
 $obj_mail = new mail_util;
+$vobj_seg_proc = new seguridad;
 
 date_default_timezone_set($_SESSION['user']['zona_horaria']);
 
@@ -108,6 +109,7 @@ if (isset($_POST['numeroemisor'])){
                                         'cliente_direccion' => $_POST['cliente_direccion'], 'cliente_contacto' => $_POST['cliente_contacto']);
 
         $arrfactura['clienteid'] = $emp->registro_express_cliente_arr($varr_cliente_express);
+        $vobj_seg_proc->next_usuario();
         // llamada a la grabacion de la factura
         $arrfactura['accion'] = 'insert';
         
@@ -118,11 +120,13 @@ if (isset($_POST['numeroemisor'])){
     } else{
         if ($tipoaccion == 'grabaenvia'){
             $arrfactura['clienteid'] = $emp->registro_express_cliente($arrfactura['numerocliente'],$arrfactura['cliente']);
+            $vobj_seg_proc->next_usuario();
             $arrfactura['accion'] = 'insert';
             $facturaid = $objfactura->graba_factura($arrfactura);
         } else {
             //if ($_POST['numeroclienteold'] != $arrfactura['numerocliente']) 
             $arrfactura['clienteid'] = $emp->registro_express_cliente($arrfactura['numerocliente'],$arrfactura['cliente']);
+            $vobj_seg_proc->next_usuario();
             //else $arrfactura['clienteid'] = $_POST['clienteid'];
 
             $arrfactura['accion'] = 'update';
@@ -148,7 +152,10 @@ if (isset($_POST['numeroemisor'])){
         $v_valida = 1;
 
         // VERIFICA INFORMACION
-        if ($varr_factura['tipofinanciamiento'] == 0 || $varr_factura['facturapath'] == '') $v_valida = -2;
+        if ($varr_factura['xmlpath'] != '' || $varr_factura['facturapath'] != '') $v_archivos_disponible = 'ok';
+        else $v_archivos_disponible = '';
+
+        if ($varr_factura['tipofinanciamiento'] == 0 || $v_archivos_disponible == '') $v_valida = -2;
         
         if ($v_valida == 1){
             $resultado = $objfactura->envia_factura($_POST['factura_id']);

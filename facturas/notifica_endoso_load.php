@@ -1,4 +1,5 @@
 <?php
+session_start();
 require("../conn/conn_db.inc");
 require("../conn/conn_db_param.inc");
 require("../conn/conn_db_trans.inc");
@@ -38,17 +39,19 @@ $output['paginacion'] = '';
 $varr_param_load = $vobj_mae_load->get_parametros();
 
 for ($i = 0; $i < count($varr_notifica); $i++){
-	if ($varr_notifica[$i]['estado_id'] == 73) $v_fnotifica ='';
-	else $v_fnotifica = date('d-m-Y', strtotime($varr_notifica[$i]['fecha']));
+	$v_fnotifica = date('d-m-Y', strtotime($varr_notifica[$i]['fecha']));
 
-	$v_ffinan = date('d-m-Y', strtotime($varr_notifica[$i]['fecha_finan']));
-
-	if ($varr_param_load['NOTI OP AUTOM']['valornum'] == 1)
-		$v_boton_accion = '<button type="button" class="btn btn-primary" style="font-size:11px;background-color:var(--color-azulv2);border:none;" onclick="enviar_notifica('.$varr_notifica[$i]['factura_id'].')">
+	if ($varr_param_load['NOTI OP AUTOM']['valornum'] == 1){
+        $v_email_op = "'".$varr_notifica[$i]['email_op']."'";
+		$v_boton_accion = '<button type="button" class="btn btn-primary" style="font-size:11px;background-color:var(--color-azulv2);border:none;" onclick="enviar_notifica('.$varr_notifica[$i]['factura_id'].','.$v_email_op.')" title="Envia notificacion">
 						<i class="fa-solid fa-envelopes-bulk"></i></button>';
-	else
-		$v_boton_accion = '<button type="button" class="btn btn-primary" style="font-size:11px;background-color:var(--color-azulv2);border:none;" onclick="registra_notifica('.$varr_notifica[$i]['factura_id'].')">
+    } else{
+		$v_boton_accion = '<button type="button" class="btn btn-primary" style="font-size:11px;background-color:var(--color-azulv2);border:none;" onclick="registra_notifica('.$varr_notifica[$i]['factura_id'].')" title="Registrar notificacion">
 						<i class="fa-solid fa-pen-to-square"></i></button>';
+
+        // cuando la noti fisica ya fue enviada muestra el link
+        if ($varr_notifica[$i]['estado_id'] == 72) $v_boton_accion .= '<a href="'.$varr_notifica[$i]['path_noti'].'" target="_blank" style="margin-left:5px;"><i class="fa-solid fa-link"></i></a>';
+    }
 
 	if ($varr_notifica[$i]['noti_old'] > 0)
 		$v_boton_old = '<button type="button" class="btn btn-primary" style="font-size:11px;background-color:var(--color-azulv2);border:none;" onclick="verNotiOld('.$varr_notifica[$i]['factura_id'].')">'.$varr_notifica[$i]['noti_old'].'</button>';
@@ -59,7 +62,6 @@ for ($i = 0; $i < count($varr_notifica); $i++){
                             <td data-label="OBLIGADO AL PAGO">'.$varr_notifica[$i]['op_nombre'].'</td>
                             <td data-label="FECHA">'.$v_fnotifica.'</td>
                             <td data-label="HORA">'.$varr_notifica[$i]['hora'].'</td>
-                            <td data-label="F FINANCIA">'.$v_ffinan.'</td>
                             <td data-label="ESTADO">'.$varr_notifica[$i]['estado_nom'].'</td>
                             <td data-label="TIPO">'.$varr_notifica[$i]['tipo_nom'].'</td>
                             <td data-label="EMAIL OP">'.$varr_notifica[$i]['email_op'].'</td>

@@ -1099,11 +1099,11 @@ class factura{
         } else {
             $v_sql = "select    endoso_notifica.id, endoso_notifica.factura_id, endoso_notifica.estado_id, estados.nombre as estado_nom,
                                 endoso_notifica.fecha, endoso_notifica.hora, endoso_notifica.tipo_id, tipos.nombre as tipo_nom,
-                                empresa.nombre as op_nombre, financiamiento.fregistro, empresa.emailcontacto,
+                                empresa.nombre as op_nombre, empresa.emailcontacto, endoso_notifica.path_noti,
                                 GET_NOTI_ENDOSOS(endoso_notifica.factura_id) as noti_old
-                        from    endoso_notifica, estados, tipos, factura, empresa, financiamiento
+                        from    endoso_notifica, estados, tipos, factura, empresa
                         where   estados.id = endoso_notifica.estado_id and tipos.id = endoso_notifica.tipo_id and factura.id = endoso_notifica.factura_id and
-                                empresa.id = factura.clienteid and financiamiento.facturaid = endoso_notifica.factura_id";
+                                empresa.id = factura.clienteid";
 
             if ($p_filtros != '') $v_sql .= " and ".$p_filtros;
             if ($p_order != '') $v_sql .= " order by ".$p_order;
@@ -1119,7 +1119,7 @@ class factura{
                 $v_result[$i] = array(  'notifica_id' => $obj->id,          'factura_id' => $obj->factura_id,   'estado_id' => $obj->estado_id,
                                         'estado_nom' => $obj->estado_nom,   'fecha' => $obj->fecha,             'hora' => $obj->hora,
                                         'tipo_id' => $obj->tipo_id,         'tipo_nom' => $obj->tipo_nom,       'op_nombre' => $obj->op_nombre,
-                                        'fecha_finan' => $obj->fregistro,   'email_op' => $obj->emailcontacto,  'noti_old' => $obj->noti_old);
+                                        'email_op' => $obj->emailcontacto,  'noti_old' => $obj->noti_old,       'path_noti' => $obj->path_noti);
 
                 $obj = $conn->next_record();
             }

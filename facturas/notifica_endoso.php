@@ -93,7 +93,7 @@ $rowcount = $vobj_factura->get_noti_endosos('COUNT', 0, 0, $filtros,'');
                     <tr>
                         <th scope="col" class="sort asc">OPERACION ID</th>          <th scope="col" class="sort asc">OBLIGADO AL PAGO</th>
                         <th scope="col" class="sort asc">FECHA</th>                 <th scope="col" class="sort asc">HORA</th>
-                        <th scope="col" class="sort asc">F FINANCIA</th>            <th scope="col" class="sort asc">ESTADO</th>
+                        <th scope="col" class="sort asc">ESTADO</th>
                         <th scope="col" class="sort asc">TIPO</th>                  <th scope="col" class="sort asc">EMAIL OP</th>
                         <th scope="col" class="sort asc">ACCION</th>                <th scope="col" class="sort asc">OTRAS</th>
                     </tr>
@@ -126,12 +126,12 @@ $rowcount = $vobj_factura->get_noti_endosos('COUNT', 0, 0, $filtros,'');
     ============== ZONA MODAL
     ========================================== -->
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg modal-dialog-centered">                   <!---- se agrega "modal-lg modal-dialog-centered" si se quiere mas grande --->
+        <div class="modal-dialog modal-dialog-centered">                   <!---- se agrega "modal-lg modal-dialog-centered" si se quiere mas grande --->
         <!-- Modal contenido -->
             <div class="modal-content">
                 <div class="modal-header">
                     <ul style="list-style:none;overflow:hidden;">
-                        <li style="display:block;width:600px;float:left;"><h5 id="exampleModalLabel" style="color:var(--color-azulv2);font-weight: bold;font-size:20px;">Detalle</h5></li>
+                        <li style="display:block;width:200px;float:left;"><h5 class="modal-title fs-5" id="exampleModalLabel" style="color:#064677;font-weight: bold;">Detalle de la Subasta</h5></li>
                         <li style="display:block;width:50px;float:right;"><button type="button" class="btn btn-default" data-dismiss="modal">X</button></li>
                     </ul>
                 </div>
@@ -219,30 +219,40 @@ $rowcount = $vobj_factura->get_noti_endosos('COUNT', 0, 0, $filtros,'');
             document.frm.submit();
         }
 
-        function enviar_notifica(p_factura_id){
+        function enviar_notifica(p_factura_id, p_email){
             let formData = new FormData()
 
             formData.append('factura_id', p_factura_id)
             formData.append('accion', 'envia')
+            formData.append('email', p_email)
 
-            fetch("notifica_endoso_envia.php", {
-                method: "POST",
-                body: formData
+            $.ajax({
+                    url:"notifica_endoso_envia.php",
+                    type:'post',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    dataType: "html"
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data == -1) alert('El OP no cuenta con mail registrado');
-                if (data == 1) alert('La notificacion fue enviada');
-            })
-            .catch(err => console.log(err))
+            .done(function(rpta){
+                    if (rpta == -1) alert('El OP no cuenta con mail registrado');
+                    if (rpta == 1) alert('La notificacion fue enviada');
+            });
         }
 
         function registra_notifica(p_factura_id){
-            alert('registro');
+            $('.modal-title').text('REGISTRO NOTIFICACION');
+            $('.modal-body').load('registra_notifica_modal.php?fid='+p_factura_id,function(){
+                $('#myModal').modal({show:true});
+            });
         }
 
         function verNotiOld(p_factura_id){
             alert('old');
+        }
+
+        function refresh_page(){
+            location.href = 'notifica_endoso.php';
         }
     </script>
 </BODY>

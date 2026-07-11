@@ -356,8 +356,7 @@ $varr_factura = $obj_factura->get_datos_factura($arrsubasta['facturaid']);
         if ($obj_mae->busca_arreglo_bidi($varr_permisos, 'codigo', 'COMP-LEG')){
             if ($arrsubasta['estado_compensa_id'] == 43)    // CONTRATO ENVIADO AL EMISOR
             echo '
-                <li> <button type="button" class="btn btn-primary" style="font-size:11px;background-color:var(--color-azulv2);border:none;" onclick="
-                ()" id="btn_recibir_contrato">
+                <li> <button type="button" class="btn btn-primary" style="font-size:11px;background-color:var(--color-azulv2);border:none;" onclick="recibirContrato()" id="btn_recibir_contrato">
                 <i class="fa-solid fa-file-invoice"></i> Recibir Contrato Emisor</button></li>';
         }
         

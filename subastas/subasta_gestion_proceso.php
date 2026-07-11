@@ -128,6 +128,7 @@ if ($_POST['accion'] == 'liquidar'){
 } elseif ($_POST['accion'] == 'reenvio_contrato'){
     $varr_subasta = $objsubasta->get_subasta($_POST['subastaid']);
     $v_mensaje = 'Se re-envio el link para la firma del contrato del emisor';
+    $v_regresar = 'subastas_comp.php';
 
     $arr_mail_user = array('mail_salida' => 'operaciones@factureate.com', 'nombre_salida' => 'FACTUREATE',
                                         'mail_destino' => $_POST['emisor_correo'],
@@ -151,9 +152,10 @@ if ($_POST['accion'] == 'liquidar'){
 } elseif($_POST['accion'] == 'contrato'){           
     //==== RECEPCION DEL CONTRATO FIRMADO POR EL EMISOR
     $archivo = $_SERVER['DOCUMENT_ROOT'].'/archivos_operaciones/OP_'.$_POST['factura_id'];
+
     if (!file_exists($archivo)) mkdir($archivo,0700);
-    
-    if (isset($_FILES['contrato']) && $_FILES['contrato']['name'] != ''){ 
+
+    if (isset($_FILES['contrato']) && $_FILES['contrato']['name'] != ''){
         //coloco el archivo en el servidor
         $contrato_path = $archivo.'/contrato_cesion-'.$_FILES['contrato']['name'];
         $contrato_path_db = '../archivos_operaciones/OP_'.$_POST['factura_id'].'/contrato_cesion-'.$_FILES['contrato']['name'];
@@ -183,7 +185,7 @@ if ($_POST['accion'] == 'liquidar'){
 
     if ($varr_parametros['REQUERIMIENTO DE ENDOSO']['valornum'] == 1){
         //== guardo el archivo de endoso
-        if (isset($_FILES['endoso']) && $_FILES['endoso']['name'] != ''){ 
+        if (isset($_FILES['endoso']) && $_FILES['endoso']['name'] != ''){
             //coloco el archivo en el servidor
             $endoso_path = $archivo.'/endoso-'.$_FILES['endoso']['name'];
             $endoso_path_db = '../archivos_operaciones/OP_'.$_POST['factura_id'].'/endoso-'.$_FILES['endoso']['name'];
