@@ -15,7 +15,7 @@ require("../lib-trans/maestros.php");
     require("../lib/valida-acceso.php");
 ?>
 </HEAD>
-<?
+<?php
 
 //------ LOGICA NO VISIBLE ------
 $vobj_modal_mae = new maestros;
@@ -103,6 +103,16 @@ $varr_inversor = $vobj_modal_mae->get_datos_inversor($_GET['inversor_id']);
         </div>  <!--==== END contenedor formulario principal ====-->
     </form>
 </div>  <!--==== END contenedor principal ====-->
+
+<!-- div para el spinner de loadgin -->
+<div id="loadingModal" class="loading-overlay">
+    <div class="loading-box">
+        <div class="spinner"></div>
+        <div class="loading-title">Procesando </div>
+        <div class="loading-subtitle">............................</div>
+    </div>
+</div>
+<!-- fin del spinner loading -->
       
 <!--################ ZONA JS ####################-->
 <script>
@@ -163,6 +173,9 @@ $varr_inversor = $vobj_modal_mae->get_datos_inversor($_GET['inversor_id']);
             var file_certificado = inputFile_certificado.files[0];
             formaData.append('file_certificado', file_certificado)
 
+            //==== llamada al spinner
+            mostrarLoading();
+
             $.ajax({
                 url: "registro_inversor_proceso.php",
                 type: "POST",
@@ -172,6 +185,8 @@ $varr_inversor = $vobj_modal_mae->get_datos_inversor($_GET['inversor_id']);
                 processData: false,
                 success: function(data)
                 {   
+                    //==== ocultar el spinner
+                    ocultarLoading();
                     if (data > 0){
                         cambia_modal_registro('datos_cuenta',inversor_id,empresa_id);
                     } else {
@@ -180,6 +195,16 @@ $varr_inversor = $vobj_modal_mae->get_datos_inversor($_GET['inversor_id']);
                 }
             });
         }
+    }
+
+    //==== FUNCIONES DEL SPINNER LOADING
+
+    function mostrarLoading() {
+        document.getElementById("loadingModal").style.display = "flex";
+    }
+
+    function ocultarLoading() {
+        document.getElementById("loadingModal").style.display = "none";
     }
     
 </script>

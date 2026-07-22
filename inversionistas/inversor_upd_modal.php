@@ -1,7 +1,7 @@
 <?php
-error_reporting(E_ALL);
+/*error_reporting(E_ALL);
 ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
+ini_set('display_startup_errors', 1);*/
 session_start();
 require("../conn/conn_db.inc");
 require("../conn/conn_db_param.inc");
@@ -54,19 +54,19 @@ if ($varr_inversor['tipo_registro'] == 111){
         
     <div id="principal" style="padding-left: 10px; overflow: hidden;">
         <div class="contenedor_formulario" style="width: 100%; overflow: hidden;">
+
+            <!--==== linea 1-->
             <div class="contenedor_formulario_column">
                 <div class="formulario_grupo_row" style="width: 200px;">
                     <label for="nombre">NOMBRE:</label>
                     <input type="text" name="nombre" id="nombre" class="formulario_control" value="<?=$varr_inversor['inversor_nombre']?>" <?php echo $v_readonly;?>>
                 </div>
-            
+
                 <div class="formulario_grupo_row" style="width: 300px;">
                     <label for="apellido">APELLIDO:</label>
                     <input type="text" name="apellido" id="apellido" class="formulario_control" value="<?=$varr_inversor['inversor_apellido']?>" <?php echo $v_readonly;?>>
                 </div>
-            </div>
 
-            <div class="contenedor_formulario_column">
                 <div class="formulario_grupo_row" style="width: 100px;">
                     <label for="tipodoc_id">TIPO DOC:</label>
                     <select name="tipodoc_id" id="tipodoc_id" class="formulario_control" disabled>
@@ -99,14 +99,15 @@ if ($varr_inversor['tipo_registro'] == 111){
 ?>
                 </div>
                 <input type="hidden" name="documento_old" id="documento_old" value="<?=$varr_inversor['documento']?>">
+            </div>
 
+            <!--==== linea 2 -->
+            <div class="contenedor_formulario_column">
                 <div class="formulario_grupo_row" style="width: 200px;">
                     <label for="email">EMAIL:</label>
                     <input type="email" name="email" id="email" class="formulario_control" value="<?=$varr_inversor['inversor_email']?>" <?php echo $v_readonly;?>>
                 </div>
-            </div>
 
-            <div class="contenedor_formulario_column">
                 <div class="formulario_grupo_row" style="width: 100px;">
                     <label for="telefono">TELEFONO:</label>
                     <input type="text" name="telefono" id="telefono" class="formulario_control" value="<?=$varr_inversor['telefono']?>" <?php echo $v_readonly;?>>
@@ -118,7 +119,13 @@ if ($varr_inversor['tipo_registro'] == 111){
                 </div>
             </div>
 
+            <!--==== linea 3 -->
             <div class="contenedor_formulario_column">
+                <div class="formulario_grupo_row" style="width: 200px;">
+                    <label for="condicion_laboral">CONDICION LABORAL:</label>
+                    <input type="text" name="condicion_laboral" id="condicion_laboral" class="formulario_control" value="<?=$varr_inversor['ocupacion_nombre']?>" readonly>
+                </div>
+
                 <div class="formulario_grupo_row" style="width: 150px;">
                     <label for="tipo_persona_nombre">TIPO PERSONA:</label>
                     <input type="text" name="tipo_persona_nombre" id="tipo_persona_nombre" class="formulario_control" value="<?=$v_tipo_inv?>" readonly>
@@ -144,6 +151,8 @@ if ($varr_inversor['tipo_registro'] == 111){
 
     if ($vobj_mae->busca_arreglo_bidi($varr_permisos, 'codigo', 'LEG-INV')){
 ?>
+
+            <!-- ==== linea 4 -->
             <div class="contenedor_formulario_column">
                 <div class="formulario_grupo_row" style="width: 50px;">
                     <label for="pep">PEP:</label>
@@ -151,14 +160,8 @@ if ($varr_inversor['tipo_registro'] == 111){
                 </div>
 
                 <div class="formulario_grupo_row" style="width: 400px;" id="content_pep">
-                    
-                </div>
-            </div>
-
-            <div class="contenedor_formulario_column">
-                <div class="formulario_grupo_row" style="width: 200px;">
-                    <label for="condicion_laboral">CONDICION LABORAL:</label>
-                    <input type="text" name="condicion_laboral" id="condicion_laboral" class="formulario_control" value="<?=$varr_inversor['ocupacion_nombre']?>" readonly>
+                    <label for="pep_motivo">DESCRIPCION:</label>
+                    <textarea name="pep_motivo" id="pep_motivo" class="formulario_control" rows="2" cols="80" disabled></textarea>
                 </div>
             </div>
 
@@ -185,9 +188,9 @@ if ($varr_inversor['tipo_registro'] == 111){
         if ($varr_fideicomiso['valornum'] == 0){
             //==== NO HAY FIDEICOMISO
 ?>
-            <div style="overflow:hidden;background-color:#555555;height:1px;width:100%; float:left;margin-top:10px;"></div>
-            
-            <div style="width:100%; float:left;margin-bottom:5px;"><label>APROBACION</label></div>
+            <div style="width:100%; float:left;margin-bottom:15px; margin-top: 20px;">
+                <label style="width: 150px; padding: 5px; font-size: 14px; font-weight: bold; background: var(--color-verde); color: #fff;">APROBACION</label>
+            </div>
 
             <div class="contenedor_formulario_column">
                 <div class="formulario_grupo_column" style="width: 500px;">
@@ -551,12 +554,13 @@ if ($varr_inversor['tipo_registro'] == 111){
         function cambiapep(obj){
             let content_pep = document.getElementById("content_pep")
             var form = document.forms.namedItem("frm_modal");
+            var pep_motivo = document.getElementById("pep_motivo");
 
-            if (obj.value){
-                content_pep.innerHTML = '<label for="pep_motivo">DESCRIPCION:</label><textarea name="pep_motivo" id="pep_motivo" class="formulario_control" rows="2" cols="80"></textarea>';
+            if (obj.checked){
+                pep_motivo.disabled = false;
                 form.pep_motivo.focus();
             } else {
-                content_pep.innerHTML = "";
+                pep_motivo.disabled = true;
             }
         }
 

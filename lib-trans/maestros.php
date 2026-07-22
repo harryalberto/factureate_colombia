@@ -2479,6 +2479,7 @@ class maestros{
         //$varr_fideicomiso = $this->get_parametro_detalle(60);
 
         if ($p_parametro == 0){
+            //======== no hay FIDEICOMISO
             $idqry = $conn->query("update inversionista 
                                 set estado = 58, informe_plaft = '".$p_plaft."', f_plaft = '".$v_fhoy."', h_plaft = '".$v_hhoy."', contrato_enviado = 1
                                 where inversor_id = ".$p_inversor_id);
@@ -3088,6 +3089,184 @@ class maestros{
 
         $v_sql = "update endoso_notifica set estado_id = 72, fecha = '".$v_fecha."', hora = '".$v_hora."', tipo_id = 122, path_noti = '".$noti_path."'
                 where factura_id = ".$p_factura_id." and estado_id > 0";
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $conn->next_record();
+    }
+
+    function get_permisos(){
+        $conn = new db_param; $conn->connect();
+
+        $v_sql = "select id, nombre, codigo from permisos where estado > 0";
+        $varr_result = array();
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+
+        for($i = 0; $i < $conn->nrows(); $i ++){
+            $varr_result[$i] = array('id' => $obj->id, 'nombre' => $obj->nombre, 'codigo' => $obj->codigo);
+            $obj = $conn->next_record();
+        }
+
+        return $varr_result;
+    }
+
+    function get_perfiles_factureate(){
+        $conn = new db_param; $conn->connect();
+
+        $v_sql = "select id, nombre from perfil_usuario where tipo in (7,8,9,13,14,15,16) and estado > 0";
+        $varr_result = array();
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+
+        for($i = 0; $i < $conn->nrows(); $i ++){
+            $varr_result[$i] = array('id' => $obj->id, 'nombre' => $obj->nombre);
+            $obj = $conn->next_record();
+        }
+
+        return $varr_result;
+    }
+
+    function get_perfil_xpermiso($p_permiso_id){
+        $conn = new db_param; $conn->connect();
+
+        $v_sql = "select perfilid, permisoid from perfil_permiso where menuid = 0 and accesoid = 0 and permisoid = ".$p_permiso_id;
+        $varr_result = array();
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+
+        for($i = 0; $i < $conn->nrows(); $i ++){
+            $varr_result[$i] = array('perfil_id' => $obj->perfilid, 'permiso_id' => $obj->permisoid);
+            $obj = $conn->next_record();
+        }
+
+        return $varr_result;
+    }
+
+    function get_permiso_xperfil($p_perfil_id){
+        $conn = new db_param; $conn->connect();
+
+        $v_sql = "select perfilid, permisoid from perfil_permiso where menuid = 0 and accesoid = 0 and perfilid = ".$p_perfil_id;
+        $varr_result = array();
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+
+        for($i = 0; $i < $conn->nrows(); $i ++){
+            $varr_result[$i] = array('perfil_id' => $obj->perfilid, 'permiso_id' => $obj->permisoid);
+            $obj = $conn->next_record();
+        }
+
+        return $varr_result;
+    }
+
+    function insert_permiso_perfil($p_permiso_id, $p_perfil_id){
+        $conn = new db_param; $conn->connect();
+
+        $v_sql = "insert into perfil_permiso(perfilid,menuid,accesoid,permisoid) values (".$p_perfil_id.",0,0,".$p_permiso_id.")";
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $conn->next_record();
+    }
+
+    function delete_permiso_perfil($p_permiso_id, $p_perfil_id){
+        $conn = new db_param; $conn->connect();
+
+        $v_sql = "delete from perfil_permiso where perfilid = ".$p_perfil_id." and permisoid = ".$p_permiso_id;
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $conn->next_record();
+    }
+
+    function procesa_permiso_perfil($p_permiso_id, $parr_insert, $parr_delete){
+        for ($i = 0; $i < count($parr_insert); $i++){
+            $this->insert_permiso_perfil($p_permiso_id, $parr_insert[$i]);
+        }
+
+        for ($j = 0; $j < count($parr_delete); $j++){
+            $this->delete_permiso_perfil($p_permiso_id, $parr_delete[$j]);
+        }
+    }
+
+    function procesa_perfil_permiso($p_perfil_id, $parr_insert, $parr_delete){
+        for ($i = 0; $i < count($parr_insert); $i++){
+            $this->insert_permiso_perfil($parr_insert[$i], $p_perfil_id);
+        }
+
+        for ($j = 0; $j < count($parr_delete); $j++){
+            $this->delete_permiso_perfil($parr_delete[$j], $p_perfil_id);
+        }
+    }
+
+    function get_notificaciones(){
+        $conn = new db_param; $conn->connect();
+        $varr_result = array();
+
+        $v_sql = "select id, nombre, descripcion, subject, body from notificaciones where estado > 0";
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+
+        for($i = 0; $i < $conn->nrows(); $i ++){
+            $varr_result[$i] = array('id' => $obj->id, 'nombre' => $obj->nombre, 'descripcion' => $obj->descripcion, 'subject' => $obj->subject, 'body' => $obj->body);
+            $obj = $conn->next_record();
+        }
+
+        return $varr_result;
+    }
+
+    function get_noti_xperfil($p_noti_id){
+        $conn = new db_param; $conn->connect();
+        $varr_result = array();
+
+        $v_sql = "  select perfilid from notificacion_perfil where estado > 0 and notificacionid = ".$p_noti_id;
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+
+        for($i = 0; $i < $conn->nrows(); $i ++){
+            $varr_result[$i] = array('id' => $obj->perfilid);
+            $obj = $conn->next_record();
+        }
+
+        return $varr_result;
+    }
+
+    function procesa_noti_perfil($p_noti_id, $parr_insert, $parr_delete){
+        for ($i = 0; $i < count($parr_insert); $i++){
+            $this->insert_noti_perfil($p_noti_id, $parr_insert[$i]);
+        }
+
+        for ($j = 0; $j < count($parr_delete); $j++){
+            $this->delete_noti_perfil($p_noti_id, $parr_delete[$j]);
+        }
+    }
+
+    function insert_noti_perfil($p_noti_id, $p_perfil_id){
+        $conn = new db_param; $conn->connect();
+
+        $v_sql = "insert into notificacion_perfil(perfilid,notificacionid, estado) values (".$p_perfil_id.",".$p_noti_id.", 1)";
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $conn->next_record();
+    }
+
+    function delete_noti_perfil($p_noti_id, $p_perfil_id){
+        $conn = new db_param; $conn->connect();
+
+        $v_sql = "delete from notificacion_perfil where perfilid = ".$p_perfil_id." and notificacionid = ".$p_noti_id;
+
         $idqry = $conn->query($v_sql);
         if (!$idqry) echo pg_last_error($conn->Link_ID);
         $conn->next_record();

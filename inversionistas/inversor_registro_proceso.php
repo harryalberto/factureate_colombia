@@ -98,7 +98,7 @@ if ($_POST['accion'] == 'grabar'){
         $file_path_db = '../archivos/INV_'.$_POST['nombre'].'_'.$_POST['apellido'].'_'.$_POST['nro_doc'].'/vinculacion/doc_inv_'.$v_hoy.'_'.$_FILES['plaft']['name'];
 	} else $file_path = '';
 
-	// APRUEBA INVERSOR
+	// APRUEBA INVERSOR, cambio de estado y registro del informe plaft y creacion de saldos
 	$varr_param_fideicomiso = $vobj_mae_proc->get_parametro_detalle(60);
 	$v_aprueba = $vobj_mae_proc->aprobar_inversor_factureate($_POST['inversor_id'], $file_path_db, $varr_param_fideicomiso['valornum']);
 
@@ -133,16 +133,37 @@ if ($_POST['accion'] == 'grabar'){
 			$v_pass = $vobj_seg_proc->cambia_pass_atm($_POST['inversor_id']);
 		}
 
-		// NOTIFICACIONES
-		// INVERSOR
-		$varr_link = $vobj_mae_proc->get_parametro_detalle(53);
+		// NOTIFICACIONES INVERSOR
+		$varr_noti = $vobj_mae_proc->get_parametro_detalle(84);
 
-		$varr_mail = array('mail_salida' => 'operaciones@factureate.com', 'nombre_salida' => 'Factureate', 'mail_destino' => $_POST['email'],
-							'subject' => '[FACTUREATE] Enhorabuena!! fuiste aprobado como inversor de Factureate',
-							'body' => 'Hola '.$_POST['nombre'].' '.$_POST['apellido'].', nos complace saludarte y darte la buena noticia que fuiste admitido como inversor de Factureate, solo falta un paso para puedas empezar a invertir en Factureate, seguidamente especificamos el link del contrato de vinculacion para que lo puedas firmar e inmediatamente podras iniciar como inversor.<br><br>LINK DEL CONTRATO: <a href="'.$_POST['contrato'].'" target="_blank">ACCEDER AL CONTRATO</a><br><br>Cordialmente,<br><br>FACTUREATE');
+		if ($varr_noti['valornum'] == 1){
+			// envio de notificacion por correo
+			if ($varr_noti['valorchar'] == ''){
+				// la notificacion la envia Factureate
+				$v_body = 'Hola '.$_POST['nombre'].' '.$_POST['apellido'].', nos complace saludarte y darte la buena noticia que fuiste admitido como inversor de Factureate,
+							solo falta un paso para que puedas empezar a invertir en Factureate, seguidamente especificamos el link del contrato de vinculacion para que lo puedas
+							firmar e inmediatamente podras iniciar como inversor.
+							<br><br>LINK DEL CONTRATO: <a href="'.$_POST['contrato'].'" target="_blank">ACCEDER AL CONTRATO</a>
+							<br><br>Cordialmente,
+							<br><br>FACTUREATE';
+			} else{
+				// la notificacion la envia el proveedor
+				$v_body = 'Hola '.$_POST['nombre'].' '.$_POST['apellido'].', nos complace saludarte y darte la buena noticia que fuiste admitido como inversor de Factureate,
+							solo falta un paso para que puedas empezar a invertir en Factureate, nuestro proveedor de contratos digitales '.$varr_noti['valorchar'].'
+							le enviara mensajes con el link del contrato para que lo pueda firmar.
+							<br><br>Cordialmente,
+							<br><br>FACTUREATE';
+			}
 
-		$vobj_mail_proc->enviar_correo($varr_mail);
-		// INTERNO
+			$varr_link = $vobj_mae_proc->get_parametro_detalle(53);
+			$varr_mail = array('mail_salida' => 'operaciones@factureate.com', 'nombre_salida' => 'Factureate', 'mail_destino' => $_POST['email'],
+								'subject' => '[FACTUREATE] Enhorabuena!! fuiste aprobado como inversor de Factureate',
+								'body' => $v_body;
+
+			$vobj_mail_proc->enviar_correo($varr_mail);
+		}
+
+		// NOTIFICACION INTERNO
 		$varr_mail_interno = array('notificaid' => 30, 'datos_body' => '<br>Nombre: '.$_POST['nombre'].' '.$_POST['apellido']);
 		$vobj_mail_proc->enviar_correo_xnotificacion($varr_mail_interno);
 	}
