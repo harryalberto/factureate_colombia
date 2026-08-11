@@ -38,7 +38,7 @@ class mail_util{
             $mail->SMTPAuth = true;
             $mail->Username = $arr_mail['mail_salida']; // A RELLENAR. Email de la cuenta de correo. ej.info@midominio.com La cuenta de correo debe ser creada previamente.
             $mail->Password = $dato; // A RELLENAR. Aqui pondremos la contrase�a de la cuenta de correo
-             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port = 587;
             $mail->CharSet = 'UTF-8';
             $mail->setFrom(
@@ -58,25 +58,33 @@ class mail_util{
     function enviar_correo_attach($arr_mail){
         if ($arr_mail['mail_salida'] == 'pymes@factureate.com') $dato = $this->decrip("502-511-518-541-569-574-503-504-566-562-");
         if ($arr_mail['mail_salida'] == 'operaciones@factureate.com') $dato = $this->decrip("538-555-568-564-508-503-502-518-552-572-");
+        if ($arr_mail['mail_salida'] == 'operacion_radian_col@factureate.com') $dato = $this->decrip("529-533-534-507-507-567-573-555-511-511-564-563-");
 
-        $mail = new PHPMailer();
-        $mail->IsSMTP();
-        $mail->SMTPAuth = true;
-        $mail->Host = "mail.brdkairos.com"; // A RELLENAR. Aqu� pondremos el SMTP a utilizar. Por ej. mail.midominio.com
-        $mail->Username = $arr_mail['mail_salida']; // A RELLENAR. Email de la cuenta de correo. ej.info@midominio.com La cuenta de correo debe ser creada previamente.
-        $mail->Password = $dato; // A RELLENAR. Aqui pondremos la contrase�a de la cuenta de correo
-        $mail->Port = 587; // Puerto de conexi�n al servidor de envio.(587)465
-        $mail->From = $arr_mail['mail_salida']; // A RELLENARDesde donde enviamos (Para mostrar). Puede ser el mismo que el email creado previamente.
-        $mail->FromName = $arr_mail['nombre_salida']; //A RELLENAR Nombre a mostrar del remitente.
+        $mail = new PHPMailer(true);
 
-        $mail->AddAttachment($arr_mail['root_archivo'], $arr_mail['nombre_archivo']);
+        try{
+            $mail->IsSMTP();
+            $mail->Host = "mail.brdkairos.com"; // A RELLENAR. Aqu� pondremos el SMTP a utilizar. Por ej. mail.midominio.com
+            $mail->SMTPAuth = true;
+            $mail->Username = $arr_mail['mail_salida']; // A RELLENAR. Email de la cuenta de correo. ej.info@midominio.com La cuenta de correo debe ser creada previamente.
+            $mail->Password = $dato; // A RELLENAR. Aqui pondremos la contrase�a de la cuenta de correo
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port = 587; // Puerto de conexi�n al servidor de envio.(587)465
+            $mail->CharSet = 'UTF-8';
+            $mail->setFrom($arr_mail['mail_salida'], 'Factureate Notificaciones');
+            $mail->AddAddress($arr_mail['mail_destino']); // Esta es la direcci�n a donde enviamos
+            $mail->IsHTML(true); // El correo se env�a como HTML
+            $mail->Subject = $arr_mail['subject']; // Este es el titulo del email.
+            $mail->Body = $arr_mail['body']; // Mensaje a enviar.
 
-        $mail->AddAddress($arr_mail['mail_destino']); // Esta es la direcci�n a donde enviamos
-        $mail->IsHTML(true); // El correo se env�a como HTML
-        $mail->Subject = $arr_mail['subject']; // Este es el titulo del email.
-        $mail->Body = $arr_mail['body']; // Mensaje a enviar.
-        $exito = $mail->Send(); // Env�a el correo.
-        $mail->ClearAllRecipients( ); // clear all
+            if (isset($arr_mail['attach_nombre1']) && $arr_mail['attach_nombre1'] != '') $mail->AddAttachment($arr_mail['attach1'], $arr_mail['attach_nombre1']);
+            if (isset($arr_mail['attach_nombre2']) && $arr_mail['attach_nombre2'] != '') $mail->AddAttachment($arr_mail['attach2'], $arr_mail['attach_nombre2']);
+            if (isset($arr_mail['attach_nombre3']) && $arr_mail['attach_nombre3'] != '') $mail->AddAttachment($arr_mail['attach3'], $arr_mail['attach_nombre3']);
+
+            $mail->Send(); // Env�a el correo.
+        } catch (Exception $e){
+            echo 'Error: ' . $mail->ErrorInfo;
+        }
     }
 
     function enviar_correo_xperfil($arr_datos){
@@ -266,7 +274,6 @@ class mail_util{
         $conn_noti->connect();
         $conn_noti_base->connect();
         $conn_delete->connect();
-        $v_borrar = 0;
         // notificaciones generadas
         $id_noti = $conn_noti->query("select id, usuarioid, contenido from genera_notificacion where notificacionid = ".$p_notificacion_id);
         if (!$id_noti) echo pg_last_error($conn_noti->Link_ID);

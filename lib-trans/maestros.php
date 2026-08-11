@@ -1110,28 +1110,7 @@ class maestros{
         if (!$idqry) echo pg_last_error($conn->Link_ID);
         
         $v_obj = $conn->next_record();
-        // PREPARACION DE CONTRATOS PARA LA FIRMA
-        //.......
-        // ENVIO DEL CORREO A LA EMPRESA
-        if ($parr_datos['valida_url_contrato'] == 'SI') $v_link = $parr_datos['url_contrato'];
-        else $v_link = 'el de la integracion con el suplidor';
-
-        $varr_empresa = $this->get_datos_emisor_full($parr_datos['empresa_id']);
-        $arr_mail_user = array('mail_salida' => 'pymes@factureate.com', 'nombre_salida' => 'FACTUREATE',
-                                'mail_destino' => $varr_empresa['email_contacto'],
-                                'subject' => 'VINCULACION CON FACTUREATE',
-                                'body' => 'Su solicitud de vinculacion para vender sus facturas en FACTUREATE ha sido aprobada.<br><br>
-                                            Empresa: '.$varr_empresa['nombre'].'<br>
-                                            RNC: '.$varr_empresa['identificacion'].'<br><br>
-                                            Lo siguiente que debe hacer es revisar y firmar el contrato de vinculacion mediante el siguiente link donde no debe ingresar 
-                                            ninguna informacion confidencial solo firmar biometricamente, le recomendamos leer el documento antes de firmar en el siguiente link.<br>
-                                            <a href="'.$v_link.'" target="_blank">CONTRATO CON FACTUREATE</a><br><br>
-                                            FACTUREATE');
         
-        $obj_mailing->enviar_correo($arr_mail_user);
-        
-        //$conn->close();
-
         return 1;
     }
     function registra_contrato_vinculacion($parr_datos){
@@ -1140,13 +1119,19 @@ class maestros{
 
         $conn->connect();
         $v_fecha_hoy = date('Y-m-d');
+
+        if (isset($parr_datos['link_contrato_provee'])) $v_sql_add = " , contrato_provee_endoso = '".$parr_datos['link_contrato_provee']."'";
+        else $v_sql_add = '';
+
+        $v_sql = "update empresa set estado = 3, contrato_path = '".$parr_datos['link_contrato']."', f_firma_contrato = '".$v_fecha_hoy."'".$v_sql_add."
+                        where id = ".$parr_datos['empresa_id'];
         
-        $idqry = $conn->query("update empresa set estado = 3, contrato_path = '".$parr_datos['link_contrato']."', f_firma_contrato = '".$v_fecha_hoy."'
-                                where id = ".$parr_datos['empresa_id']);
+        $idqry = $conn->query($v_sql);
         if (!$idqry) echo pg_last_error($conn->Link_ID);
         $conn->next_record();
         // ENVIO DEL CORREO A LA EMPRESA
-        $v_link = 'https://factureate-webapp-cadjdpb8ccb9emg6.eastus-01.azurewebsites.net/';
+        $varr_param_plataforma = $this->get_parametro_detalle(53);
+        $v_link = $varr_param_plataforma['valorchar'];
         $varr_empresa = $this->get_datos_emisor_full($parr_datos['empresa_id']);
         $arr_mail_user = array('mail_salida' => 'pymes@factureate.com', 'nombre_salida' => 'FACTUREATE',
                                 'mail_destino' => $varr_empresa['email_contacto'],
@@ -2479,7 +2464,6 @@ class maestros{
         //$varr_fideicomiso = $this->get_parametro_detalle(60);
 
         if ($p_parametro == 0){
-            //======== no hay FIDEICOMISO
             $idqry = $conn->query("update inversionista 
                                 set estado = 58, informe_plaft = '".$p_plaft."', f_plaft = '".$v_fhoy."', h_plaft = '".$v_hhoy."', contrato_enviado = 1
                                 where inversor_id = ".$p_inversor_id);
@@ -3000,276 +2984,6 @@ class maestros{
         $idqry = $conn_direccion->query($v_sql);
         if (!$idqry) echo pg_last_error($conn_direccion->Link_ID);
         $conn_direccion->next_record();
-    }
-
-    function get_tipo_detalle($p_id){
-        $conn = new db_param_trans; $conn->connect();
-
-        $v_sql = "select nombre, dato1, dato_num from tipos where id = ".$p_id;
-
-        $idqry = $conn->query($v_sql);
-        if (!$idqry) echo pg_last_error($conn->Link_ID);
-        $obj = $conn->next_record();
-
-        $varr_result = array('nombre' => $obj->nombre, 'dato1' => $obj->dato1, 'dato_num' => $obj->dato_num);
-
-        return $varr_result;
-    }
-
-    function get_banco_detalle($p_id){
-        $conn = new db_param_trans; $conn->connect();
-
-        $v_sql = "select nombre_banco from bancos where id = ".$p_id;
-
-        $idqry = $conn->query($v_sql);
-        if (!$idqry) echo pg_last_error($conn->Link_ID);
-        $obj = $conn->next_record();
-
-        $varr_result = array('nombre' => $obj->nombre_banco);
-
-        return $varr_result;
-    }
-
-    function registra_noti_endoso($p_factura_id, $p_estado_id, $p_tipo_id){
-        $conn = new db_param_trans; $conn->connect();
-        $conn2 = new db_param_trans; $conn2->connect();
-
-        $v_sql = "select nextval('s_noti_endoso') as seq";
-
-        $idqry = $conn->query($v_sql);
-        if (!$idqry) echo pg_last_error($conn->Link_ID);
-        $obj = $conn->next_record();
-
-        $v_fecha = date('Y-m-d');
-        $v_hora = date('H:i:s');
-        $v_sql = "insert into endoso_notifica(id,factura_id,estado_id,fecha,hora,tipo_id) values (".$obj->seq.",".$p_factura_id.",".$p_estado_id.",'".$v_fecha."','".$v_hora."',".$p_tipo_id.")";
-
-        $idqry = $conn2->query($v_sql);
-        if (!$idqry) echo pg_last_error($conn2->Link_ID);
-        $conn2->next_record();
-
-        return 1;
-    }
-
-    function envia_noti_endoso($p_id, $p_factura_id,  $p_estado_id, $p_tipo_id,$p_path){
-        $conn = new db_param_trans; $conn->connect();
-
-        $v_estado = 0;
-        $v_registro = 0;
-        $v_fecha = date('Y-m-d');
-        $v_hora = date('H:i:s');
-
-        if ($p_estado_id == 73){
-            //==== no enviado
-            $v_estado = 72;
-            $v_registro = 0;
-        } elseif ($p_estado_id == 72 || $p_estado_id == 74){
-            //==== enviado
-            $v_estado = 74;
-            $v_registro = 1;
-        }
-
-        if ($v_estado == 72) $v_sql = "update endoso_notifica set estado_id = 72, fecha = '".$v_fecha."', hora = '".$v_hora."', tipo_id = ".$p_tipo_id.", path_noti = '".$p_path."' where id = ".$p_id;
-        else $v_sql = "update endoso_notifica set estado_id = 0 where id = ".$p_id;
-
-        $idqry = $conn->query($v_sql);
-        if (!$idqry) echo pg_last_error($conn->Link_ID);
-        $conn->next_record();
-
-        if ($v_registro == 1) $this->registra_noti_endoso($p_factura_id, $v_estado, $p_tipo_id);
-
-        return 1;
-    }
-
-    function registra_noti_fisica($p_factura_id, $noti_path){
-        $conn = new db_param_trans; $conn->connect();
-
-        $v_fecha = date('Y-m-d');
-        $v_hora = date('H:i:s');
-
-        $v_sql = "update endoso_notifica set estado_id = 72, fecha = '".$v_fecha."', hora = '".$v_hora."', tipo_id = 122, path_noti = '".$noti_path."'
-                where factura_id = ".$p_factura_id." and estado_id > 0";
-        $idqry = $conn->query($v_sql);
-        if (!$idqry) echo pg_last_error($conn->Link_ID);
-        $conn->next_record();
-    }
-
-    function get_permisos(){
-        $conn = new db_param; $conn->connect();
-
-        $v_sql = "select id, nombre, codigo from permisos where estado > 0";
-        $varr_result = array();
-
-        $idqry = $conn->query($v_sql);
-        if (!$idqry) echo pg_last_error($conn->Link_ID);
-        $obj = $conn->next_record();
-
-        for($i = 0; $i < $conn->nrows(); $i ++){
-            $varr_result[$i] = array('id' => $obj->id, 'nombre' => $obj->nombre, 'codigo' => $obj->codigo);
-            $obj = $conn->next_record();
-        }
-
-        return $varr_result;
-    }
-
-    function get_perfiles_factureate(){
-        $conn = new db_param; $conn->connect();
-
-        $v_sql = "select id, nombre from perfil_usuario where tipo in (7,8,9,13,14,15,16) and estado > 0";
-        $varr_result = array();
-
-        $idqry = $conn->query($v_sql);
-        if (!$idqry) echo pg_last_error($conn->Link_ID);
-        $obj = $conn->next_record();
-
-        for($i = 0; $i < $conn->nrows(); $i ++){
-            $varr_result[$i] = array('id' => $obj->id, 'nombre' => $obj->nombre);
-            $obj = $conn->next_record();
-        }
-
-        return $varr_result;
-    }
-
-    function get_perfil_xpermiso($p_permiso_id){
-        $conn = new db_param; $conn->connect();
-
-        $v_sql = "select perfilid, permisoid from perfil_permiso where menuid = 0 and accesoid = 0 and permisoid = ".$p_permiso_id;
-        $varr_result = array();
-
-        $idqry = $conn->query($v_sql);
-        if (!$idqry) echo pg_last_error($conn->Link_ID);
-        $obj = $conn->next_record();
-
-        for($i = 0; $i < $conn->nrows(); $i ++){
-            $varr_result[$i] = array('perfil_id' => $obj->perfilid, 'permiso_id' => $obj->permisoid);
-            $obj = $conn->next_record();
-        }
-
-        return $varr_result;
-    }
-
-    function get_permiso_xperfil($p_perfil_id){
-        $conn = new db_param; $conn->connect();
-
-        $v_sql = "select perfilid, permisoid from perfil_permiso where menuid = 0 and accesoid = 0 and perfilid = ".$p_perfil_id;
-        $varr_result = array();
-
-        $idqry = $conn->query($v_sql);
-        if (!$idqry) echo pg_last_error($conn->Link_ID);
-        $obj = $conn->next_record();
-
-        for($i = 0; $i < $conn->nrows(); $i ++){
-            $varr_result[$i] = array('perfil_id' => $obj->perfilid, 'permiso_id' => $obj->permisoid);
-            $obj = $conn->next_record();
-        }
-
-        return $varr_result;
-    }
-
-    function insert_permiso_perfil($p_permiso_id, $p_perfil_id){
-        $conn = new db_param; $conn->connect();
-
-        $v_sql = "insert into perfil_permiso(perfilid,menuid,accesoid,permisoid) values (".$p_perfil_id.",0,0,".$p_permiso_id.")";
-
-        $idqry = $conn->query($v_sql);
-        if (!$idqry) echo pg_last_error($conn->Link_ID);
-        $conn->next_record();
-    }
-
-    function delete_permiso_perfil($p_permiso_id, $p_perfil_id){
-        $conn = new db_param; $conn->connect();
-
-        $v_sql = "delete from perfil_permiso where perfilid = ".$p_perfil_id." and permisoid = ".$p_permiso_id;
-
-        $idqry = $conn->query($v_sql);
-        if (!$idqry) echo pg_last_error($conn->Link_ID);
-        $conn->next_record();
-    }
-
-    function procesa_permiso_perfil($p_permiso_id, $parr_insert, $parr_delete){
-        for ($i = 0; $i < count($parr_insert); $i++){
-            $this->insert_permiso_perfil($p_permiso_id, $parr_insert[$i]);
-        }
-
-        for ($j = 0; $j < count($parr_delete); $j++){
-            $this->delete_permiso_perfil($p_permiso_id, $parr_delete[$j]);
-        }
-    }
-
-    function procesa_perfil_permiso($p_perfil_id, $parr_insert, $parr_delete){
-        for ($i = 0; $i < count($parr_insert); $i++){
-            $this->insert_permiso_perfil($parr_insert[$i], $p_perfil_id);
-        }
-
-        for ($j = 0; $j < count($parr_delete); $j++){
-            $this->delete_permiso_perfil($parr_delete[$j], $p_perfil_id);
-        }
-    }
-
-    function get_notificaciones(){
-        $conn = new db_param; $conn->connect();
-        $varr_result = array();
-
-        $v_sql = "select id, nombre, descripcion, subject, body from notificaciones where estado > 0";
-
-        $idqry = $conn->query($v_sql);
-        if (!$idqry) echo pg_last_error($conn->Link_ID);
-        $obj = $conn->next_record();
-
-        for($i = 0; $i < $conn->nrows(); $i ++){
-            $varr_result[$i] = array('id' => $obj->id, 'nombre' => $obj->nombre, 'descripcion' => $obj->descripcion, 'subject' => $obj->subject, 'body' => $obj->body);
-            $obj = $conn->next_record();
-        }
-
-        return $varr_result;
-    }
-
-    function get_noti_xperfil($p_noti_id){
-        $conn = new db_param; $conn->connect();
-        $varr_result = array();
-
-        $v_sql = "  select perfilid from notificacion_perfil where estado > 0 and notificacionid = ".$p_noti_id;
-
-        $idqry = $conn->query($v_sql);
-        if (!$idqry) echo pg_last_error($conn->Link_ID);
-        $obj = $conn->next_record();
-
-        for($i = 0; $i < $conn->nrows(); $i ++){
-            $varr_result[$i] = array('id' => $obj->perfilid);
-            $obj = $conn->next_record();
-        }
-
-        return $varr_result;
-    }
-
-    function procesa_noti_perfil($p_noti_id, $parr_insert, $parr_delete){
-        for ($i = 0; $i < count($parr_insert); $i++){
-            $this->insert_noti_perfil($p_noti_id, $parr_insert[$i]);
-        }
-
-        for ($j = 0; $j < count($parr_delete); $j++){
-            $this->delete_noti_perfil($p_noti_id, $parr_delete[$j]);
-        }
-    }
-
-    function insert_noti_perfil($p_noti_id, $p_perfil_id){
-        $conn = new db_param; $conn->connect();
-
-        $v_sql = "insert into notificacion_perfil(perfilid,notificacionid, estado) values (".$p_perfil_id.",".$p_noti_id.", 1)";
-
-        $idqry = $conn->query($v_sql);
-        if (!$idqry) echo pg_last_error($conn->Link_ID);
-        $conn->next_record();
-    }
-
-    function delete_noti_perfil($p_noti_id, $p_perfil_id){
-        $conn = new db_param; $conn->connect();
-
-        $v_sql = "delete from notificacion_perfil where perfilid = ".$p_perfil_id." and notificacionid = ".$p_noti_id;
-
-        $idqry = $conn->query($v_sql);
-        if (!$idqry) echo pg_last_error($conn->Link_ID);
-        $conn->next_record();
     }
 }
 ?>

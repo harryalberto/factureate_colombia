@@ -118,6 +118,7 @@ $vobj_seg = new seguridad;
 
 $arr_empresa = $obj_mae->get_datos_empresa($_GET['id']);
 $varr_param_contratoemi = $obj_mae->get_parametro_detalle(27);
+$previo = '';
 
 if ($_GET['previo'] == 'empresas') $previo = 'empresas.php';
 elseif ($_GET['previo'] == 'emisores') $previo = 'emisores.php';
@@ -168,7 +169,6 @@ else $v_muestra_estado_legal = '';
     <!--=== INFORMACION -->
 <?php
     $varr_permisos = $vobj_seg->get_permisos($_SESSION['user']['perfilid']);
-    $v_tabla_accionistas = '';
 
     if ($obj_mae->busca_arreglo_bidi($varr_permisos, 'codigo', 'EMP-UPD-OP')) $v_readonly = ''; else $v_readonly = 'readonly';
 
@@ -476,6 +476,9 @@ else $v_muestra_estado_legal = '';
 
     //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     //@@@@@@@@@@@@@@@@@@@@@@@@ CONTRATO DE VINCULACION
+    $varr_param_endoso = $obj_mae->get_parametro_detalle(85);
+
+    echo '<input type="hidden" name="contrato_provee" id="contrato_provee" value="'.$varr_param_endoso['valornum'].'">';
 
     if ($obj_mae->busca_arreglo_bidi($varr_permisos, 'codigo', 'EMP-LEG')){
         if ($t_empresa != 'obligpago'){
@@ -500,13 +503,22 @@ else $v_muestra_estado_legal = '';
                     <label for="url_contrato">URL CONTRATO</label>
                     <input type="text" name="url_contrato" id="url_contrato" class="formulario_control">';
                 } elseif ($arr_empresa['estado'] == 50) {
-                    // PRE APROBADA
+                    //==== PRE APROBADA
                     echo '
                     <label>PROCESO MANUAL <i class="fa-solid fa-pen" style="font-size:18px;"></i></label>
                 </div>
                 <div class="formulario_grupo_row" style="width: 200px;">
                     <label for="url_contrato">CONTRATO FIRMADO</label>
                     <input type="file" name="file_contrato_vinculacion" id="file_contrato_vinculacion" class="formulario_control" style="background-color:#fff;">';
+
+                    if ($varr_param_endoso['valornum'] == 1){
+                        //==== proveedor de endoso entra en el proceso de vinculacion
+                        echo '
+                </div>
+                <div class="formulario_grupo_row" style="width: 200px;">
+                    <label for="url_contrato_provee_endoso">CONTRATO PROVEEDOR ENDOSO</label>
+                    <input type="file" name="file_contrato_provee_endoso" id="file_contrato_provee_endoso" class="formulario_control" style="background-color:#fff;">';
+                    }
                 } elseif ($arr_empresa['estado'] == 1) {
                     // REGISTRADO
                     echo '
@@ -936,31 +948,43 @@ else $v_muestra_estado_legal = '';
 
         function registrarContrato(){
             var v_contrato = $('#file_contrato_vinculacion').val();
+            var v_contrato_provee = $('#file_contrato_provee_endoso').val();
+            var procede = 1;
+            var v_contrato_provee_param = $('#contrato_provee').val();
 
             if (v_contrato == '') alert('Debe cargar el contrato firmado por la empresa');
             else {
-                var vbtn_contrato = document.getElementById('boton_contrato');
-                var vbtn_cerrar = document.getElementById('boton_cerrar');
+                if (v_contrato_provee_param == 1){
+                    if (v_contrato_provee == ''){
+                        procede = 0;
+                        alert('Debe registrar el contrato firmado enviado por el proveedor de endoso');
+                    }
+                }
+                
+                if (procede == 1){
+                    var vbtn_contrato = document.getElementById('boton_contrato');
+                    var vbtn_cerrar = document.getElementById('boton_cerrar');
 
-                vbtn_contrato.disabled = true;
-                vbtn_cerrar.disabled = true;
+                    vbtn_contrato.disabled = true;
+                    vbtn_cerrar.disabled = true;
 
-                document.frm.accion.value = 'reg_contrato';
+                    document.frm.accion.value = 'reg_contrato';
 
-                var formData = new FormData(document.getElementById("frm"));
-                                
-                $.ajax({
-                    url:"empresa_gestion_proceso.php",
-                    type:'post',
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    dataType: "html"
-                })
-                .done(function(rpta){
-                    alert('Se registro el contrato firmado por la empresa');
-                    location.href = 'empresa_gestion_detalle.php?id='+v_empresa_id+'&previo=empresas';
-                });
+                    var formData = new FormData(document.getElementById("frm"));
+                                    
+                    $.ajax({
+                        url:"empresa_gestion_proceso.php",
+                        type:'post',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        dataType: "html"
+                    })
+                    .done(function(rpta){
+                        alert('Se registro el contrato firmado por la empresa');
+                        location.href = 'empresa_gestion_detalle.php?id='+v_empresa_id+'&previo=empresas';
+                    });
+                }
             }
         }
 
