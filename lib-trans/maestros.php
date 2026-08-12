@@ -3047,7 +3047,7 @@ class maestros{
         $conn = new db_param; $conn->connect();
         $varr_result = array();
 
-        $v_sql = "select permisoid where menuid = 0 and accesoid = 0 and perfilid = ".$p_perfil_id;
+        $v_sql = "select permisoid from perfil_permiso where menuid = 0 and accesoid = 0 and perfilid = ".$p_perfil_id;
 
         $idqry = $conn->query($v_sql);
         if (!$idqry) echo pg_last_error($conn->Link_ID);
