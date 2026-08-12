@@ -2985,5 +2985,121 @@ class maestros{
         if (!$idqry) echo pg_last_error($conn_direccion->Link_ID);
         $conn_direccion->next_record();
     }
+
+    function get_permisos(){
+        $conn = new db_param; $conn->connect();
+        $varr_result = array();
+
+        $v_sql = "select id, nombre, codigo from permisos where estado = 1";
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+
+        for($i = 0; $i < $conn->nrows(); $i ++){
+            $varr_result[$i] = array(   'id' => $obj->id, 'nombre' => $obj->nombre, 'codigo' => $obj->codigo);
+
+            $obj = $conn->next_record();
+        }
+
+        return $varr_result;
+    }
+
+    function get_perfiles_factureate(){
+        $conn = new db_param; $conn->connect();
+        $varr_result = array();
+
+        $v_sql = "select id, nombre from perfil_usuario where tipo in (7,8,13,14,15,16)";
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+
+        for($i = 0; $i < $conn->nrows(); $i ++){
+            $varr_result[$i] = array(   'id' => $obj->id, 'nombre' => $obj->nombre);
+
+            $obj = $conn->next_record();
+        }
+
+        return $varr_result;
+    }
+
+    function get_perfil_xpermiso($p_permiso_id){
+        $conn = new db_param; $conn->connect();
+        $varr_result = array();
+
+        $v_sql = "select perfilid from perfil_permiso where menuid = 0 and accesoid = 0 and permisoid = ".$p_permiso_id;
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+
+        for($i = 0; $i < $conn->nrows(); $i ++){
+            $varr_result[$i] = array(   'perfil_id' => $obj->perfilid);
+
+            $obj = $conn->next_record();
+        }
+
+        return $varr_result;
+    }
+
+    function get_permiso_xperfil($p_perfil_id){
+        $conn = new db_param; $conn->connect();
+        $varr_result = array();
+
+        $v_sql = "select permisoid where menuid = 0 and accesoid = 0 and perfilid = ".$p_perfil_id;
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+
+        for($i = 0; $i < $conn->nrows(); $i ++){
+            $varr_result[$i] = array(   'permiso_id' => $obj->permisoid);
+
+            $obj = $conn->next_record();
+        }
+
+        return $varr_result;
+    }
+
+    function insert_permiso_perfil($p_permiso_id, $p_perfil_id){
+        $conn = new db_param; $conn->connect();
+
+        $v_sql = "insert into perfil_permiso (perfilid,menuid,accesoid,permisoid) values (".$p_perfil_id.",0,0,".$p_permiso_id.")";
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $conn->next_record();
+    }
+
+    function delete_permiso_perfil($p_permiso_id, $p_perfil_id){
+        $conn = new db_param; $conn->connect();
+
+        $v_sql = "delete from perfil_permiso where perfilid = ".$p_perfil_id." and permisoid = ".$p_permiso_id." and menuid = 0 and accesoid = 0";
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $conn->next_record();
+    }
+
+    function procesa_permiso_perfil($p_permiso_id, $parr_insert, $parr_delete){
+        for ($i = 0; $i < count($parr_insert); $i++){
+            $this->insert_permiso_perfil($p_permiso_id, $parr_insert[$i]);
+        }
+
+        for ($j = 0; $j < count($parr_delete); $j++){
+            $this->delete_permiso_perfil($p_permiso_id, $parr_delete[$j]);
+        }
+    }
+
+    function procesa_perfil_permiso($p_perfil_id, $parr_insert, $parr_delete){
+        for ($i = 0; $i < count($parr_insert); $i++){
+            $this->insert_permiso_perfil($parr_insert[$i], $p_perfil_id);
+        }
+
+        for ($j = 0; $j < count($parr_delete); $j++){
+            $this->delete_permiso_perfil($parr_delete[$j], $p_perfil_id);
+        }
+    }
 }
 ?>
