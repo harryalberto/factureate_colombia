@@ -3101,5 +3101,43 @@ class maestros{
             $this->delete_permiso_perfil($parr_delete[$j], $p_perfil_id);
         }
     }
+
+    function get_notificaciones(){
+        $conn = new db_param; $conn->connect();
+        $varr_result = array();
+
+        $v_sql = "select id, nombre, descripcion, subject, body from notificaciones where estado = 1";
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+
+        for($i = 0; $i < $conn->nrows(); $i ++){
+            $varr_result[$i] = array(   'id' => $obj->id, 'nombre' => $obj->nombre, 'descripcion' => $obj->descripcion, 'subject' => $obj->subject, 'body' => $obj->body);
+
+            $obj = $conn->next_record();
+        }
+
+        return $varr_result;
+    }
+
+    function get_noti_xperfil($p_noti_id){
+        $conn = new db_param; $conn->connect();
+        $varr_result = array();
+
+        $v_sql = "select perfilid from notificacion_perfil where notificacionid = ".$p_noti_id." and estado = 1";
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+
+        for($i = 0; $i < $conn->nrows(); $i ++){
+            $varr_result[$i] = array(   'id' => $obj->perfilid);
+
+            $obj = $conn->next_record();
+        }
+
+        return $varr_result;
+    }
 }
 ?>
