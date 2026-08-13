@@ -49,6 +49,9 @@ class mail_util{
             $mail->IsHTML(true); // El correo se env�a como HTML
             $mail->Subject = $arr_mail['subject']; // Este es el titulo del email.
             $mail->Body = $arr_mail['body']; // Mensaje a enviar.
+
+            if (isset($arr_mail['firma']) && $arr_mail['firma'] != '') $mail->addEmbeddedImage($arr_mail['firma'], $arr_mail['firma_nombre']);
+
             $mail->Send(); // Env�a el correo.
         } catch (Exception $e) {
             echo 'Error: ' . $mail->ErrorInfo;

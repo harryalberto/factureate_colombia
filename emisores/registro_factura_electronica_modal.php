@@ -485,6 +485,11 @@ $v_dias_min = $v_dias_min.' días';
                     v_ok = 0;
                 }
 
+                if (v_ok == 1 && v_factura_file == ''){
+                    alert('Debe ingresar la repesentación gráfica de la factura');
+                    v_ok = 0;
+                }
+
                 if (v_ok == 1){
                     btn_grabar.disabled = true;
                     btn_enviar.disabled = true;
