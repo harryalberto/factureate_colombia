@@ -96,7 +96,7 @@ if ($v_perfil == 'USER'){
                     <input type="text" name="nombre_empresa" id="nombre_empresa" class="formulario_control" value="<?=$arr_empresa['nombre']?>" <?php echo $readonly;?>>
                 </div>
                 <div class="formulario_grupo_row" style="width: 100px;">
-                    <label for="ruc">RNC <b style="color:var(--color-rojo);">[*]</b></label>
+                    <label for="ruc">NIT <b style="color:var(--color-rojo);">[*]</b></label>
                     <input type="text" name="ruc" id="ruc" class="formulario_control" value="<?=$arr_empresa['identificacion']?>" <?php echo $readonly;?>>
                 </div>
                 <div class="formulario_grupo_row" style="width: 100px;">
@@ -316,7 +316,6 @@ if ($_SESSION['user']['perfilid'] == 4){
                         <th scope="col">ID</th>
                         <th scope="col">NOMBRE</th>
                         <th scope="col">E-MAIL</th>
-                        <th scope="col">TELEFONO</th>
                         <th scope="col">TIPO DOC</th>
                         <th scope="col">NRO DOC</th>
                         <th scope="col">F APERTURA</th>
@@ -336,7 +335,6 @@ if ($_SESSION['user']['perfilid'] == 4){
                             <td data-label="ID">'.$varr_usuarios_empresa[$i]['usuario_id'].'</td>
                             <td data-label="NOMBRE">'.$varr_usuarios_empresa[$i]['nombre'].'</td>
                             <td data-label="E-MAIL">'.$varr_usuarios_empresa[$i]['email'].'</td>
-                            <td data-label="TELEFONO">'.$varr_usuarios_empresa[$i]['telefono'].'</td>
                             <td data-label="TIPO DOC">'.$varr_usuarios_empresa[$i]['tipodoc_nombre'].'</td>
                             <td data-label="NRO DOC">'.$varr_usuarios_empresa[$i]['nro_doc'].'</td>
                             <td data-label="F APERTURA">'.$v_fapertura.'</td>';
