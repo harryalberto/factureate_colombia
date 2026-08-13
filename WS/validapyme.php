@@ -1,8 +1,19 @@
 <?php
-ini_set('display_errors', 0);
-ini_set('pcre.jit', 0);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-header('Content-Type: application/json');
+register_shutdown_function(function () {
+
+    $error = error_get_last();
+
+    if ($error !== NULL) {
+
+        print_r($error);
+
+    }
+
+});
 
 require("../conn/conn_db.inc");
 require("../conn/conn_db_param.inc");   //seguridad
@@ -29,12 +40,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
     $resultado = $obj_mae->registro_empresa($input);
 
     if ($resultado > 0){
-      $output = array('id' => 1, 'mensaje' => $resultado);
+      $output = array('id' => 1, 'mensaje' => 'Empresa creada');
+      //@@@@ NOTIFICACION AL REPRESENTANTE LEGAL DE LA EMRPESA
       $arr_nusuario = array('identificacion' => $input['nrodoc_repre'], 'password' => '',
-                          'email' => $input['email_repre'], 'nombre' => $input['nombre_repre'], 'apellido' => $input['a_paterno_repre'].' '.$input['a_materno_repre'],
+                          'email' => $input['email_repre'], 'nombre' => $input['nombre_representante'], 'apellido' => '',
                           'tipodoc' => $input['tipodoc_repre'], 'tipousuario' => 3, 'perfilid' => 4,
                           'empresaid' => $resultado);
-
       $arr_resultado = $obj_seg->crear_usuario($arr_nusuario);
 
       $varr_link = $obj_mae->get_parametro_detalle(53);
@@ -50,11 +61,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
         if ($v_provee_docugid != '') $v_provee_docugid .= ' y otro correo de nuestro proveedor de contratos digitales '.$varr_docudig['valorchar'].' con el contrato de vinculacion con FACTUREATE ';
         else $v_provee_docugid .= ' de nuestro proveedor de contratos digitales '.$varr_docudig['valorchar'].' con el contrato de vinculacion con FACTUREATE ';
       }
-
-      // envio de correo al usuario registrado
+      
       $arr_mail = array('mail_salida' => 'pymes@factureate.com', 'nombre_salida' => 'Factureate',
                         'mail_destino' => $input['email_repre'], 'subject' => 'Registro en FACTUREATE',
-                        'body' => 'Hola '.$input['nombre_repre'].',<br><br>Se ha registrado su empresa '.$input['nombre'].' con NIT '.$input['identificacion'].' en nuestra plataforma, 
+                        'body' => 'Hola '.$input['nombre_repre'].',<br><br>Se ha registrado su empresa '.$input['nombre'].' con RNC '.$input['identificacion'].' en nuestra plataforma,
                                 debe seguir los siguientes pasos para terminar el registro:<br><ul>
                                 <li>Ingresar a nuestra plataforma con las credenciales al final de este correo</li>
                                 <li>Completar la informacion de su empresa y enviar su registro (botom enviar)</li>
@@ -66,43 +76,42 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
                                 <li>Link de la plataforma: <a href="'.$varr_link['valorchar'].'" target="_blank">Plataforma Factureate</a></li></ul><br><br>
                                 Gracias por confiar en nosotros, trabajaremos para conseguir el financiamiento que necesita.<br>
                                 * Tildes omitidas intencionalmente<br><br>
-                                FACTUREATE');
+                                <img src="cid:logo_factureate" width="100">',
+                        'firma' => '../img/logo.png',
+                        'firma_nombre' => 'logo_factureate');
       $obj_mail->enviar_correo($arr_mail);
 
-       // envio de cooreo a los analistas de factureate
+      //@@@@ enviio de cooreo a los analistas de factureate
       $arr_mail_perfil = array('perfilid' => 8, 'nombre_salida' => 'Operaciones FACTUREATE',
-                              'subject' => 'Registro de nuevo EMISOR',
+                              'subject' => 'Registro de nuevo EMISOR', 
                               'body' => 'Hola, <br><br>Se ha registrado a trav&eacute;s de la web el siguiente emisor;<br>
-                                      <ul><li>Nombre: '.$input['nombre'].'</li><li>NIT: '.$input['identificacion'].'</li></ul><br>
+                                      <ul><li>Nombre: '.$input['nombre'].'</li><li>RNC: '.$input['identificacion'].'</li></ul><br>
                                       Gracias<br><br>
                                       FACTUREATE');
       $obj_mail->enviar_correo_xperfil($arr_mail_perfil);
-
-      //@@@@ TRANSFERENCIA DE ARCHIVOS DESDE LA WEB A LA PLATAFORMA
-      // VERIFICACION DE CARPETAS
+      
+      //@@@@ ACTUALIZO LOS PATH DE LOS ARCHIVOS RECIBIDOS
       $v_carpeta_destino = $_SERVER['DOCUMENT_ROOT'].'/pdf/EMP_'.$input['nombre'].'_'.$input['identificacion'];
       if (!is_dir($v_carpeta_destino)) mkdir($v_carpeta_destino, 0777, true);
 
       $v_carpeta_destino = $_SERVER['DOCUMENT_ROOT'].'/pdf/EMP_'.$input['nombre'].'_'.$input['identificacion'].'/vinculacion';
       if (!is_dir($v_carpeta_destino)) mkdir($v_carpeta_destino, 0777, true);
 
-      //ACTUALIZO LOS PATH EN EL REGISTRO EMPRESA
       $file_registro_mercantil = $v_carpeta_destino.'/registro_mercantil_'.$input['identificacion'].'.pdf';
       $file_poderes = $v_carpeta_destino.'/estatutos_'.$input['identificacion'].'.pdf';
-      $file_documento_repre = $v_carpeta_destino.'/documento_'.$input['nombre_repre'].'_'.$input['a_paterno_repre'].'_'.$input['a_materno_repre'].'.pdf';
+      $file_documento_repre = $v_carpeta_destino.'/documento_'.$input['nombre_repre'].'_'.$input['ap_repre'].'_'.$input['am_repre'].'.pdf';
 
       $varr_path_documentos = array('registro_mercantil' => $file_registro_mercantil, 'documento_repre' => $file_documento_repre, 'poderes_empresa' => $file_poderes, 'empresa_id' => $resultado);
 
       $obj_mae->registra_path_documentos_empresa($varr_path_documentos);
-
+      
       //@@@@ TRANSFERENCIA DE ARCHIVOS
       $host = "ftp.brdkairos.com";
       $port = 21;
-      $user = "vincula_emisorwebco@factureate.com";
-      $password = "^_d[1SgwONoD+D{=";
-      //$arrpassword = explode(".",$password);
-      //$pass = $arrpassword[0];
-      $pass = $password;
+      $user = "vincula_emisorwebrd@factureate.com";
+      $password = "?tTq}2!+Euah.2025";
+      $arrpassword = explode(".",$password);
+      $pass = $arrpassword[0];
                 
       $connection = ftp_connect($host, $port);
 
@@ -124,37 +133,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 
       //@@@@ DOCUMENTO IDENTIDAD
       $destino = $file_documento_repre;
-      $origen = $v_hoy."_".$input['nombre']."_".$input['identificacion']."/documento_representante_".$input['nombre_repre']."_".$input['a_paterno_repre']."_".$input['a_materno_repre']."_".$input['nrodoc_repre'].".pdf";
+      $origen = $v_hoy."_".$input['nombre']."_".$input['identificacion']."/documento_representante_".$input['nombre_repre']."_".$input['ap_repre']."_".$input['am_repre']."_".$input['nrodoc_repre'].".pdf";
       $upload = ftp_get($connection, $destino, $origen, FTP_BINARY);
       if (!$upload) { echo 'Fallo la subida al FTP'; }
 
       //@@@@ REGISTRO MERCANTIL
       $destino = $file_registro_mercantil;
-      $origen = $v_hoy."_".$input['nombre']."_".$input['identificacion']."/certificado_existencia_".$input['identificacion'].".pdf";
+      $origen = $v_hoy."_".$input['nombre']."_".$input['identificacion']."/registro_mercantil_".$input['identificacion'].".pdf";
       $upload = ftp_get($connection, $destino, $origen, FTP_BINARY);
       if (!$upload) { echo 'Fallo la subida al FTP'; }
 
       //@@@@ PODERES
       $destino = $file_poderes;
-      $origen = $v_hoy."_".$input['nombre']."_".$input['identificacion']."/ficha_rut_".$input['identificacion'].".pdf";
+      $origen = $v_hoy."_".$input['nombre']."_".$input['identificacion']."/estatutos_".$input['identificacion'].".pdf";
       $upload = ftp_get($connection, $destino, $origen, FTP_BINARY);
       if (!$upload) { echo 'Fallo la subida al FTP'; }
 
       ftp_close($connection);
-    } else $output = array('id' => 2, 'mensaje' => '');
-  }
 
-      /*echo '<pre>';
-      print_r($arr_resultado);
-      die();*/
-      
-  //header("HTTP/1.1 200 OK");
-  //echo json_encode($output);
-  //exit();
-  http_response_code(200);
+    }
+  }
+  
+  header("HTTP/1.1 200 OK");
+  echo json_encode($output);
+  exit();
 }
 //En caso de que ninguna de las opciones anteriores se haya ejecutado
-//header("HTTP/1.1 400 Bad Request");
-echo json_encode($output);
-exit;
+header("HTTP/1.1 400 Bad Request");
 ?>

@@ -76,7 +76,9 @@ class seguridad_trans{
                             <br>Plataforma: <a href="'.$varr_link['valorchar'].'" target="_blank">Acceso Plataforma</a>
                             <br><br>(*) Tildes omitidas intencionalmente
                             <br><br>==============================
-                            <br>FACTUREATE');
+                            <br><img src="cid:logo_factureate" width="100">',
+                        'firma' => '../img/logo.png',
+                        'firma_nombre' => 'logo_factureate');
 
                 //------ NOTIFICACION AL INVERSOR
                 $vobj_mail_ws->enviar_correo($varr_mail);
