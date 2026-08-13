@@ -6,12 +6,12 @@ require("conn/conn_db_trans.inc");
 require("conn/conn_db_param_trans.inc");
 require("lib-trans/maestros.php");
 require("lib-seg/seguridad-acceso.php");
-require("libmail/class.phpmailer.php");
-require("lib/mail_util.php");
+/*require("libmail/class.phpmailer.php");
+require("lib/mail_util.php");*/
 
 $vobj_mae = new maestros;
 $vobj_seg = new seguridad;
-$vobj_mail = new mail_util;
+//$vobj_mail = new mail_util;
 
 $varr_usuario = $vobj_seg->cambiar_password_usuario($_POST['documento'], $_POST['password'], $_POST['new_password']);
 
