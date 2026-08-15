@@ -97,21 +97,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
       $v_carpeta_destino = $_SERVER['DOCUMENT_ROOT'].'/pdf/EMP_'.$input['nombre'].'_'.$input['identificacion'].'/vinculacion';
       if (!is_dir($v_carpeta_destino)) mkdir($v_carpeta_destino, 0777, true);
 
-      $file_registro_mercantil = $v_carpeta_destino.'/registro_mercantil_'.$input['identificacion'].'.pdf';
-      $file_poderes = $v_carpeta_destino.'/estatutos_'.$input['identificacion'].'.pdf';
+      $v_carpeta_destino_db = '../pdf/EMP_'.$input['nombre'].'_'.$input['identificacion'];
+      $file_registro_mercantil = $v_carpeta_destino.'/certificado_existencia_'.$input['identificacion'].'.pdf';
+      $file_registro_mercantil_db = $v_carpeta_destino_db.'/certificado_existencia_'.$input['identificacion'].'.pdf';
+      $file_poderes = $v_carpeta_destino.'/ficha_rut_'.$input['identificacion'].'.pdf';
+      $file_poderes_db = $v_carpeta_destino_db.'/ficha_rut_'.$input['identificacion'].'.pdf';
       $file_documento_repre = $v_carpeta_destino.'/documento_'.$input['nombre_repre'].'_'.$input['ap_repre'].'_'.$input['am_repre'].'.pdf';
+      $file_documento_repre_db = $v_carpeta_destino_db.'/documento_'.$input['nombre_repre'].'_'.$input['ap_repre'].'_'.$input['am_repre'].'.pdf';
 
-      $varr_path_documentos = array('registro_mercantil' => $file_registro_mercantil, 'documento_repre' => $file_documento_repre, 'poderes_empresa' => $file_poderes, 'empresa_id' => $resultado);
+      $varr_path_documentos = array('registro_mercantil' => $file_poderes_db, 'documento_repre' => $file_documento_repre_db, 'poderes_empresa' => $file_registro_mercantil_db, 'empresa_id' => $resultado);
 
       $obj_mae->registra_path_documentos_empresa($varr_path_documentos);
       
       //@@@@ TRANSFERENCIA DE ARCHIVOS
       $host = "ftp.brdkairos.com";
       $port = 21;
-      $user = "vincula_emisorwebrd@factureate.com";
-      $password = "?tTq}2!+Euah.2025";
-      $arrpassword = explode(".",$password);
-      $pass = $arrpassword[0];
+      $user = "vincula_emisorwebco@factureate.com";
+      $password = "^_d[1SgwONoD+D{=";
+      //$arrpassword = explode(".",$password);
+      //$pass = $arrpassword[0];
+      $pass = $password;
                 
       $connection = ftp_connect($host, $port);
 
@@ -133,31 +138,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 
       //@@@@ DOCUMENTO IDENTIDAD
       $destino = $file_documento_repre;
-      $origen = $v_hoy."_".$input['nombre']."_".$input['identificacion']."/documento_representante_".$input['nombre_repre']."_".$input['ap_repre']."_".$input['am_repre']."_".$input['nrodoc_repre'].".pdf";
+      $origen = $v_hoy."_".$input['nombre']."_".$input['identificacion']."/documento_representante_".$input['nombre_repre']."_".$input['a_paterno_repre']."_".$input['a_materno_repre']."_".$input['nrodoc_repre'].".pdf";
       $upload = ftp_get($connection, $destino, $origen, FTP_BINARY);
       if (!$upload) { echo 'Fallo la subida al FTP'; }
 
       //@@@@ REGISTRO MERCANTIL
       $destino = $file_registro_mercantil;
-      $origen = $v_hoy."_".$input['nombre']."_".$input['identificacion']."/registro_mercantil_".$input['identificacion'].".pdf";
+      $origen = $v_hoy."_".$input['nombre']."_".$input['identificacion']."/certificado_existencia_".$input['identificacion'].".pdf";
       $upload = ftp_get($connection, $destino, $origen, FTP_BINARY);
       if (!$upload) { echo 'Fallo la subida al FTP'; }
 
       //@@@@ PODERES
       $destino = $file_poderes;
-      $origen = $v_hoy."_".$input['nombre']."_".$input['identificacion']."/estatutos_".$input['identificacion'].".pdf";
+      $origen = $v_hoy."_".$input['nombre']."_".$input['identificacion']."/ficha_rut_".$input['identificacion'].".pdf";
       $upload = ftp_get($connection, $destino, $origen, FTP_BINARY);
       if (!$upload) { echo 'Fallo la subida al FTP'; }
 
       ftp_close($connection);
 
-    }
+    } else $output = array('id' => 2, 'mensaje' => '');
   }
   
-  header("HTTP/1.1 200 OK");
-  echo json_encode($output);
-  exit();
+  http_response_code(200);
 }
 //En caso de que ninguna de las opciones anteriores se haya ejecutado
-header("HTTP/1.1 400 Bad Request");
+echo json_encode($output);
+exit;
 ?>
