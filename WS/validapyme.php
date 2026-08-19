@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
       $v_carpeta_destino = $_SERVER['DOCUMENT_ROOT'].'/pdf/EMP_'.$input['nombre'].'_'.$input['identificacion'].'/vinculacion';
       if (!is_dir($v_carpeta_destino)) mkdir($v_carpeta_destino, 0777, true);
 
-      $v_carpeta_destino_db = '../pdf/EMP_'.$input['nombre'].'_'.$input['identificacion'];
+      $v_carpeta_destino_db = '../pdf/EMP_'.$input['nombre'].'_'.$input['identificacion'].'/vinculacion';
       $file_registro_mercantil = $v_carpeta_destino.'/certificado_existencia_'.$input['identificacion'].'.pdf';
       $file_registro_mercantil_db = $v_carpeta_destino_db.'/certificado_existencia_'.$input['identificacion'].'.pdf';
       $file_poderes = $v_carpeta_destino.'/ficha_rut_'.$input['identificacion'].'.pdf';
