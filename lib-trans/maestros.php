@@ -322,12 +322,10 @@ class maestros{
         }
 
         //==== obtencion del secuencial de usuario para igualar con la de la empresa
-        $idqry = $conn_seg->query("select nextval('s_usuario') as secuencial");
-
+        //$idqry = $conn_seg->query("select nextval('s_usuario') as secuencial");
+        $idqry = $conn_seg->query("select SEG_SECUENCIA_USUARIO() as secuencial");
         if (!$idqry) echo pg_last_error($conn_seg->Link_ID);
         $conn_seg->next_record();
-        
-        //$conn->close(); $conn2->close(); $conn_seg->close();
 
         return $empresaid;
     }
