@@ -179,7 +179,7 @@ else $v_muestra_estado_legal = '';
 
             <div class="contenedor_formulario_column">
                 <div class="formulario_grupo_row" style="width: 100px;">
-                    <label for="ruc">ID EMPRESA</label>
+                    <label for="ruc">NIT</label>
                     <input type="text" name="ruc" id="ruc" class="formulario_control" value="<?=$arr_empresa['identificacion']?>" readonly>
                 </div>
                 <div class="formulario_grupo_row" style="width: 250px;">
@@ -360,7 +360,7 @@ else $v_muestra_estado_legal = '';
 
             echo '
                 <div class="formulario_grupo_row" style="width: 200px;">
-                    <label for="regmercantil_file">REG MERC / CC</label>
+                    <label for="regmercantil_file">CAMARA COMERCIO</label>
                     <input type="file" name="regmercantil_file" id="regmercantil_file" class="formulario_control">
                 </div>';
 
