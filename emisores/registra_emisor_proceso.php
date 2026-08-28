@@ -131,7 +131,7 @@ if ($_POST['accion'] == 'grabar'){
         $obj_mae->enviar_registro_empresa($_POST['empresa_id']);
         // correo a los analistas
         $arr_email = array( 'notificaid' => 46,
-                            'datos_body' => 'Emisor: '.$_POST['nombre_empresa'].'<br>RNC: '.$_POST['ruc']
+                            'datos_body' => 'Emisor: '.$arr_empresa['nombre'].'<br>NIT: '.$arr_empresa['identificacion']
                         );
         //$obj_mail->enviar_correo_xnotificacion($arr_email);
 
