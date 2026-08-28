@@ -26,7 +26,7 @@ class mail_util{
    
         return $dec;
     }
-    function enviar_correo($arr_mail){
+    function enviar_correo_original($arr_mail){
         if ($arr_mail['mail_salida'] == 'pymes@factureate.com') $dato = $this->decrip("502-511-518-541-569-574-503-504-566-562-");
         if ($arr_mail['mail_salida'] == 'operaciones@factureate.com') $dato = $this->decrip("538-555-568-564-508-503-502-518-552-572-");
 
@@ -68,6 +68,29 @@ class mail_util{
         } catch (Exception $e) {
             echo 'Error: ' . $mail->ErrorInfo;
         }
+    }
+
+    function enviar_correo($arr_mail){
+        if (isset($arr_mail['firma']) && $arr_mail['firma'] != ''){
+            $v_firma = $arr_mail['firma'];
+            $v_firma_nombre = $arr_mail['firma_nombre'];
+            $v_body = $arr_mail['body'];
+        } else {
+            $v_firma = '../images/logo.png';
+            $v_firma_nombre = 'logo_factureate';
+            $v_body = $arr_mail['body'].'<br><img src="cid:logo_factureate" width="100">';
+        }
+
+        $varr_correo = array(
+                                'mail_salida' => $arr_mail['mail_salida'],
+                                'mail_destino' => $arr_mail['mail_destino'],
+                                'subject' => $arr_mail['subject'],
+                                'body' => $v_body,
+                                'firma' => $v_firma,
+                                'firma_nombre' => $v_firma_nombre
+                            );
+
+        $this->enviar_correo_ws($varr_correo);
     }
 
     function enviar_correo_ws($arr_mail){
@@ -169,13 +192,10 @@ class mail_util{
         $arr_mail = array();
 
         $mail_salida = 'operaciones@factureate.com';
-        $dato = $this->decrip("538-555-568-564-508-503-502-518-552-572-");
+        
         $v_sql = "  select  usuarios.id as usuarioid, usuarios.email 
                     from    usuarios 
                     where   usuarios.perfilid = ".$arr_datos['perfilid'];
-        /*$idqry = $conn->query("select perfil_usuario_notificaciones.usuarioid, usuarios.email from perfil_usuario_notificaciones, usuarios 
-                                where perfil_usuario_notificaciones.perfilid = ".$arr_datos['perfilid']." and perfil_usuario_notificaciones.estado = 1 and 
-                                    usuarios.id = perfil_usuario_notificaciones.usuarioid");*/
         $idqry = $conn->query($v_sql);
 
         if (!$idqry) echo pg_last_error($conn->Link_ID);
@@ -190,8 +210,6 @@ class mail_util{
             $this->enviar_correo($arr_mail);
             $obj = $conn->next_record();
         }
-
-        $conn->close();
     }
     function enviar_multicorreo_xperfil($arr_datos, $id_perfil){
         $conn = new db_param;
@@ -248,8 +266,6 @@ class mail_util{
             }
         }
 
-        //$conn->close();
-        //$conn_perfil->close();
     }
     function enviar_multicorreo_interno($id_notificacion){
         $conn = new db_param;

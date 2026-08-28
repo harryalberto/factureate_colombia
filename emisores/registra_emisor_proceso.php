@@ -133,7 +133,7 @@ if ($_POST['accion'] == 'grabar'){
         $arr_email = array( 'notificaid' => 46,
                             'datos_body' => 'Emisor: '.$arr_empresa['nombre'].'<br>NIT: '.$arr_empresa['identificacion']
                         );
-        //$obj_mail->enviar_correo_xnotificacion($arr_email);
+        $obj_mail->enviar_correo_xnotificacion($arr_email);
 
         // correo al usuario
         $arr_mail_user = array( 'mail_salida' => 'pymes@factureate.com',
@@ -143,7 +143,7 @@ if ($_POST['accion'] == 'grabar'){
                                 'body' => 'Su solicitud de registro como Emisor de FACTUREATE ha sido enviada, en breve terminaremos el analisis de la informacion y
                                             le enviaremos un correo para que pueda iniciar a solicitar financiamiento.<br><br>
                                             Empresa: '.$arr_empresa['nombre'].'<br>
-                                            RNC: '.$arr_empresa['identificacion'].'<br>
+                                            NIT: '.$arr_empresa['identificacion'].'<br>
                                             * Tildes omitidas intencionalmente<br><br>
                                             <img src="cid:logo_factureate" width="100">',
                                 'firma' => '../images/logo.png',
