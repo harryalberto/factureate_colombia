@@ -149,7 +149,7 @@ if ($_POST['accion'] == 'grabar'){
                                 'firma' => '../images/logo.png',
                                 'firma_nombre' => 'logo_factureate'
                                 );
-        //$resp_correo = $obj_mail->enviar_correo_ws($arr_mail_user);
+        $resp_correo = $obj_mail->enviar_correo_ws($arr_mail_user);
 
         $output = 1;
 
