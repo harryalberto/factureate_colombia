@@ -122,7 +122,7 @@ if ($_POST['accion'] == 'grabar'){
         $varr_datos = array('emisor_id' => $_POST['empresa_id'], 'moneda_id' => $_POST['moneda'], 'banco_id' => $_POST['banco'], 'nro_cuenta' => $_POST['nro_cuenta'],
                         'tcuenta_id' => $_POST['tipo_cuenta'], 'certificado' => $v_file_path_db);
 
-        $vobj_cuentas->registra_cuenta_banco_emisor($varr_datos);
+        $output = $vobj_cuentas->registra_cuenta_banco_emisor($varr_datos);
 
         //++++ envio de de emisor para aprobacion
         //$obj_mae->enviar_registro_empresa($_POST['empresa_id']);
@@ -148,8 +148,7 @@ if ($_POST['accion'] == 'grabar'){
                                 );
         //$resp_correo = $obj_mail->enviar_correo_ws($arr_mail_user);
 
-        //$output = $resp_correo['status'];
-        $output = 1;
+        //$output = 1;
 
     } else $output = 'No se encontro el certificado bancario';
 

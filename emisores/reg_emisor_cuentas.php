@@ -184,7 +184,7 @@ $vobj_modal_mae = new maestros;
                 cache: false,
                 processData: false,
                 success: function(data)
-                {
+                {alert(data);
                     //==== ocultar el spinner
                     ocultarLoading();
 
