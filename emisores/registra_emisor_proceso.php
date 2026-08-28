@@ -13,7 +13,7 @@ require("../lib/mail_util.php");
 //------ LOGICA NO VISIBLE ------
 $obj_mae = new maestros;
 $obj_mail = new mail_util;
-$arr_empresa = $obj_mae->get_datos_emisor_full($_SESSION['user']['empresaid']);
+$arr_empresa = $obj_mae->get_datos_emisor_full($_POST['empresa_id']);
 date_default_timezone_set($_SESSION['user']['zona_horaria']);
 $v_hoy = date('Y-m-d');
 
