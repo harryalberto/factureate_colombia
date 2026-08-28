@@ -3137,5 +3137,39 @@ class maestros{
 
         return $varr_result;
     }
+
+    function insert_noti_perfil($p_noti, $p_perfil){
+        $conn = new db_param; $conn->connect();
+
+        $v_sql = "insert into notificacion_perfil (perfilid,notificacionid,estado) values (".$p_perfil.",".$p_noti.",1)";
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $conn->next_record();
+    }
+
+    function delete_noti_perfil($p_noti, $p_perfil){
+        $conn = new db_param; $conn->connect();
+
+        $v_sql = "delete from notificacion_perfil where perilid = ".$p_perfil." and notificacionid = ".$p_noti;
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $conn->next_record();
+    }
+
+    function procesa_noti_perfil($p_noti, $parr_insert, $parr_delete){
+        if (isset($parr_insert)){
+            for ($i = 0; $i < count($parr_insert); $i++){
+                $this->insert_noti_perfil($p_noti,$parr_insert[$i]);
+            }
+        }
+
+        if (isset($parr_delete)){
+            for ($i = 0; $i < count($parr_delete); $i++){
+                $this->delete_noti_perfil($p_noti,$parr_delete[$i]);
+            }
+        }
+    }
 }
 ?>
