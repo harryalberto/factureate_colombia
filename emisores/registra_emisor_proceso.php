@@ -125,12 +125,12 @@ if ($_POST['accion'] == 'grabar'){
         $vobj_cuentas->registra_cuenta_banco_emisor($varr_datos);
 
         //++++ envio de de emisor para aprobacion
-        $obj_mae->enviar_registro_empresa($_POST['empresa_id']);
+        //$obj_mae->enviar_registro_empresa($_POST['empresa_id']);
         // correo a los analistas
         $arr_email = array( 'notificaid' => 46,
                             'datos_body' => 'Emisor: '.$_POST['nombre_empresa'].'<br>RNC: '.$_POST['ruc']
                         );
-        $obj_mail->enviar_correo_xnotificacion($arr_email);
+        //$obj_mail->enviar_correo_xnotificacion($arr_email);
 
         // correo al usuario
         $arr_mail_user = array( 'mail_salida' => 'pymes@factureate.com',
@@ -146,7 +146,7 @@ if ($_POST['accion'] == 'grabar'){
                                 'firma' => '../images/logo.png',
                                 'firma_nombre' => 'logo_factureate'
                                 );
-        $resp_correo = $obj_mail->enviar_correo_ws($arr_mail_user);
+        //$resp_correo = $obj_mail->enviar_correo_ws($arr_mail_user);
 
         //$output = $resp_correo['status'];
         $output = 1;
