@@ -1140,7 +1140,7 @@ class cuentas{
         $conn2 = new db_param_trans; $conn2->connect();
         $conn3 = new db_param_trans; $conn3->connect();
 
-        /*$idqry = $conn->query(" select count(1) as contador 
+        $idqry = $conn->query(" select count(1) as contador 
                                 from empresa_cuenta_banco 
                                 where empresa_id = ".$parr_cuenta['emisor_id']." and moneda_id = ".$parr_cuenta['moneda_id']." and estado_id > 0");
 
@@ -1160,8 +1160,8 @@ class cuentas{
                                 values(".$parr_cuenta['emisor_id'].",".$parr_cuenta['moneda_id'].",".$parr_cuenta['banco_id'].",'".$parr_cuenta['nro_cuenta']."',66,".$parr_cuenta['tcuenta_id'].",'".$parr_cuenta['certificado']."',".$v_id.")");
 
         if (!$idqry) echo pg_last_error($conn2->Link_ID);
-        $obj2 = $conn2->next_record();*/
-        $v_rpta = 500;
+        $obj2 = $conn2->next_record();
+        
         return $v_rpta;
     }
 
