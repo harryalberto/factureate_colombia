@@ -78,6 +78,82 @@ if ($_POST['accion'] == 'grabar'){
                                         ============
                                         <br>FACTUREATE');
     $obj_mail->enviar_correo($arr_mail_user);
+} elseif ($_POST['accion'] == 'archivos_emisor'){
+    if (isset($_FILES['file_cert_existencia']) && $_FILES['file_cert_existencia']['name'] != ''){
+        if (isset($_FILES['file_reg_accionistas']) && $_FILES['file_reg_accionistas']['name'] != ''){
+            if (isset($_FILES['file_doc_representante']) && $_FILES['file_doc_representante']['name'] != ''){
+                $v_carpeta_destino = $_SERVER['DOCUMENT_ROOT'].'/pdf/EMP_'.$arr_empresa['nombre'].'_'.$arr_empresa['identificacion'].'/vinculacion';
+                $v_carpeta_destino_db = '../pdf/EMP_'.$arr_empresa['nombre'].'_'.$arr_empresa['identificacion'].'/vinculacion';
+
+                $v_file_reg_mercantil = $v_carpeta_destino.'/cert_existencia_'.$_FILES['file_cert_existencia']['name'];
+                $v_file_reg_mercantil_db = $v_carpeta_destino_db.'/cert_existencia_'.$_FILES['file_cert_existencia']['name'];
+                $v_file_reg_accionistas = $v_carpeta_destino.'/reg_accionistas_'.$_FILES['file_reg_accionistas']['name'];
+                $v_file_reg_accionistas_db = $v_carpeta_destino_db.'/reg_accionistas_'.$_FILES['file_reg_accionistas']['name'];
+                $v_file_doc_representante = $v_carpeta_destino.'/doc_representante_'.$_FILES['file_doc_representante']['name'];
+                $v_file_doc_representante_db = $v_carpeta_destino_db.'/doc_representante_'.$_FILES['file_doc_representante']['name'];
+
+                move_uploaded_file($_FILES['file_cert_existencia']['tmp_name'],  $v_file_reg_mercantil);
+                move_uploaded_file($_FILES['file_reg_accionistas']['tmp_name'],  $v_file_reg_accionistas);
+                move_uploaded_file($_FILES['file_doc_representante']['tmp_name'],  $v_file_doc_representante);
+
+                $varr_path_documentos = array('registro_mercantil' => $v_file_reg_mercantil_db, 'documento_repre' => $v_file_doc_representante_db,
+                                            'poderes_empresa' => $v_file_reg_accionistas_db, 'empresa_id' => $_POST['empresa_id']);
+
+                $obj_mae->registra_path_documentos_empresa($varr_path_documentos);
+
+                $output = 1;
+            } else $output = 'No se encontro el documento del representante legal';
+        } else $output = 'No se encontrol el Registro de accionistas';
+    } else $output = 'No se encontro el Registro mercantil';
+
+    echo $output;
+} elseif ($_POST['accion'] == 'cuentas_emisor'){
+    if (isset($_FILES['file_cuenta']) && $_FILES['file_cuenta']['name'] != ''){
+        $v_carpeta = $_SERVER['DOCUMENT_ROOT'].'/pdf/EMP_'.$arr_empresa['nombre'].'_'.$arr_empresa['identificacion'].'/cuentas';
+        $v_carpeta_db = '../pdf/EMP_'.$arr_empresa['nombre'].'_'.$arr_empresa['identificacion'].'/cuentas';
+
+        if (!is_dir($v_carpeta)) mkdir($v_carpeta, 0777, true);
+
+        $v_file_path = $v_carpeta.'/'.$_FILES['file_cuenta']['name'];
+        $v_file_path_db = $v_carpeta_db.'/'.$_FILES['file_cuenta']['name'];
+
+        move_uploaded_file($_FILES['file_cuenta']['tmp_name'],  $v_file_path);
+
+        $varr_datos = array('emisor_id' => $_POST['empresa_id'], 'moneda_id' => $_POST['moneda'], 'banco_id' => $_POST['banco'], 'nro_cuenta' => $_POST['nro_cuenta'],
+                        'tcuenta_id' => $_POST['tipo_cuenta'], 'certificado' => $v_file_path_db);
+
+        $vobj_cuentas->registra_cuenta_banco_emisor($varr_datos);
+
+        //++++ envio de de emisor para aprobacion
+        $obj_mae->enviar_registro_empresa($_POST['empresa_id']);
+        // correo a los analistas
+        $arr_email = array( 'notificaid' => 46,
+                            'datos_body' => 'Emisor: '.$_POST['nombre_empresa'].'<br>RNC: '.$_POST['ruc']
+                        );
+        $obj_mail->enviar_correo_xnotificacion($arr_email);
+
+        // correo al usuario
+        $arr_mail_user = array( 'mail_salida' => 'pymes@factureate.com',
+                                'nombre_salida' => 'FACTUREATE',
+                                'mail_destino' => $arr_empresa['email_repre'],
+                                'subject' => 'Solicitud de admisi(o)n de nuevo Emisor',
+                                'body' => 'Su solicitud de registro como Emisor de FACTUREATE ha sido enviada, en breve terminaremos el analisis de la informacion y
+                                            le enviaremos un correo para que pueda iniciar a solicitar financiamiento.<br><br>
+                                            Empresa: '.$arr_empresa['nombre'].'<br>
+                                            RNC: '.$arr_empresa['identificacion'].'<br>
+                                            * Tildes omitidas intencionalmente<br><br>
+                                            <img src="cid:logo_factureate" width="100">',
+                                'firma' => '../images/logo.png',
+                                'firma_nombre' => 'logo_factureate'
+                                );
+        $resp_correo = $obj_mail->enviar_correo_ws($arr_mail_user);
+
+        //$output = $resp_correo['status'];
+        $output = 1;
+
+    } else $output = 'No se encontro el certificado bancario';
+
+    echo $output;
 }
 /*--------------------------------------------------------*/
 ?>

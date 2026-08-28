@@ -38,8 +38,20 @@ class mail_util{
             $mail->SMTPAuth = true;
             $mail->Username = $arr_mail['mail_salida']; // A RELLENAR. Email de la cuenta de correo. ej.info@midominio.com La cuenta de correo debe ser creada previamente.
             $mail->Password = $dato; // A RELLENAR. Aqui pondremos la contrase�a de la cuenta de correo
+            
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port = 587;
+
+            $mail->Timeout = 10;
+
+            $mail->SMTPOptions = array(
+                'ssl' => array(
+                    'verify_peer'       => false,
+                    'verify_peer_name'  => false,
+                    'allow_self_signed' => true
+                )
+            );
+            
             $mail->CharSet = 'UTF-8';
             $mail->setFrom(
                 $arr_mail['mail_salida'],
@@ -56,6 +68,66 @@ class mail_util{
         } catch (Exception $e) {
             echo 'Error: ' . $mail->ErrorInfo;
         }
+    }
+
+    function enviar_correo_ws($arr_mail){
+        $url = "https://factureate.com/co/envia_correo.php";
+
+        if (isset($arr_mail['firma']) && $arr_mail['firma'] != ''){
+            $v_firma = $arr_mail['firma'];
+            $v_firma_nombre = $arr_mail['firma_nombre'];
+        } else {
+            $v_firma = '';
+            $v_firma_nombre = '';
+        }
+
+        $arr_mail = http_build_query(
+                        array('mail_salida' => $arr_mail['mail_salida'] ?? '',
+                             'nombre_salida' => 'Factureate Notificaciones',
+                             'mail_destino' => $arr_mail['mail_destino'] ?? '',
+                             'subject' => $arr_mail['subject'] ?? '',
+                             'body' => $arr_mail['body'] ?? '',
+                             'firma' => $v_firma,
+                             'firma_nombre' => $v_firma_nombre
+                             )
+                    );
+
+        $ch = curl_init();
+
+        curl_setopt_array($ch, array(
+            CURLOPT_URL            => $url,
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => $arr_mail,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_TIMEOUT        => 10,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTPHEADER     => array('Expect:')//,
+            //CURLOPT_USERAGENT      => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) FactureateAzure/1.0'
+        ));
+
+        $rpta_raw   = curl_exec($ch);
+        $http_code  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $error_msg  = curl_error($ch);
+        $error_num  = curl_errno($ch);
+        curl_close($ch);
+
+        if ($error_num !== 0) {
+            return [
+                'status' => 'error_curl',
+                'code'   => $error_num,
+                'detail' => $error_msg
+            ];
+        }
+
+        if ($http_code !== 200) {
+            return ['status' => 'error', 'msj' => "HTTP Code $http_code desde cPanel. Respuesta: $rpta_raw"];
+        }
+
+        return ['status' => 'ok', 'data' => json_decode($rpta_raw, true)];
+        //$rpta_json = json_decode($rpta_raw, true);
     }
 
     function enviar_correo_attach($arr_mail){

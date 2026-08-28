@@ -405,13 +405,13 @@ if ($_SESSION['user']['perfilid'] == 4){
         if ($arr_empresa['estado'] == 1){   //REGISTRADA
             $v_grabar = 1;
 
-            echo '
+            /*echo '
                 <button style="font-size:12px;background-color:var(--color-azulv2);border:none;margin-top: 5px;" type="button" class="btn btn-primary" id="boton_grabar" onclick="grabar('.$v_grabar.')">
                     <i class="fa-solid fa-floppy-disk"></i> Grabar
                 </button>
                 <button style="font-size:12px;background-color:var(--color-azulv2);border:none;margin-top: 5px;" type="button" class="btn btn-primary" id="boton_enviar" onclick="enviar()">
                     <i class="fa-solid fa-paper-plane"></i> Enviar
-                </button>';
+                </button>';*/
         } elseif ($arr_empresa['estado'] == 3) {
             $v_grabar = 2;
 
@@ -457,6 +457,7 @@ if ($_SESSION['user']['perfilid'] == 4){
     <script type="text/javascript">
         // llamada a las funciones cuando se carga por primera vez la pagina
         document.addEventListener("DOMContentLoaded", getCuentasBanco);
+        document.addEventListener("DOMContentLoaded", gestionaEmisorNuevo);
 
         // funcion para obtener las cuentas de banco con AJAX
         function getCuentasBanco(){
@@ -479,6 +480,46 @@ if ($_SESSION['user']['perfilid'] == 4){
             .catch(err => console.log(err))
             //cierra_modal();
         }
+
+        //++++ funciones para gestionar un emisor nuevo
+        function gestionaEmisorNuevo(){
+            let estado_id = document.getElementById("estado_id").value
+            let empresa_id = document.getElementById("empresa_id").value
+            let poderes_path = document.getElementById("poderes_path").value
+
+            if (estado_id == 1){
+                // REGISTRADA
+                if (poderes_path == ""){
+                    $('.modal-title').text('REGISTRO');
+                    $('.modal-body').load('reg_emisor_archivos.php?empresa_id='+empresa_id,function(){
+                        $('#EmisorModal').modal({show:true});
+                    });
+                } else {
+                    $('.modal-title').text('REGISTRO CTA BANCO');
+                    $('.modal-body').load('reg_emisor_cuentas.php?empresa_id='+empresa_id,function(){
+                        $('#EmisorModal').modal({show:true});
+                    });
+                }
+
+            }
+        }
+
+        function cambia_modal_registro(origen, empresa){
+            $('#EmisorModal').modal({show:false});
+
+            if (origen == 'cuenta_banco'){
+                $('.modal-title').text('REGISTRO CTA BANCO');
+                $('.modal-body').load('reg_emisor_cuentas.php?empresa_id='+empresa,function(){
+                    $('#EmisorModal').modal({show:true});
+                });
+            }
+
+            if (origen == 'proceso_terminado'){
+                alert('Enhorabuena!! terminaste el registro, tu información será analizada por nuestra área legal, luego de ello recibirás un correo donde te avisaremos que ya puedes financiarte con nosotros');
+                refresh_page();
+            }
+        }
+        //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
         function cierra_modal(){
             //$('#EmisorModal').modal('hide');
