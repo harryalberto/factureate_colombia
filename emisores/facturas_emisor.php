@@ -55,6 +55,7 @@ if ($_SESSION['user']['tipousuario'] == 2 || $_SESSION['user']['tipousuario'] ==
 
 if (isset($_POST['estadoid'])){
     $estado_id_filtro = $_POST['estadoid'];
+    $estado_id_filtro_orig = $estado_id_filtro;
     $estadoid = 21;
 }
 
@@ -64,8 +65,10 @@ $v_empresaid = $_SESSION['user']['empresaid'];
 //DATOS PARA EL DETALLE
 if ($estado_id_filtro == 0) $filtros = '';
 else {
-    if ($estado_id_filtro > 100) $filtros = 'factura.estadofinanciamiento = '.$estado_id_filtro;
-    else $filtros = 'factura.estado = '.$estado_id_filtro;
+    if ($estado_id_filtro > 100){
+        $estado_id_filtro = $estado_id_filtro - 100;
+        $filtros = 'factura.estadofinanciamiento = '.$estado_id_filtro;
+    } else $filtros = 'factura.estado = '.$estado_id_filtro;
 }
 
 $rowcount = $objfactura->get_facturas_activas_xemisor('COUNT', 0, 0, $filtros,'', $_SESSION['user']['empresaid']);
@@ -105,7 +108,7 @@ $rowcount = $objfactura->get_facturas_activas_xemisor('COUNT', 0, 0, $filtros,''
                     if ($varr_estadofin[$j]['id'] != 36){   // EXCLUYO LAS PAGADAS
                         $v_id_option = 100 + $varr_estadofin[$j]['id'];
 
-                        if ($estado_id_filtro == $v_id_option)
+                        if ($estado_id_filtro_orig == $v_id_option)
                             echo '
                     <option value="'.$v_id_option.'" selected>'.$varr_estadofin[$j]['nombre'].'</option>';
                         else
@@ -114,7 +117,7 @@ $rowcount = $objfactura->get_facturas_activas_xemisor('COUNT', 0, 0, $filtros,''
                     }
                 }
             } else {
-                if ($estado_id_filtro == $arrestados[$i]['id'])
+                if ($estado_id_filtro_orig == $arrestados[$i]['id'])
                     echo '
                     <option value="'.$arrestados[$i]['id'].'" selected>'.$arrestados[$i]['nombre'].'</option>';
                 else

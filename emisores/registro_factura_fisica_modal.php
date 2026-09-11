@@ -80,6 +80,7 @@ if ($tipo == 'new'){
     $nrofactura = $arrfactura['factura'];
     
     $femision = $arrfactura['femision'];
+
     $v_femision_esp = date('d-m-Y',strtotime($femision));
     $v_femision_eng = $femision;
     
@@ -142,21 +143,37 @@ if ($tipo == 'new'){
     }
 
     //======== CALCULO DE ESTIMADOS PARA EL EMISOR
+    $fhoy = strtotime($hoy);
+    $fhoy = date('Y-m-d', $fhoy);
+    $v_dt_hoy = new DateTime($fhoy);
+
     $v_dt_femision = new DateTime($femision);
     $v_dt_fvencimiento = new DateTime($fvencimiento);
-    $v_diff = $v_dt_femision->diff($v_dt_fvencimiento);
+    
+    //$v_diff = $v_dt_femision->diff($v_dt_fvencimiento);
+    $v_diff = $v_dt_hoy->diff($v_dt_fvencimiento);
     $v_dias = $v_diff->days;
 
-    $v_comi_fact_emi = $objmaestros->get_comision_fact_emisor($_SESSION['user']['empresaid'],$clienteid);
     $v_porc_adelanto = $objmaestros->get_porc_adelanto_emisor($_SESSION['user']['empresaid'],$clienteid);
 
     $v_inicial = number_format($total * $arrparametros['% FINANCIA']['valornum'],2,'.',',');
     $v_inicial_math = $total * $arrparametros['% FINANCIA']['valornum'];
 
-    if ($monedaid == 20) $v_tarifa_registro = $arrparametros['TARIFA REGISTRO INSTRUMENTO']['valornum'];
-    else $v_tarifa_registro = $arrparametros['TARIFA REG INST DOL']['valornum'];
-
     $v_adelanto_upd = $total * $v_porc_adelanto;
+
+    // nueva modalidad de tarifas para emisor
+    $varr_tarifas_emisor = $objmaestros->get_tarifas_emisor($_SESSION['user']['empresaid']);
+
+    // tarifa de registro
+    if ($monedaid == 20) $v_tarifa_registro = $varr_tarifas_emisor['registro_nac'];
+    else $v_tarifa_registro = $varr_tarifas_emisor['registro_ext'];
+    /*if ($monedaid == 20) $v_tarifa_registro = $arrparametros['TARIFA REGISTRO INSTRUMENTO']['valornum'];
+    else $v_tarifa_registro = $arrparametros['TARIFA REG INST DOL']['valornum'];*/
+
+    // comision que le cobra factureatre al emisor
+    $v_comi_fact_emi = $varr_tarifas_emisor['comision'] / 100;
+    //$v_comi_fact_emi = $objmaestros->get_comision_fact_emisor($_SESSION['user']['empresaid'],$clienteid);
+
     $v_comi_fact_upd = $v_tarifa_registro + ($v_comi_fact_emi * $v_adelanto_upd);
     $v_ganancia_upd = $arrparametros['TED PROMEDIO INVERSOR']['valornum'] * $v_dias * $v_adelanto_upd;
     
@@ -991,11 +1008,31 @@ $v_dias_min = $v_dias_min.' días';
             });
         }
         function anular(){
-            var opcion = confirm("Esta seguro de anular la factura?")
+            var opcion = confirm("Esta seguro de anular la factura?");
 
             if (opcion == true){
-                document.frm_factura_modal.action = 'anular_factura.php';
-                document.frm_factura_modal.submit();
+                var formData = new FormData();
+                var factura_id = document.getElementById("facturaid").value;
+
+                formData.append('facturaid', factura_id)
+
+                $.ajax({
+                    url: "anular_factura_proceso.php",
+                    type: "POST",
+                    data: formData,
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+                    success: function(data)
+                    {
+                        if (data == 1) {
+                            alert('La factura fue anulada');
+                            refresh_page();
+                        }
+                        if (data == 0) alert('No se pudo anular la factura');
+                        if (data < 0) alert('Ocurrio un error');
+                    }
+                });
             }
         }
 

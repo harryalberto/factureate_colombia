@@ -23,6 +23,7 @@ if ($_POST['orderCol'] == 1) $v_order = 'empresa.nombre '.$_POST['orderType'];
 if ($_POST['orderCol'] == 2) $v_order = 'factura.total '.$_POST['orderType'];
 if ($_POST['orderCol'] == 4) $v_order = 'tipos.nombre '.$_POST['orderType'];
 if ($_POST['orderCol'] == 6) $v_order = 'factura.fvencimiento '.$_POST['orderType'];
+if ($_POST['orderCol'] == 8) $v_order = 'factura.tipofinanciamiento '.$_POST['orderType'];
 
 $varr_subastas_load = $vobj_subastas_load->get_subastas_inversor('SELECT', $_POST['registros'], $rowini, $_POST['filtros'], $v_order, $_POST['inversor_id']);
 $totalFiltro = count($varr_subastas_load);
@@ -54,14 +55,25 @@ for ($i = 0; $i < count($varr_subastas_load); $i++){
     $dias = $dif->days;
     $v_fvencimiento_t = strtotime($varr_subastas_load[$i]['f_vencimiento']);
     $v_fvencimiento_l = date('d-m-Y',$v_fvencimiento_t);
-    
+
+    //++++ tipo financiamiento
+    if ($varr_subastas_load[$i]['tipo_financiamiento'] == 23){
+        $v_label_financiamiento = 'DIRECTO';
+        $v_label_financiamiento_help = 'Asignación directa a la primera propuesta';
+    } else {
+        $v_label_financiamiento = 'SUBASTA';
+        $v_label_financiamiento_help = 'Subasta donde se asignará la compra a la mejor propuesta';
+    }
+    //$varr_subastas_load[$i]['riesgo']
     $output['data'] .= '<tr>
                             <td data-label="ID">'.$varr_subastas_load[$i]['factura_id'].'</td>      <td data-label="PAGADOR">'.$varr_subastas_load[$i]['cliente'].'</td>
                             <td data-label="MONTO FACTURA">'.number_format($varr_subastas_load[$i]['total'],2,'.',',').'</td>   
                             <td data-label="FINANCIAMIENTO">'.number_format($varr_subastas_load[$i]['monto_fin'],2,'.',',').'</td>
                             <td data-label="MONEDA">'.$varr_subastas_load[$i]['moneda'].'</td>      <td data-label="DIAS X COBRAR">'.$dias.'</td>
                             <td data-label="F VENCIMIENTO">'.$v_fvencimiento_l.'</td>               
-                            <td data-label="RIESGO" style="background-color:#'.$varr_subastas_load[$i]['color'].';color:#'.$varr_subastas_load[$i]['color_fuente'].';">['.$varr_subastas_load[$i]['calificacion'].'] '.$varr_subastas_load[$i]['riesgo'].'</td>
+                            <td data-label="RIESGO" style="background-color:#'.$varr_subastas_load[$i]['color'].';color:#'.$varr_subastas_load[$i]['color_fuente'].';border-radius: 10px;">
+                            ['.$varr_subastas_load[$i]['calificacion'].'] <abbr title="'.$varr_subastas_load[$i]['riesgo'].'='.$varr_subastas_load[$i]['riesgo_desc'].'"><i class="fa-solid fa-circle-info"></i></abbr></td>
+                            <td data-label="TIPO">'.$v_label_financiamiento.' <abbr title="'.$v_label_financiamiento_help.'"><i class="fa-solid fa-circle-info"></i></abbr></td>
                             <td data-label="ACCION">'.$v_boton_detalle.'</td>
                         </tr>';
 }

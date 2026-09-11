@@ -292,6 +292,8 @@ else $v_qempresas_sinvalidar = '---';
     $v_dataset_graph2 = '';
     $v_bg_graph2 = '';
     $v_border_graph2 = '';
+    $v_dataset2_graph2 = '';
+    $v_bg2_graph2 = '';
 
     for ($i = 0; $i < count($varr_subastas_tiempo); $i++){
         $v_labels_graph2 .= "'".$varr_subastas_tiempo[$i]['mes']."'";

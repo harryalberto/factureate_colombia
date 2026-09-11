@@ -25,7 +25,7 @@ if ($_POST['orderCol'] == 4) $v_order = 'factura.total '.$_POST['orderType'];
 if ($_POST['orderCol'] == 5) $v_order = 'factura.fvencimiento '.$_POST['orderType'];
 if ($_POST['orderCol'] == 6) $v_order = 'tfin.nombre '.$_POST['orderType'];
 
-$varr_datos = $vobj_factura_load->get_facturas_activas_xemisor('SELECT', 0, 0, '',$v_order, $_SESSION['user']['empresaid']);
+$varr_datos = $vobj_factura_load->get_facturas_activas_xemisor('SELECT', 0, 0, $_POST['filtros'],$v_order, $_SESSION['user']['empresaid']);
 $totalFiltro = count($varr_datos);
 $totalRegistros = $rowcount;
 

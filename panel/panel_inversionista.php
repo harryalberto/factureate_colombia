@@ -257,7 +257,7 @@ $rowcount = $vobj_subastas->get_subastas_inversor('COUNT', 0, 0, $filtros, '', $
                         <th scope="col" class="sort asc">MONTO FACTURA</th> <th scope="col" class="sort asc">FINANCIAMIENTO</th>
                         <th scope="col" class="sort asc">MONEDA</th>        <th scope="col" class="sort asc">DIAS X COBRAR</th>
                         <th scope="col" class="sort asc">F VENCIMIENTO</th> <th scope="col" class="sort asc">RIESGO</th>
-                        <th scope="col" class="sort asc">ACCION</th>        
+                        <th scope="col" class="sort asc">TIPO</th>          <th scope="col" class="sort asc">ACCION</th>
                     </tr>
                 </thead>
                 <tbody id="content">

@@ -358,6 +358,8 @@ else $v_muestra_estado_legal = '';
                     <label><a href="'.$arr_empresa['docrepre_path'].'" target="_blank"><i class="fa-solid fa-file-pdf" style="font-size:18px;"></i></a></label>
                 </div>';
 
+            $varr_documentos = $obj_mae->get_archivos_empresa($_GET['id']);
+
             echo '
                 <div class="formulario_grupo_row" style="width: 200px;">
                     <label for="regmercantil_file">CAMARA COMERCIO</label>
@@ -371,6 +373,19 @@ else $v_muestra_estado_legal = '';
                     <label><a href="'.$arr_empresa['vigencia_path'].'" target="_blank"><i class="fa-solid fa-file-pdf" style="font-size:18px;"></i></a></label>
                 </div>';
 
+            echo '
+                <div class="formulario_grupo_row" style="width: 200px;">
+                    <label for="certaccionistas_file">CERTIFICADO ACCIONISTAS</label>
+                    <input type="file" name="certaccionistas_file" id="certaccionistas_file" class="formulario_control" style="background-color:#fff;">
+                </div>';
+
+            if ($varr_documentos['cert_accionistas'] != '' && !is_null($varr_documentos['cert_accionistas']))
+                echo '
+                <div class="formulario_grupo_row" style="width: 80px;">
+                    <label for="certaccionistas_path">PDF</label>
+                    <label><a href="'.$varr_documentos['cert_accionistas'].'" target="_blank"><i class="fa-solid fa-file-pdf" style="font-size:18px;"></i></a></label>
+                </div>';
+            
             echo '
             </div>';
         }

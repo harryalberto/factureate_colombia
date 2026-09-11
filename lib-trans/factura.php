@@ -187,6 +187,20 @@ class factura{
         //$cfact->close();
         return 1;
     }
+
+    function anula_factura_v2($p_factura_id){
+        $cfact = new db_param_trans; $cfact->connect();
+
+        $idqry = $cfact->query("select fact_anula_factura_v2(".$p_factura_id.",".$_SESSION['user']['usuarioid'].") as resultado");
+        if (!$idqry) echo pg_last_error($cfact->Link_ID);
+        $obj = $cfact->next_record();
+
+        $v_resultado = $obj->resultado;
+
+        //+++ resultado 0= no se anulo nada, 1 = si se anulo
+        return $v_resultado;
+    }
+
     function get_facturas_xestado($estadoid,$rows,$rowini,$tipo){
         $cfact = new db_param_trans;
         $cfact->connect();
@@ -1140,6 +1154,20 @@ class factura{
         $varr_result = array('id' => $obj->id, 'estado_id' => $obj->estado_id, 'tipo_id' => $obj->tipo_id, 'fecha' => $obj->fecha, 'hora' => $obj->hora);
 
         return $varr_result;
+    }
+
+    function get_comisiones_factureate($p_factura_id, $p_tipo){
+        $conn = new db_param_trans; $conn->connect();
+
+        $v_sql = "select FINAN_CALCULA_COMISIONES(".$p_factura_id.",'".$p_tipo."') as comision";
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+
+        $v_resultado = $obj->comision;
+
+        return $v_resultado;
     }
 }
 ?>

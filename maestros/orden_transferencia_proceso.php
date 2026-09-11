@@ -67,6 +67,7 @@ if ($_POST['accion'] == 'transferir'){
         $obj_mae->termina_orden_transferencia($_POST['ot_id']);
 
         $arr_inversionistas = $obj_subasta->get_inversionistas_xsubasta($_POST['subasta_id']);
+
         //--- envio de correo a inversionistas
         for ($i=0; $i<count($arr_inversionistas); $i++){
             $arr_usuario = $obj_seg->get_datos_usuario($arr_inversionistas[$i]['inversionista_id']);

@@ -155,8 +155,12 @@ if ($_GET['pid'] == 0) $tia = $v_tea_minima;
         <ul>
             <li><span class="icon-office" style="font-size:25px;color:#1F9A8E;"></span></li>
             <li style="width:300px;"><?php echo ' '.$arrsubasta['cliente'];?></li>
-    <?php
-    echo '  <li style="padding-left:5px;padding-right:5px;background-color:#'.$arrsubasta['riesgo_factura_color'].';color:#'.$arrsubasta['riesgo_factura_color_fuente'].';">['.$arrsubasta['riesgo_factura_califica'].'] '.$arrsubasta['riesgo_factura_nombre'].'</li>
+
+<?php
+    echo '  <li style="padding-left:5px;padding-right:5px;background-color:#'.$arrsubasta['riesgo_factura_color'].';color:#'.$arrsubasta['riesgo_factura_color_fuente'].';">
+                ['.$arrsubasta['riesgo_factura_califica'].']
+            </li>
+            <li style="font-size:20px;"><abbr title="'.$arrsubasta['riesgo_factura_nombre'].'='.$arrsubasta['riesgo_desc'].'"><i class="fa-solid fa-circle-info"></i></abbr></li>
         </ul>';
 
     if ($varr_parametros['VER CATEGORIA INVERSOR']['valornum'] == 1){
@@ -194,15 +198,41 @@ if ($_GET['pid'] == 0) $tia = $v_tea_minima;
             <input type="hidden" name="dias" value="<?=$dias?>">
         </ul>
         <div style="overflow:hidden;background-color:#555555;height:1px;"></div>
-        <ul style="margin-top:10px;">
-            <li style="font-weight:bold;width:300px;padding-left:5px;padding-right:5px;">CALIFICACION DEL PAGADOR (SCORE):</li>
-            <li style="padding-left:5px;padding-right:5px;background-color:#<?=$arrsubasta['colorscore']?>"><?php echo '[ '.$arrsubasta['calificacionscore'].' ] '.$arrsubasta['riesgoscore'];?></li>
+
+<?php
+    if ($arrsubasta['tipo_financiamiento'] == 23){
+        $v_label_financiamiento = 'DIRECTO';
+        $v_label_financiamiento_help = 'Asignación directa a la primera propuesta';
+    } else {
+        $v_label_financiamiento = 'SUBASTA';
+        $v_label_financiamiento_help = 'Subasta donde se asignará la compra a la mejor propuesta';
+    }
+
+    //+++ calculo fecha de fin
+    $f_hoy = date('Y-m-d');
+    $dt_hoy_en = new DateTime();
+
+    $f_termino = date('d-m-Y', strtotime($arrsubasta['f_fin_subasta']));
+    $h_termino = strstr($arrsubasta['h_fin_subasta'], '.', true);
+    $dt_termino_en = new DateTime($arrsubasta['f_fin_subasta'].' '.$h_termino);
+
+    $dif_segundos = $dt_termino_en->getTimestamp() - $dt_hoy_en->getTimestamp();
+    $dif_horas = round($dif_segundos / 3600, 2);
+?>
+
+        <ul style="font-weight:bold; background-color: var(--color-amarillo);">
+            <li>Tipo de Inversión:</li>
+            <li><?php echo $v_label_financiamiento.' <abbr title="'.$v_label_financiamiento_help.'"><i class="fa-solid fa-circle-info"></i></abbr>';?></li>
         </ul>
-        <ul>
-            <li style="font-weight:bold;width:300px;padding-left:5px;padding-right:5px;">CALIFICACION DEL PAGADOR (FACTUREATE):</li>
-            <li style="padding-left:5px;padding-right:5px;background-color:#<?=$arrsubasta['color']?>"><?php echo '[ '.$arrsubasta['calificacion'].' ] '.$arrsubasta['riesgo'];?></li>
+        <ul style="font-weight:bold; background-color: var(--color-amarillo);">
+            <li>Oportunidad termina el:</li>
+            <li><?php echo $f_termino.' '.$h_termino;?></li>
+            <li>en</li>
+            <li><?php echo $dif_horas.' horas'?></li>
         </ul>
+
         <div style="overflow:hidden;background-color:#555555;height:1px;"></div>
+
         <ul style="margin-top:10px;">
             <li style="font-weight:bold;">PROPUESTA (<?php echo $arrsubasta['moneda'];?>): <?php echo $v_alerta_preliminar;?></li>
         </ul>
@@ -263,37 +293,68 @@ if ($_GET['pid'] == 0) $tia = $v_tea_minima;
                 <details>
                     <summary style="font-size: 14px;font-weight: bold;"><i class="fa-solid fa-diagram-successor"></i> Detalle del Obligado al Pagador</summary>
                     <p style="font-size:12px;max-width:600px;">
-                        <b style="color:#064677;">RNC:</b> <?php echo $arrobpago['identificacion'];?><br>
-                        <b style="color:#064677;">Nombre:</b> <?php echo $arrobpago['nombre'];?><br>
-                        <b style="color:#064677;">Sector Econ&oacute;mico:</b> <?php echo $arrobpago['sectoreconomico'];?><br>
-                        <b style="color:#064677;">Descripci&oacute;n de la empresa:</b> <?php echo $arrobpago['actividad'];?><br>
-                        <b style="color:#064677;">Fecha de fundaci&oacute;n:</b> <?php echo $finicio;?><br>
-                        <b style="color:#064677;">Pagina Web:</b> <?php echo $arrobpago['paginaweb'];?>
+                        <b style="color:color:var(--color-azul-oscuro);">NIT:</b> <?php echo $arrobpago['identificacion'];?><br>
+                        <b style="color:color:var(--color-azul-oscuro);">Nombre:</b> <?php echo $arrobpago['nombre'];?><br>
+                        <b style="color:color:var(--color-azul-oscuro);">Sector Econ&oacute;mico:</b> <?php echo $arrobpago['sectoreconomico'];?><br>
+                        <b style="color:color:var(--color-azul-oscuro);">Descripci&oacute;n de la empresa:</b> <?php echo $arrobpago['actividad'];?><br>
+                        <b style="color:color:var(--color-azul-oscuro);">Fecha de fundaci&oacute;n:</b> <?php echo $finicio;?><br>
+                        <b style="color:color:var(--color-azul-oscuro);">Pagina Web:</b> <?php echo $arrobpago['paginaweb'];?>
                     </p>
                 </details>
             </li>
         </ul>
+
+<?php
+$varr_riesgos = $obj_mae->get_reporte_riesgos_factura($arrsubasta['emisorid'], $arrsubasta['clienteid']);
+$varr_riesgos_pagador = $obj_mae->get_reporte_riesgos_pagador($varr_riesgos['riesgo_empresa_id']);
+$varr_riesgos_comercial = $obj_mae->get_reporte_riesgos_comercial($arrsubasta['emisorid'], $arrsubasta['clienteid']);
+?>
+
         <ul>
             <li>
                 <details>
-                    <summary style="font-size: 14px;font-weight: bold;"><i class="fa-solid fa-diagram-successor"></i> Riesgos de la Factura y del Obligado al Pago</summary>
-                    <?php
-                    if ($arrfacturariesgo['riesgoid'] != 0){
-                        echo '<p style="font-size:12px;max-width:600px;color:#064677;font-weight: bold;">Riesgo Factura</p>
-                                <p style="font-size:12px;max-width:600px;">['.$arrfacturariesgo['calificacion_riesgo'].'] '.$arrfacturariesgo['nombre_riesgo'].'</p>
-                                <p style="font-size:12px;max-width:600px;">'.$arrfacturariesgo['desc_riesgo'].'</p>';
-                    }
-                    if ($arrobpagoriesgo['riesgo_factid'] != 0){
-                        echo '<p style="font-size:12px;max-width:600px;color:#064677;font-weight: bold;">Calificaci&oacute;n de Riesgo Factureate</p>
-                                <p style="font-size:12px;max-width:600px;">['.$arrobpagoriesgo['crfact'].'] '.$arrobpagoriesgo['nrfact'].'</p>
-                                <p style="font-size:12px;max-width:600px;">'.$arrobpagoriesgo['desc_riesgofact'].'</p>';
-                    }
+                    <summary style="font-size: 14px;font-weight: bold;"><i class="fa-solid fa-diagram-successor"></i>Analisis de Riesgos</summary>
+                    <p style="font-size:14px;max-width:600px;color:var(--color-azul);font-weight: bold;">Nivel de Riesgo</p>
+                    <p style="font-size:12px;max-width:600px;">
+                        <b><?php echo '['.$varr_riesgos['NIVEL RIESGO']['calificacion'].'] '.$varr_riesgos['NIVEL RIESGO']['nombre'];?></b><br>
+                        <?php echo $varr_riesgos['NIVEL RIESGO']['descripcion'];?>
+                    </p>
 
-                    echo '<p style="font-size:12px;max-width:600px;color:#064677;font-weight: bold;">Calificación de Empresa Score de Riesgo</p>
-                            <p style="font-size:12px;max-width:600px;font-weight: bold;>Nombre de Calificadora: '.$arrobpagoriesgo['nombrescore'].'</p>
-                            <p style="font-size:12px;max-width:600px;">['.$arrobpagoriesgo['crscore'].'] '.$arrobpagoriesgo['nrscore'].'</p>
-                            <p style="font-size:12px;max-width:600px;">'.$arrobpagoriesgo['desc_riesgoscore'].'</p>';
-                    ?>
+                    <p style="font-size:14px;max-width:600px;color:var(--color-azul);font-weight: bold;">Analisis Pagador</p>
+                    <p style="font-size:12px;max-width:600px;">
+
+<?php
+    if (count($varr_riesgos_pagador) > 0){
+        for ($i = 0; $i < count($varr_riesgos_pagador); $i++){
+            echo '      <b>'.$varr_riesgos_pagador[$i]['nombre'].': </b>'.$varr_riesgos_pagador[$i]['descripcion'].'<br>';
+        }
+    }
+?>
+
+                    </p>
+
+<?php
+    if (count($varr_riesgos_comercial) >0){
+        echo '      <p style="font-size:14px;max-width:600px;color:var(--color-azul);font-weight: bold;">Analisis Comercial</p>
+                    <p style="font-size:12px;max-width:600px;">';
+
+        for ($i = 0; $i < count($varr_riesgos_comercial); $i++){
+            echo '      <b>'.$varr_riesgos_comercial[$i]['nombre'].': </b>'.$varr_riesgos_comercial[$i]['descripcion'].'<br>';
+        }
+
+        echo '      </p>';
+    }
+
+    if ($varr_riesgos['BURO']['empresa'] != '' && $varr_riesgos['BURO']['descripcion'] != '' && $varr_riesgos['BURO']['informe'] != ''){
+        echo '      <p style="font-size:14px;max-width:600px;color:var(--color-azul-oscuro);font-weight: bold;">Informe Buro</p>
+                    <p style="font-size:12px;max-width:600px;">
+                        <b>Empresa: </b>'.$varr_riesgos['BURO']['empresa'].'<br>
+                        <b>Desripción: </b>'.$varr_riesgos['BURO']['descripcion'].'<br>
+                        <b>Informe: </b><a href="'.$varr_riesgos['BURO']['informe'].'" target="_blank"><i class="fa-solid fa-file-pdf"></i></a><br>
+                    </p>';
+    }
+?>
+
                 </details>
             </li>
         </ul>
@@ -301,27 +362,44 @@ if ($_GET['pid'] == 0) $tia = $v_tea_minima;
             <li>
                 <details>
                     <summary style="font-size: 14px;font-weight: bold;"><i class="fa-solid fa-diagram-successor"></i> Historial de Negociaci&oacute;n</summary>
-                    <?php
-                    if ($arrhistoria['noperaciones'] > 0){
-                        echo '<p style="font-size:12px;max-width:600px;">El obligado al pago cuenta con el siguiente historial de negociaci&oacute;n:</p>
-                            <p style="font-size:12px;max-width:600px;"><b>Nro TOTAL de operaciones:</b>'.$arrhistoria['noperaciones'].'<br>
-                                <b>Nro de operaciones en proceso:</b>'.$arrhistoria['enproceso'].'<br>
-                                <b>Nro de operaciones pagadas a tiempo:</b>'.$arrhistoria['pagadaontime'].'<br>
-                                <b>Nro de operaciones pagadas con retrazo:</b>'.$arrhistoria['pagadadelay'].'<br>
-                                <b>Nro de operaciones en cobranza:</b>'.$arrhistoria['cobranza'].'
-                            </p>
-                            <p style="font-size:12px;max-width:600px;">Historial en montos:</p>';
-                        if ($arrhistoria['montofinanciadosol'] > 0) echo '<p style="font-size:12px;max-width:600px;">Financiado S/. : '.number_format($arrhistoria['montofinanciadosol'],2,'.',',').'</p>';
+
+<?php
+    $v_promedio = $obj_mae->get_promedio_retraso_pagador($arrsubasta['clienteid']);
+
+    echo '              <p style="font-size:12px;max-width:600px;">
+                            <b>Promedio pagos luego de fecha: </b>'.number_format($v_promedio,2,'.',',').' días
+                        </p>';
+
+    if ($arrhistoria['noperaciones'] > 0){
+        echo '          <p style="font-size:12px;max-width:600px;">Operaciones donde participa el pagador:</p>
+                        <p style="font-size:12px;max-width:600px;">
+                            <b>Nro TOTAL de operaciones:</b>'.$arrhistoria['noperaciones'].'<br>
+                            <b>Nro de operaciones en proceso:</b>'.$arrhistoria['enproceso'].'<br>
+                            <b>Nro de operaciones pagadas a tiempo:</b>'.$arrhistoria['pagadaontime'].'<br>
+                            <b>Nro de operaciones pagadas con retrazo:</b>'.$arrhistoria['pagadadelay'].'<br>
+                            <b>Nro de operaciones en cobranza:</b>'.$arrhistoria['cobranza'].'
+                        </p>';
+
+        $v_historial_montos = $arrhistoria['montofinanciadosol'] + $arrhistoria['montofinanciadodol'] + $arrhistoria['montofinanciadoeur'] + $arrhistoria['montocobranzasol'];
+        $v_historial_montos = $v_historial_montos + $arrhistoria['montocobranzadol'] + $arrhistoria['montocobranzaeur'];
+
+        if ($v_historial_montos > 0){
+            echo '      <p style="font-size:12px;max-width:600px;">Historial en montos:</p>';
+                        if ($arrhistoria['montofinanciadosol'] > 0) echo '<p style="font-size:12px;max-width:600px;">Financiado COP$ : '.number_format($arrhistoria['montofinanciadosol'],2,'.',',').'</p>';
                         if ($arrhistoria['montofinanciadodol'] > 0) echo '<p style="font-size:12px;max-width:600px;">Financiado US$ : '.number_format($arrhistoria['montofinanciadodol'],2,'.',',').'</p>';
                         if ($arrhistoria['montofinanciadoeur'] > 0) echo '<p style="font-size:12px;max-width:600px;">Financiado EUR : '.number_format($arrhistoria['montofinanciadoeur'],2,'.',',').'</p>';
-                        if ($arrhistoria['montocobranzasol'] > 0) echo '<p style="font-size:12px;max-width:600px;">En Cobranza S/. : '.number_format($arrhistoria['montocobranzasol'],2,'.',',').'</p>';
+                        if ($arrhistoria['montocobranzasol'] > 0) echo '<p style="font-size:12px;max-width:600px;">En Cobranza COP$ : '.number_format($arrhistoria['montocobranzasol'],2,'.',',').'</p>';
                         if ($arrhistoria['montocobranzadol'] > 0) echo '<p style="font-size:12px;max-width:600px;">En Cobranza US$ : '.number_format($arrhistoria['montocobranzadol'],2,'.',',').'</p>';
                         if ($arrhistoria['montocobranzaeur'] > 0) echo '<p style="font-size:12px;max-width:600px;">En Cobranza EUR : '.number_format($arrhistoria['montocobranzaeur'],2,'.',',').'</p>';
-                    } else echo '<p style="font-size:12px;max-width:600px;">El obligado al pago no tiene historial de negociaci&oacute;n a&uacute;n</p>';
-                    ?>
+        }
+    
+    } else echo '<p style="font-size:12px;max-width:600px;">El obligado al pago no tiene historial de negociaci&oacute;n a&uacute;n</p>';
+?>
+
                 </details>
             </li>
         </ul>
+
         <div style="overflow:hidden;background-color:#555555;height:1px;"></div>
         <!--#######################################################
         ##################### BOTONERA

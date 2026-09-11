@@ -3171,5 +3171,154 @@ class maestros{
             }
         }
     }
+
+    function get_archivos_empresa($p_empresa_id){
+        $conn = new db_param_trans; $conn->connect();
+
+        $v_sql = "select ficharucpath, vigenciapoderespath, identificacionreprepath from empresa where id = ".$p_empresa_id;
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+
+        $varr_rpta = array( 'registro_mercantil' => $obj->ficharucpath,
+                            'cert_accionistas' => $obj->vigenciapoderespath,
+                            'doc_representante' => $obj->identificacionreprepath
+                        );
+
+        return $varr_rpta;
+    }
+
+    function get_tarifas_emisor($p_emisor_id){
+        $conn = new db_param_trans; $conn->connect();
+
+        $v_sql = "  select empresa.categoria_id, empresa_categoria_emisor.nombre, empresa_categoria_emisor.registro, empresa_categoria_emisor.registro_ext, empresa_categoria_emisor.comision
+                    from empresa, empresa_categoria_emisor
+                    where empresa.id = ".$p_emisor_id." and empresa_categoria_emisor.id = empresa.categoria_id and empresa_categoria_emisor.estado_id = 1";
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+
+        $varr_rpta = array( 'categoria_id' => $obj->categoria_id,
+                            'nombre' => $obj->nombre,
+                            'registro_nac' => $obj->registro,
+                            'registro_ext' => $obj->registro_ext,
+                            'comision' => $obj->comision
+                        );
+
+        return $varr_rpta;
+    }
+
+    function get_reporte_riesgos_factura($p_emisor_id, $p_pagador_id){
+        $conn = new db_param_trans; $conn->connect();
+
+        $varr_rpta = array();
+
+        //++++ obtengo el nivel de riesgo y del buro
+        $v_sql = "  select  riesgo_empresa.id, riesgo_empresa.riesgoid, COALESCE(riesgo_empresa.riesgoscoreid,0) as riesgo_score_id,
+                            COALESCE(riesgo_empresa.empresa_scoreid,0) as empresa_score_id, COALESCE(riesgo_empresa.informe_score,'') as informe_score_path,
+                            tipo_riesgo_empresa.nombre as riesgo_nombre, tipo_riesgo_empresa.calificacion, tipo_riesgo_empresa.descripcion as riesgo_desc,
+                            tipo_riesgo_empresa.color, tipo_riesgo_empresa.color_fuente, COALESCE(empresa_score_riesgos.nombre,'') as empresa_score_nombre,
+                            COALESCE(riesgo_empresa.desc_riesgo_score,'') as riesgo_score_desc
+                    from (riesgo_empresa left outer join empresa_score_riesgos on riesgo_empresa.empresa_scoreid = empresa_score_riesgos.id), tipo_riesgo_empresa
+                    where riesgo_empresa.empresaid = ".$p_pagador_id." and riesgo_empresa.estado = 1 and tipo_riesgo_empresa.id = riesgo_empresa.riesgoid";
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+
+        $varr_rpta['NIVEL RIESGO']['calificacion'] = $obj->calificacion;
+        $varr_rpta['NIVEL RIESGO']['nombre'] = $obj->riesgo_nombre;
+        $varr_rpta['NIVEL RIESGO']['descripcion'] = $obj->riesgo_desc;
+        $varr_rpta['BURO']['empresa'] = $obj->empresa_score_nombre;
+        $varr_rpta['BURO']['descripcion'] = $obj->riesgo_score_desc;
+        $varr_rpta['BURO']['informe'] = $obj->informe_score_path;
+        $varr_rpta['riesgo_empresa_id'] = $obj->id;
+
+        return $varr_rpta;
+    }
+
+    function get_reporte_riesgos_pagador($p_riesgo_empresa_id){
+        //++++ riesgos del pagador
+        $conn = new db_param_trans; $conn->connect();
+
+        $v_sql = "  select riesgo_empresa_detalle.id, riesgo_empresa_detalle.tipo_detalle_id, riesgo_empresa_detalle.descripcion, tipos.nombre as riesgo_det_nombre
+                    from riesgo_empresa_detalle, tipos
+                    where tipos.id = riesgo_empresa_detalle.tipo_detalle_id and riesgo_empresa_detalle.estado_id = 1 and riesgo_empresa_detalle.riesgo_empresa_id = ".$p_riesgo_empresa_id."
+                    order by riesgo_empresa_detalle.tipo_detalle_id";
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+
+        $obj = $conn->next_record();
+        $varr_rpta = array();
+
+        for ($i = 0; $i < $conn->nrows(); $i++){
+            $varr_rpta[$i] = array('nombre' => $obj->riesgo_det_nombre, 'descripcion' => $obj->descripcion);
+            $obj = $conn->next_record();
+        }
+
+        return $varr_rpta;
+    }
+
+    function get_reporte_riesgos_comercial($p_emisor_id, $p_pagador_id){
+        $conn = new db_param_trans; $conn->connect();
+
+        $v_sql = "  select  riesgo_comercial.id, tipos.nombre as riesgo_comercial_nombre, riesgo_comercial_detalle.descripcion
+                    from    riesgo_comercial, riesgo_comercial_detalle, tipos
+                    where   riesgo_comercial.cliente_id = ".$p_pagador_id." and riesgo_comercial.emisor_id = ".$p_emisor_id." and riesgo_comercial.estado = 1 and
+                            riesgo_comercial_detalle.riesgo_comercial_id = riesgo_comercial.id and riesgo_comercial_detalle.estado_id = 1 and
+                            tipos.id = riesgo_comercial_detalle.tipo_detalle_id
+                    order by riesgo_comercial_detalle.tipo_detalle_id";
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+
+        $obj = $conn->next_record();
+        $varr_rpta = array();
+
+        for ($j = 0; $j < $conn->nrows(); $j++){
+            $varr_rpta[$j] = array('nombre' => $obj->riesgo_comercial_nombre, 'descripcion' => $obj->descripcion);
+            $obj = $conn->next_record();
+        }
+
+        return $varr_rpta;
+    }
+
+    function get_promedio_retraso_pagador($p_pagador_id){
+        $conn = new db_param_trans; $conn->connect();
+
+        $v_sql = "  select  RISK_PROMEDIO_PAGO(".$p_pagador_id.") as promedio";
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+
+        $obj = $conn->next_record();
+        $v_promedio = $obj->promedio;
+
+        return $v_promedio;
+    }
+
+    function registra_noti_endoso($p_factura_id, $p_estado, $p_tipo){
+        $conn = new db_param_trans; $conn->connect();
+        $conn2 = new db_param_trans; $conn2->connect();
+
+        $v_sql = "select nextval('s_noti_endoso') as secuencial";
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+
+        $obj = $conn->next_record();
+        $v_secuencial = $obj->secuencial;
+        $v_fecha_hoy = date('Y-m-d');
+        $v_hora_hoy = date('H:i:s');
+
+        $v_sql = "  insert into endoso_notifica(id, factura_id, estado_id, fecha, hora, tipo_id, path_noti)
+                    values (".$v_secuencial.", ".$p_factura_id.", ".$p_estado.", '".$v_fecha_hoy."', '".$v_hora_hoy."', ".$p_tipo.", '')";
+
+        $idqry = $conn2->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn2->Link_ID);
+    }
 }
 ?>

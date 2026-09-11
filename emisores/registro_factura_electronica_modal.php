@@ -81,16 +81,33 @@ $v_porc_adelanto = $objmaestros->get_porc_adelanto_emisor($_SESSION['user']['emp
 
 $v_adelanto_upd = $total_neto * $v_porc_adelanto;
 
+// nueva modalidad de tarifas para emisor
+$varr_tarifas_emisor = $objmaestros->get_tarifas_emisor($_SESSION['user']['empresaid']);
+
+// tarifa de registro
 if ($monedaid == 20) $v_tarifa_registro = $arrparametros['TARIFA REGISTRO INSTRUMENTO']['valornum'];
 else $v_tarifa_registro = $arrparametros['TARIFA REG INST DOL']['valornum'];
+/*if ($monedaid == 20) $v_tarifa_registro = $arrparametros['TARIFA REGISTRO INSTRUMENTO']['valornum'];
+else $v_tarifa_registro = $arrparametros['TARIFA REG INST DOL']['valornum'];*/
 
-$v_comi_fact_emi = $objmaestros->get_comision_fact_emisor($_SESSION['user']['empresaid'],$clienteid);
+// comision que le cobra factureatre al emisor
+$v_comi_fact_emi = $varr_tarifas_emisor['comision'] / 100;
+//$v_comi_fact_emi = $objmaestros->get_comision_fact_emisor($_SESSION['user']['empresaid'],$clienteid);
+
 $v_comi_fact_upd = $v_tarifa_registro + ($v_comi_fact_emi * $v_adelanto_upd);
+
+//+++ calculo de dias
+$fhoy = strtotime($hoy);
+$fhoy = date('Y-m-d', $fhoy);
+$v_dt_hoy = new DateTime($fhoy);
 
 $v_dt_femision = new DateTime($femision);
 $v_dt_fvencimiento = new DateTime($fvencimiento);
-$v_diff = $v_dt_femision->diff($v_dt_fvencimiento);
+
+$v_diff = $v_dt_hoy->diff($v_dt_fvencimiento);
+//$v_diff = $v_dt_femision->diff($v_dt_fvencimiento);
 $v_dias = $v_diff->days;
+
 $v_ganancia_upd = $arrparametros['TED PROMEDIO INVERSOR']['valornum'] * $v_dias * $v_adelanto_upd;
 
 $v_remanente_math = $total_neto - $v_adelanto_upd - $v_comi_fact_upd - $v_ganancia_upd;

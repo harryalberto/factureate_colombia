@@ -316,6 +316,7 @@ if ($_SESSION['user']['perfilid'] == 4){
                         <th scope="col">ID</th>
                         <th scope="col">NOMBRE</th>
                         <th scope="col">E-MAIL</th>
+                        <th scope="col">TELEFONO</th>
                         <th scope="col">TIPO DOC</th>
                         <th scope="col">NRO DOC</th>
                         <th scope="col">F APERTURA</th>
@@ -335,6 +336,7 @@ if ($_SESSION['user']['perfilid'] == 4){
                             <td data-label="ID">'.$varr_usuarios_empresa[$i]['usuario_id'].'</td>
                             <td data-label="NOMBRE">'.$varr_usuarios_empresa[$i]['nombre'].'</td>
                             <td data-label="E-MAIL">'.$varr_usuarios_empresa[$i]['email'].'</td>
+                            <td data-label="TELEFONO">'.$varr_usuarios_empresa[$i]['telefono'].'</td>
                             <td data-label="TIPO DOC">'.$varr_usuarios_empresa[$i]['tipodoc_nombre'].'</td>
                             <td data-label="NRO DOC">'.$varr_usuarios_empresa[$i]['nro_doc'].'</td>
                             <td data-label="F APERTURA">'.$v_fapertura.'</td>';
@@ -375,6 +377,34 @@ if ($_SESSION['user']['perfilid'] == 4){
 ?>
 
             <div style="margin-top: 20px;width:100%;float:left;font-weight: bold;color:var(--color-azulv2);font-size: 14px;width:300px;float:left;">TARIFAS FACTUREATE</div>
+
+<?php
+    $varr_tarifas_emisor = $obj_mae->get_tarifas_emisor($_SESSION['user']['empresaid']);
+
+    $v_texto_comision = $varr_tarifas_emisor['comision'].' %';
+?>
+
+            <!--+++ categorias emisor +++-->
+            <div class="contenedor_formulario_column">
+                <div class="formulario_grupo_column" style="width: 300px;">
+                    <label for="categoria">CATEGORIA:</label>
+                    <input type="text" name="categoria" id="categoria" value="<?=$varr_tarifas_emisor['nombre']?>" class="formulario_control" style="text-align: right;" readonly>
+                </div>
+
+                <div class="formulario_grupo_column" style="width: 400px;">
+
+<?php
+    for ($i = 0; $i < $varr_tarifas_emisor['categoria_id']; $i++){
+        echo '      <label><i class="fa-solid fa-star" style="color:var(--color-amarillo);"></i></label>';
+    }
+
+    for ($j = $i; $j < 4; $j++){
+        echo '      <label><i class="fa-regular fa-star"></i></label>';
+    }
+
+?>
+                </div>
+            </div>
 
             <div class="contenedor_formulario_column">
                 <div class="formulario_grupo_column" style="width: 200px;">
@@ -481,7 +511,6 @@ if ($_SESSION['user']['perfilid'] == 4){
             //cierra_modal();
         }
 
-        //++++ funciones para gestionar un emisor nuevo
         function gestionaEmisorNuevo(){
             let estado_id = document.getElementById("estado_id").value
             let empresa_id = document.getElementById("empresa_id").value
@@ -519,7 +548,6 @@ if ($_SESSION['user']['perfilid'] == 4){
                 refresh_page();
             }
         }
-        //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
         function cierra_modal(){
             //$('#EmisorModal').modal('hide');

@@ -48,7 +48,7 @@ class subasta{
         $conector = new db_param_trans;
         $conector->connect();
                 
-        $idqry = $conector->query("select * from sub_datos_subasta(".$subastaid.")");
+        $idqry = $conector->query("select * from sub_datos_subasta_v2(".$subastaid.")");
 
         if (!$idqry) echo pg_last_error($conector->Link_ID);
         $obj = $conector->next_record();
@@ -77,7 +77,9 @@ class subasta{
                                     'emisor_telefono' => $obj->emisor_telefono, 'factura_femision' => $obj->factura_femision,
                                     'repre_emisor_nombre' => $obj->repre_emisor_nombre, 'repre_emisor_tipodoc_id' => $obj->repre_emisor_tipodoc_id,
                                     'repre_emisor_nrodoc' => $obj->repre_emisor_nrodoc, 'repre_emisor_tipodoc' => $obj->repre_emisor_tipodoc, 'monto_remanente' => $obj->monto_remanente,
-                                    'simbolo_moneda'=>$obj->r_simbolo_moneda, 'condesc_maximo' => $obj->r_condesc_maximo, 'desc_maximo' => $obj->r_desc_maximo
+                                    'simbolo_moneda'=>$obj->r_simbolo_moneda, 'condesc_maximo' => $obj->r_condesc_maximo, 'desc_maximo' => $obj->r_desc_maximo,
+                                    'tipo_financiamiento' => $obj->tipofinancia, 'riesgo_desc' => $obj->r_riesgo_desc,
+                                    'f_fin_subasta' => $obj->f_fin_subasta, 'h_fin_subasta' => $obj->h_fin_subasta
                             );
                 
         //$conector->close();
@@ -861,7 +863,8 @@ class subasta{
                                     tipo_riesgo_empresa.nombre as riesgonom, tipo_riesgo_empresa.calificacion, tipo_riesgo_empresa.color,
                                     tipo_riesgo_empresa.color_fuente, factura.porciento_financia, 
                                     SUB_PROPUESTAS_INVERSOR_SUBASTA(subasta.id,".$p_inversor_id.") as qpropuestas,
-                                    (factura.porciento_financia * factura.total) as monto_a_financiar 
+                                    (factura.porciento_financia * factura.total) as monto_a_financiar, factura.tipofinanciamiento,
+                                    tipo_riesgo_empresa.descripcion
                             from    subasta, factura, empresa, tipos, tipo_riesgo_empresa, perfil_inversion 
                             where   subasta.estado in (23,24) and factura.id = subasta.facturaid and empresa.id = factura.clienteid and 
                                     tipos.id = factura.monedaid and tipo_riesgo_empresa.id = factura.riesgofacturaid and perfil_inversion.estado_id = 1 and 
@@ -898,7 +901,8 @@ class subasta{
                                     tipo_riesgo_empresa.nombre as riesgonom, tipo_riesgo_empresa.calificacion, tipo_riesgo_empresa.color,
                                     tipo_riesgo_empresa.color_fuente, factura.porciento_financia,
                                     SUB_PROPUESTAS_INVERSOR_SUBASTA(subasta.id,".$p_inversor_id.") as qpropuestas,
-                                    (factura.porciento_financia * factura.total) as monto_a_financiar 
+                                    (factura.porciento_financia * factura.total) as monto_a_financiar, factura.tipofinanciamiento,
+                                    tipo_riesgo_empresa.descripcion
                             from    subasta, factura, empresa, tipos, tipo_riesgo_empresa 
                             where   subasta.estado in (23,24) and factura.id = subasta.facturaid and empresa.id = factura.clienteid and 
                                     tipos.id = factura.monedaid and tipo_riesgo_empresa.id = factura.riesgofacturaid ";
@@ -930,7 +934,8 @@ class subasta{
                                             'moneda' => $obj->monedanom,'f_vencimiento' => $obj->fvencimiento,  'riesgo_id' => $obj->riesgoid, 
                                             'riesgo' => $obj->riesgonom,'calificacion' => $obj->calificacion,   'color' => $obj->color,
                                             'qpropuestas' => $obj->qpropuestas,                                 'monto_fin' => $obj->monto_a_financiar,
-                                            'color_fuente' => $obj->color_fuente
+                                            'color_fuente' => $obj->color_fuente,                               'tipo_financiamiento' => $obj->tipofinanciamiento,
+                                            'riesgo_desc' => $obj->descripcion
                                         );
                 $obj = $consulta->next_record();
             }
