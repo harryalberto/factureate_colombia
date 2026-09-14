@@ -15,39 +15,12 @@ require("../lib-trans/c_subasta.php");
     $acceso = 'SUBASTAS';
     require("../lib/valida-acceso.php");
 ?>
-    <script type="text/javascript">
-        $(document).ready(function() {
-            $('.paginate').on('click', function(){
-                $('#content').html('<div class="loading"><img src="../img/loading.gif" width="70px" height="70px"/></div>');
-		        var page = $(this).attr('pagenum');
-		        var rowcount = $(this).attr('rowcount');
-		        var sectorid = $(this).attr('sectorid');
-                var riesgoid = $(this).attr('riesgoid');
-		        var dataString = 'page='+page+'&rowcount='+rowcount+'&dsectoreconomicoid='+sectorid+'&dtriesgoid='+riesgoid;
-
-		        $.ajax({
-                    type: "GET",
-                    url: "pagina_subastas_dispo_inver.php",
-                    data: dataString,
-                    success: function(data) {
-                        $('#content2').fadeIn(1000).html(data);
-                        $('.pagination li').removeClass('active');
-                        $('.pagination li a[pagenum="'+page+'"]').parent().addClass('active');
-                    }
-                });
-            });
-        });
-    </script>
-    <script type="text/javascript">
-        function filtrar(){
-            document.frm.submit();
-        }
-    </script>
 </HEAD>
 <?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
 $objmaestro = new maestros;
+$vobj_subastas = new subasta;
 
 $arrestados = $objmaestro->get_estados('SUBASTA');
 $seconomicoid = 0;
@@ -64,7 +37,27 @@ if ($_SESSION['user']['tipousuario'] == 2 || $_SESSION['user']['tipousuario'] ==
 if (isset($_POST['seconomicoid'])){
     $seconomicoid = $_POST['seconomicoid'];
     $triesgoid = $_POST['triesgoid'];
+} else {
+    $seconomicoid = 0;
+    $triesgoid = 0;
 }
+
+//==== ID DEL INVERSOR
+if ($_SESSION['user']['empresaid'] > 0) $v_inversor_id = $_SESSION['user']['empresaid'];
+elseif ($_SESSION['user']['empresaid'] < 0) $v_inversor_id = $_SESSION['user']['empresaid'] * -1;
+else $v_inversor_id = $_SESSION['user']['usuarioid'];
+
+//==== CALCULO LOS FILTROS
+$filtros = '';
+
+if ($seconomicoid > 0) $filtros .= ' empresa.sectoreconomicoid = '.$seconomicoid;
+if ($triesgoid > 0){
+    if ($filtros != '') $filtros .= ' and factura.riesgofacturaid = '.$triesgoid;
+    else $filtros .= 'factura.riesgofacturaid = '.$triesgoid;
+}
+
+//==== CALCULO LA CANTIDAD DE REGISTROS CONSIDERANDO FILTROS
+$rowcount = $vobj_subastas->get_subastas_inversor('COUNT', 0, 0, $filtros, '', $v_inversor_id);
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
@@ -80,6 +73,7 @@ if (isset($_POST['seconomicoid'])){
     <div style="overflow:hidden;text-align:center;font-size: 18px;font-weight: bold;color:#064677;padding:10px;">
         Relaci&oacute;n de Subastas Disponibles para inversi&oacute;n
     </div>
+
     <div class="frmtransaccion">
         <form name='frm' method='post' id='frm' action="subastas_disponibles_inver.php">
         <ul>
@@ -124,25 +118,50 @@ if (isset($_POST['seconomicoid'])){
         </ul>
         </form>
     </div>
-    <div id="content2"><?php require('pagina_subastas_dispo_inver.php'); ?></div>
-    <?php
-    if ($total_paginas > 1) {
-        echo '<div class="pagination">';
-        echo '  <ul>';
-        if ($pageNum != 1) 
-            echo '  <li><a class="paginate" pagenum="'.($pageNum-1).'" rowcount="'.$rowcount.'" sectorid="'.$seconomicoid.'" riesgoid="'.$triesgoid.'">Anterior</a></li>';
 
-        for ($i=1;$i<=$total_paginas;$i++) {
-            if ($pageNum == $i) echo '<li class="active"><a class="paginate" pagenum="'.$i.'" rowcount="'.$rowcount.'" sectorid="'.$seconomicoid.'" riesgoid="'.$triesgoid.'">'.$i.'</a></li>';
-            else echo '<li><a class="paginate" pagenum="'.$i.'" rowcount="'.$rowcount.'" sectorid="'.$seconomicoid.'" riesgoid="'.$triesgoid.'">'.$i.'</a></li>';
-        }
+    <!--==== contenedor del listado de oportunidades -->
+    <div style="overflow:hidden;margin:5px;padding:5px;">
 
-        if ($pageNum != $total_paginas) 
-            echo '<li><a class="paginate" pagenum="'.($pageNum+1).'" rowcount="'.$rowcount.'" sectorid="'.$seconomicoid.'" riesgoid="'.$triesgoid.'">Siguiente</a></li>';
-        echo '  </ul>
-            </div>';
-    }
-    ?>
+        <!--==== DIV HEADER -->
+        <div style="overflow:hidden;margin:5px;padding:5px;">
+            <table class="tabla_resize">
+                <thead>
+                    <tr>
+                        <th scope="col" class="sort asc">ID</th>            <th scope="col" class="sort asc">PAGADOR</th>
+                        <th scope="col" class="sort asc">MONTO FACTURA</th> <th scope="col" class="sort asc">FINANCIAMIENTO</th>
+                        <th scope="col" class="sort asc">MONEDA</th>        <th scope="col" class="sort asc">DIAS X COBRAR</th>
+                        <th scope="col" class="sort asc">F VENCIMIENTO</th> <th scope="col" class="sort asc">RIESGO</th>
+                        <th scope="col" class="sort asc">TIPO</th>          <th scope="col" class="sort asc">ACCION</th>
+                    </tr>
+                </thead>
+                <tbody id="content">
+
+                </tbody>
+            </table>
+        </div>
+
+        <!--==== DIV PAGINACION -->
+        <div class="row justify-content-between">
+            <div class="col-12 col-md-4">
+                <label id="lbl-total" style="font-size: 10px;"></label>
+            </div>
+
+            <div class="col-12 col-md-4" id="nav-paginacion"></div>
+
+            <input type="hidden" id="pagina" value="1">
+            <input type="hidden" id="orderCol" value="0">
+            <input type="hidden" id="orderType" value="asc">
+            <input type="hidden" id="num_registros" value="10">
+            <input type="hidden" id="rowcount" value="<?=$rowcount?>">
+            <input type="hidden" id="filtros" value="<?=$filtros?>">
+
+            <!-- datos de negocio -->
+            <input type="hidden" id="inversor_id" value="<?=$v_inversor_id?>">
+            <input type="hidden" id="sector_id" value="<?=$seconomicoid?>">
+            <input type="hidden" id="riesgo_id" value="<?=$triesgoid?>">
+        </div>
+    </div>
+
     <!------ END CUERPO VARIABLE ------>
     <!--#####################################################
     ########### ZONA MODAL 
@@ -164,24 +183,103 @@ if (isset($_POST['seconomicoid'])){
         </div>
     </div>
     </div>
-    <!--============= LLAMADA AL MODAL CON PARAMETROS -->`
-    <script>
-        $('.openBtnn').on('click',function(){
-            var fid = $(this).attr('fid');
-            var pid = $(this).attr('pid');
-            var retorno = $(this).attr('retorno');
-            var pagina = $(this).attr('pagina');
-            var rowcount = $(this).attr('rowcount');
-            var subastaid = $(this).attr('subastaid');
-            
-            $('.modal-body').load('propuesta_detalle_modal.php?fid='+fid+'&pid='+pid+'&retorno='+retorno+'&pagina='+pagina+'&rowcount='+rowcount+'&subastaid='+subastaid,function(){
-                $('#PropuestaDetalle').modal({show:true});
-            });
+    <!--############# FIN ZONA MODAL ##############-->
+
+    <!--==== Funciones del LOAD del listado y paginacion -->
+    <script type="text/javascript">
+        // Llamando a la función getData() al cargar la página
+        document.addEventListener("DOMContentLoaded", getData);
+
+        // Función para obtener datos con AJAX
+        function getData() {
+            //let input = document.getElementById("campo").value
+            let num_registros = document.getElementById("num_registros").value
+            let content = document.getElementById("content")
+            let pagina = document.getElementById("pagina").value || 1;
+            let orderCol = document.getElementById("orderCol").value
+            let orderType = document.getElementById("orderType").value
+            let rowcount = document.getElementById("rowcount").value
+            let filtros = document.getElementById("filtros").value
+            let inversor_id = document.getElementById("inversor_id").value
+            let sector_id = document.getElementById("sector_id").value
+            let riesgo_id = document.getElementById("riesgo_id").value
+
+            let formaData = new FormData()
+            //formaData.append('campo', input)
+            formaData.append('registros', num_registros)
+            formaData.append('pagina', pagina)
+            formaData.append('orderCol', orderCol)
+            formaData.append('orderType', orderType)
+            formaData.append('rowcount', rowcount)
+            formaData.append('filtros', filtros)
+            formaData.append('inversor_id', inversor_id)
+            formaData.append('sector_id', sector_id)
+            formaData.append('riesgo_id', riesgo_id)
+
+
+            fetch("subastas_inversor_load.php", {
+                    method: "POST",
+                    body: formaData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    content.innerHTML = data.data
+                    document.getElementById("lbl-total").innerHTML = `Mostrando ${data.totalFiltro} de ${data.totalRegistros} registros`;
+                    document.getElementById("nav-paginacion").innerHTML = data.paginacion
+
+                    // Si la página actual no tiene resultados, ajustar la paginación para mostrar la primera página
+                    if (data.data.includes('Sin resultados') && parseInt(pagina) !== 1) {
+                        nextPage(1); // Ir a la primera página
+                    }
+                })
+                .catch(err => console.log(err))
+        }
+
+        // Función para cambiar de página
+        function nextPage(pagina) {
+            document.getElementById('pagina').value = pagina
+            getData()
+        }
+
+        // Función para ordenar columnas
+        function ordenar(e) {
+            let elemento = e.target;
+            let orderType = elemento.classList.contains("asc") ? "desc" : "asc";
+
+            document.getElementById('orderCol').value = elemento.cellIndex;
+            document.getElementById("orderType").value = orderType;
+            elemento.classList.toggle("asc");
+            elemento.classList.toggle("desc");
+
+            getData()
+        }
+
+        // Event listeners para los eventos de cambio en el campo de entrada y el select
+        //document.getElementById("campo").addEventListener("keyup", getData);
+        //document.getElementById("num_registros").addEventListener("change", getData);
+
+        // Event listener para ordenar las columnas
+        let columns = document.querySelectorAll(".sort");
+        columns.forEach(column => {
+            column.addEventListener("click", ordenar);
         });
 
+        // Funciones de transaccion
+        function verDetalle(p_factura_id, p_subasta_id, p_propuesta_id){
+            $('.modal-title').text('PROPUESTA');
+            $('.modal-body').load('propuesta_detalle_modal.php?fid='+p_factura_id+'&pid='+p_propuesta_id+'&subastaid='+p_subasta_id,function(){
+                $('#PropuestaDetalle').modal({show:true});
+            });
+        }
+
+        function filtrar(){
+            document.frm.submit();
+        }
+
         function refresh_page(){
-            location.href = 'subastas_disponibles_inver.php';
+            document.frm.submit();
         }
     </script>
+
 </BODY>
 </HTML>
