@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 	$v_input = $_POST;
 
 	$output = $vobj_ws_seg->ws_registra_inversor($v_input);
-	header("HTTP/1.1 200 OK");
+	//header("HTTP/1.1 200 OK");
 	echo json_encode($output);
 	exit();
 }

@@ -98,7 +98,7 @@ if ($_POST['accion'] == 'grabar'){
         $file_path_db = '../archivos/INV_'.$_POST['nombre'].'_'.$_POST['apellido'].'_'.$_POST['nro_doc'].'/vinculacion/doc_inv_'.$v_hoy.'_'.$_FILES['plaft']['name'];
 	} else $file_path = '';
 
-	// APRUEBA INVERSOR, cambio de estado y registro del informe plaft y creacion de saldos
+	// APRUEBA INVERSOR
 	$varr_param_fideicomiso = $vobj_mae_proc->get_parametro_detalle(60);
 	$v_aprueba = $vobj_mae_proc->aprobar_inversor_factureate($_POST['inversor_id'], $file_path_db, $varr_param_fideicomiso['valornum']);
 
@@ -137,7 +137,7 @@ if ($_POST['accion'] == 'grabar'){
 		$varr_noti = $vobj_mae_proc->get_parametro_detalle(84);
 
 		if ($varr_noti['valornum'] == 1){
-			// envio de notificacion por correo
+		// envio de notificacion por correo
 			if ($varr_noti['valorchar'] == ''){
 				// la notificacion la envia Factureate
 				$v_body = 'Hola '.$_POST['nombre'].' '.$_POST['apellido'].', nos complace saludarte y darte la buena noticia que fuiste admitido como inversor de Factureate,
@@ -156,14 +156,15 @@ if ($_POST['accion'] == 'grabar'){
 			}
 
 			$varr_link = $vobj_mae_proc->get_parametro_detalle(53);
+
 			$varr_mail = array('mail_salida' => 'operaciones@factureate.com', 'nombre_salida' => 'Factureate', 'mail_destino' => $_POST['email'],
 								'subject' => '[FACTUREATE] Enhorabuena!! fuiste aprobado como inversor de Factureate',
-								'body' => $v_body;
+								'body' => $v_body);
 
 			$vobj_mail_proc->enviar_correo($varr_mail);
 		}
 
-		// NOTIFICACION INTERNO
+		// INTERNO
 		$varr_mail_interno = array('notificaid' => 30, 'datos_body' => '<br>Nombre: '.$_POST['nombre'].' '.$_POST['apellido']);
 		$vobj_mail_proc->enviar_correo_xnotificacion($varr_mail_interno);
 	}
