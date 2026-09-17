@@ -9,7 +9,7 @@ require("../lib-trans/maestros.php");
 ?>
 <HTML>
 <HEAD>
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'EMPRESAS';
     require("../lib/valida-acceso.php");
@@ -73,7 +73,7 @@ if (!empty($_POST['estados'])){
 ?>
 
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     $menu = 'inversionistas/inversionistas_todo.php';
     //$pagina = 'empresas/empresas.php';
     //------ PARTE SUPERIOR ------
@@ -116,7 +116,7 @@ if (!empty($_POST['estados'])){
     ========================== PAGINA -->
 
     <div id="contenedor_listado">
-        <? require('inversionistas_todo_pagina.php');?>
+        <?php require('inversionistas_todo_pagina.php');?>
     </div>
     <!--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     @@@@@@@@@@@@@@@@@ ZONA MODAL -->
