@@ -62,6 +62,8 @@ $varr_prop = $obj_inv->get_propuestas_pre_xinversor('SELEC',$_SESSION['user']['u
 $v_titular = 'false';
 
 if ($_SESSION['user']['empresaid'] > 0){
+    $v_inversor_id = $_SESSION['user']['empresaid'];
+
     if ($_SESSION['user']['empresaid'] == $_SESSION['user']['usuarioid']){
         //---- una persona natural con broker, esta accediendo el titular
         $v_titular = 'true';
@@ -69,7 +71,10 @@ if ($_SESSION['user']['empresaid'] > 0){
         //---- verifico si el usuario es el representante de la empresa
         if ($_SESSION['user']['perfiltipo'] == 10) $v_titular = 'true';
     }
-} else $v_titular = 'true';
+} else {
+    $v_titular = 'true';
+    $v_inversor_id = $_SESSION['user']['usuarioid'];
+}
 
 $v_detalle_saldoi = '';
 /*--------------------------------------------------------*/
@@ -87,6 +92,7 @@ $v_detalle_saldoi = '';
 ?>
 
     <!------ CUERPO VARIABLE ------>
+    <input type="hidden" name="inversor_id" id="inversor_id" value="<?=$v_inversor_id?>">
 
     <div style="overflow:hidden;text-align:center;font-size: 18px;font-weight: bold;color:#064677;padding:10px;max-width:700px;margin:0px auto;">
         Cuenta Efectivo Inversionista
@@ -410,6 +416,15 @@ $v_detalle_saldoi = '';
 
         function refresh_page(){
             location.href='estado_cuenta.php';
+        }
+
+        function retirar_saldo(p_cuenta_id){
+            var inversor_id = document.getElementById("inversor_id").value;
+
+            $('.modal-title').text('RETIRO DE SALDO DISPONIBLE');
+            $('.modal-body').load('retirar_saldo_modal.php?cuenta_id='+p_cuenta_id+'&inversor_id='+inversor_id,function(){
+                $('#SaldosModal').modal({show:true});
+            });
         }
 
     </script>

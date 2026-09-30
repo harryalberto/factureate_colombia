@@ -121,9 +121,19 @@ date_default_timezone_set("America/Santo_Domingo");
                 $('#OT').modal({show:true});
                 });
             } else {
-                if (p_resultado == -1) alert("El receptor de los fondos debe registrar una cuenta de banco en la moneda de la transferencia");
-                else alert("El area financiera tiene pendiente aprobar la cuenta de banco del receptor de los fondos");
+                if (p_resultado == 74){
+                    $('.modal-body').load('orden_transferencia_inver_modal.php?ot_id='+p_ot,function(){
+                        $('#OT').modal({show:true});
+                    });
+                } else {
+                    if (p_resultado == -1) alert("El receptor de los fondos debe registrar una cuenta de banco en la moneda de la transferencia");
+                    else alert("El area financiera tiene pendiente aprobar la cuenta de banco del receptor de los fondos");
+                }
             }
+        }
+
+        function refresh_page(){
+            location.href = "ordenes_transferencia.php";
         }
     </script>
     <!---=============== end modal ==============--->

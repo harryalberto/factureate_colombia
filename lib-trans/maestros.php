@@ -1275,9 +1275,9 @@ class maestros{
                                         orden_transferencia.cuenta_bancaria, orden_transferencia.nombre_destinatario, orden_transferencia.fecha, 
                                         orden_transferencia.operacion_id, orden_transferencia.moneda_id, orden_transferencia.monto, tipo_moneda.nombre as moneda,
                                         orden_transferencia.destinatario_id, orden_transferencia.motivo_id, motivo.nombre as motivo_nombre, subasta.id as subasta_id 
-                                from    orden_transferencia, tipos, tipos as tipo_moneda, tipos as motivo, subasta
+                                from    (orden_transferencia left outer join subasta on orden_transferencia.operacion_id = subasta.facturaid), tipos, tipos as tipo_moneda, tipos as motivo
                                 where   orden_transferencia.id = ".$p_ot." and tipos.id = orden_transferencia.destinatario_tipo and 
-                                        tipo_moneda.id = orden_transferencia.moneda_id and motivo.id = orden_transferencia.motivo_id and subasta.facturaid = orden_transferencia.operacion_id");
+                                        tipo_moneda.id = orden_transferencia.moneda_id and motivo.id = orden_transferencia.motivo_id");
         if (!$idqry) echo pg_last_error($conn->Link_ID);
         $obj = $conn->next_record();
 
@@ -1302,8 +1302,25 @@ class maestros{
             $varr_result['cuenta_banco'] = $obj->nro_cuenta;
         }
 
-        /*$conn->close();
-        $conn2->close();*/
+        if ($obj->destinatario_tipo == 74){
+            //+++ inversor
+            $qry = "    select  cuenta_banco_inversionista.id, cuenta_banco_inversionista.banco_id, bancos.nombre_banco, cuenta_banco_inversionista.tcuenta_id, tcuenta.nombre as tipo_cuenta,
+                                inversionista.email, inversionista.identificacion, inversionista.tipodoc, tdocumento.nombre as tipo_documento
+                        from    cuenta_banco_inversionista, bancos, tipos as tcuenta, inversionista, tipos as tdocumento
+                        where   cuenta_banco_inversionista.estado_id > 0 and cuenta_banco_inversionista.cuenta = '".$obj->cuenta_bancaria."' and
+                                cuenta_banco_inversionista.inversor_id = ".$obj->destinatario_id." and cuenta_banco_inversionista.moneda_id = ".$obj->moneda_id." and
+                                bancos.id = cuenta_banco_inversionista.banco_id and tcuenta.id = cuenta_banco_inversionista.tcuenta_id and
+                                inversionista.inversor_id = cuenta_banco_inversionista.inversor_id and tdocumento.id = inversionista.tipodoc";
+
+            $idqry = $conn2->query($qry);
+            if (!$idqry) echo pg_last_error($conn2->Link_ID);
+            $obj = $conn2->next_record();
+
+            $varr_result['cuenta_banco_id'] = $obj->id;                     $varr_result['banco_id'] = $obj->banco_id;                      $varr_result['banco'] = $obj->nombre_banco;
+            $varr_result['tcuenta_id'] = $obj->tcuenta_id;                  $varr_result['tcuenta'] = $obj->tipo_cuenta;                    $varr_result['email_contacto'] = $obj->email;
+            $varr_result['identificacion'] = $obj->identificacion;          $varr_result['tdocumento_id'] = $obj->tipodoc;                  $varr_result['tdocumento'] = $obj->tipo_documento;
+        }
+
         return $varr_result;
     }
     function transferir_fondos_exterior($parr_datos){
@@ -3319,6 +3336,64 @@ class maestros{
 
         $idqry = $conn2->query($v_sql);
         if (!$idqry) echo pg_last_error($conn2->Link_ID);
+    }
+
+    function registra_orden_transferencia_v2($parr_datos){
+        $conn = new db_param_trans; $conn->connect();
+        $conn2 = new db_param_trans; $conn2->connect();
+
+        $v_sql = "select nextval('s_otransferencia') as s_ot";
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+
+        $obj = $conn->next_record();
+        $v_secuencial = $obj->s_ot;
+        $v_fecha_hoy = date('Y-m-d');
+
+        $v_sql = "  insert into orden_transferencia (id, destinatario_id, destinatario_tipo, estado_id, cuenta_bancaria, nombre_destinatario, fecha, operacion_id, moneda_id, monto, motivo_id,
+                                                    cuenta_id, cuenta_banco_id)
+                    values (".$v_secuencial.", ".$parr_datos['destinatario_id'].", ".$parr_datos['destino_tipo_id'].", ".$parr_datos['estado_id'].", '".$parr_datos['cuenta']."',
+                            '".$parr_datos['destinatario']."', '".$v_fecha_hoy."', 0, ".$parr_datos['moneda_id'].", ".$parr_datos['monto'].", ".$parr_datos['motivo_id'].",
+                            ".$parr_datos['cuenta_id'].", ".$parr_datos['cuenta_banco_id'].")";
+
+        $idqry = $conn2->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn2->Link_ID);
+
+        if ($parr_datos['motivo_id'] == 92){
+            //+++ retiro de saldo del inversor
+            $varr_atm = $this->get_parametro_detalle(91);
+
+            if ($varr_atm['valornum'] == 0){
+                //+++ actualizo el saldo del inversor
+                $this->registra_retiro_inversor_manual($parr_datos['cuenta_id'], $parr_datos['monto']);
+            }
+        }
+    }
+
+    function registra_retiro_inversor_manual($p_cuenta_id, $p_monto){
+        $conn = new db_param_trans; $conn->connect();
+
+        $v_sql = "  update cuenta_inversionista set saldo_transito_retiro = saldo_transito_retiro + ".$p_monto.", saldo_disponible = saldo_disponible - ".$p_monto."
+                    where id = ".$p_cuenta_id;
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+    }
+
+    function registra_transferencia_bancaria($parr_transferencia){
+        $conn = new db_param_trans; $conn->connect();
+
+        $v_sql = "  select FINAN_REGISTRA_TRANSFERENCIA_EXT(".$parr_transferencia['motivo'].",".$parr_transferencia['moneda_id'].",".$parr_transferencia['monto'].",
+                                                            ".$parr_transferencia['destinatario_id'].",".$parr_transferencia['usuario_id'].",".$parr_transferencia['operacion_id'].",
+                                                            ".$parr_transferencia['ot_id'].",".$parr_transferencia['atm'].") as resultado";
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+        $v_resultado = $obj->resultado;
+
+        return $v_resultado;
     }
 }
 ?>

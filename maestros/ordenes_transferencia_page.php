@@ -52,10 +52,13 @@ if ($rowcount > 0){
         $t_forden = strtotime($varr_ordenes[$i]['fecha_orden']);
         $v_forden = date('d-m-Y',$t_forden);
 
-        $v_valida_cuenta = $objmaestro->valida_cuenta_banco_empresa($varr_ordenes[$i]['destinatario_id'], $varr_ordenes[$i]['moneda_id']);
-
-        /*$v_accion = '<button style="font-size:12px;" type="button" ot_id='.$varr_ordenes[$i]['ot_id'].' class="btn btn-primary openBtn2"><span class="icon-search" style="font-size:16px;"></span> Detalle</button>';*/
-        $v_accion = '<button type="button" class="btn btn-primary" style="font-size:11px;background-color:var(--color-azulv2);border:none;" onclick="verDetalle('.$varr_ordenes[$i]['ot_id'].','.$v_valida_cuenta.')"><i class="fa-solid fa-magnifying-glass"></i> Detalle</button>';
+        if ($varr_ordenes[$i]['destino_tipo_id'] == 74){
+            //+++ inversor
+            $v_accion = '<button type="button" class="btn btn-primary" style="font-size:11px;background-color:var(--color-azulv2);border:none;" onclick="verDetalle('.$varr_ordenes[$i]['ot_id'].',74)"><i class="fa-solid fa-magnifying-glass"></i> Detalle</button>';
+        } else {
+            $v_valida_cuenta = $objmaestro->valida_cuenta_banco_empresa($varr_ordenes[$i]['destinatario_id'], $varr_ordenes[$i]['moneda_id']);
+            $v_accion = '<button type="button" class="btn btn-primary" style="font-size:11px;background-color:var(--color-azulv2);border:none;" onclick="verDetalle('.$varr_ordenes[$i]['ot_id'].','.$v_valida_cuenta.')"><i class="fa-solid fa-magnifying-glass"></i> Detalle</button>';
+        }
 
         echo '  <tr>
                     <td data-label="ORDEN ID">'.$varr_ordenes[$i]['ot_id'].'</td>
