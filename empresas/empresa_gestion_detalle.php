@@ -9,14 +9,14 @@ require("../lib-trans/maestros.php");
 ?>
 <HTML>
 <HEAD>
+
 <?php
+    $menu = 'empresas/empresas.php';
     require("../lib/head.php");
-?>
-    <link href="../css/bootstrap.min.css" rel="stylesheet">
-<?php
     $acceso = 'GESTEMP';
     require("../lib/valida-acceso.php");
 ?>
+
     <script type="text/javascript">
         function acciones(accion){
             var enviar, previo;
@@ -110,6 +110,7 @@ require("../lib-trans/maestros.php");
         }
     </script>
 </HEAD>
+
 <?php
 /*--------------------------------------------------------*/
 //------ LOGICA NO VISIBLE ------
@@ -145,20 +146,20 @@ if ($arr_empresa['estado_legal'] == -1) $v_muestra_estado_legal = '<i class="fa-
 else $v_muestra_estado_legal = '';
 
 ?>
+
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
+
 <?php
-    if ($_GET['previo'] == 'empresas_xriesgo') $menu = 'empresas/empresas_xriesgo.php';
-    else $menu = 'empresas/empresas.php';
     //------ PARTE SUPERIOR ------
     require("../lib/superior.php");
     //------ PARTE IZQUIERDA ------
     require("../lib/menu-n1.php");
 ?>
+
     <!--======================= BODY -->
     <form name='frm' method='post' id='frm' enctype="multipart/form-data">
     <input type="hidden" name="accion" id="accion">
     <input type="hidden" name="origen" id="origen">
-    <input type="hidden" name="previo" id="previo" value="<?=$previo?>">
     <input type="hidden" name="empresaid" id="empresaid" value="<?=$_GET['id']?>">
     <input type="hidden" name="t_empresaid" value="<?=$arr_empresa['t_empresaid']?>">
     <input type="hidden" name="estado_id" id="estado_id" value="<?=$arr_empresa['e_empresa_id']?>">
@@ -166,8 +167,11 @@ else $v_muestra_estado_legal = '';
     <div style="overflow:hidden;text-align:center;font-size: 18px;font-weight: bold;color:var(--color-azulv2);padding: 5px;">
         Ficha de Empresa <?php echo $v_muestra_estado_legal;?>
     </div>
+
     <!--=== INFORMACION -->
+
 <?php
+    //++++ permisos del usuario
     $varr_permisos = $vobj_seg->get_permisos($_SESSION['user']['perfilid']);
 
     if ($obj_mae->busca_arreglo_bidi($varr_permisos, 'codigo', 'EMP-UPD-OP')) $v_readonly = ''; else $v_readonly = 'readonly';
@@ -175,11 +179,13 @@ else $v_muestra_estado_legal = '';
 ?>
     <div class="contenedor_principal" id="contenedor_principal">
         <div class="contenedor_formulario">
-            <div style="font-weight: bold;color:var(--color-azulv2);font-size: 14px;margin-top: 10px;"> INFORMACION DE LA EMPRESA</div>
+            <div style="font-weight: bold;color:var(--color-azulv2);font-size: 14px;margin-top: 10px;"> INFORMACION OPERATIVA</div>
 
+            <!--+++++++++++++++++++++++++++++++++++++++++++
+            ++++ bloque operativo ++++-->
             <div class="contenedor_formulario_column">
                 <div class="formulario_grupo_row" style="width: 100px;">
-                    <label for="ruc">NIT</label>
+                    <label for="ruc">ID EMPRESA</label>
                     <input type="text" name="ruc" id="ruc" class="formulario_control" value="<?=$arr_empresa['identificacion']?>" readonly>
                 </div>
                 <div class="formulario_grupo_row" style="width: 250px;">
@@ -197,14 +203,14 @@ else $v_muestra_estado_legal = '';
             </div>
 
             <div class="contenedor_formulario_column">
-                <div class="formulario_grupo_row" style="width: 350px;">
+                <div class="formulario_grupo_row" style="width: 360px;">
                     <label for="direccion">DIRECCION</label>
                     <input type="text" name="direccion" id="direccion" class="formulario_control" value="<?=$arr_empresa['direccion']?>" <?php echo $v_readonly;?>>
                 </div>
                 <div class="formulario_grupo_row" style="width: 150px;">
                     <label for="tamano">TAMAÑO DE EMPRESA</label>
-<?php
 
+<?php
     if ($v_readonly == 'readonly'){
         echo '
                     <input type="text" name="tamano" id="tamano" class="formulario_control" value="'.$arr_empresa['tamano'].'" readonly>
@@ -265,58 +271,73 @@ else $v_muestra_estado_legal = '';
                 </div>
             </div>
 
+            <!--++++++++ informacion de contacto ++++++++-->
+            <div class="contenedor_formulario_column">
+                <div class="formulario_grupo_row" style="width: 250px;">
+                    <label for="nombre_contacto">NOMBRE CONTACTO</label>
+                    <input type="text" name="nombre_contacto" id="nombre_contacto" class="formulario_control" value="<?=$arr_empresa['nombre_contacto']?>">
+                </div>
+                <div class="formulario_grupo_row" style="width: 200px;">
+                    <label for="email_contacto">EMAIL CONTACTO</label>
+                    <input type="text" name="email_contacto" id="email_contacto" class="formulario_control" value="<?=$arr_empresa['email_contacto']?>">
+                </div>
+                <div class="formulario_grupo_row" style="width: 100px;">
+                    <label for="tdoc_contacto">TIPO DOC</label>
+
+<?php
+        echo '      <select name="tdoc_contacto" class="formulario_control" id="tdoc_contacto">';
+
+        $arr_tdoc = $obj_mae->get_tipos('TIPOIDENTIF');
+
+        for ($i=0; $i<count($arr_tdoc); $i++){
+            if ($arr_tdoc[$i]['id'] == $arr_empresa['tdoc_repre'])
+                echo '  <option value="'.$arr_tdoc[$i]['id'].'" selected>'.$arr_tdoc[$i]['nombre'].'</option>';
+            else echo ' <option value="'.$arr_tdoc[$i]['id'].'">'.$arr_tdoc[$i]['nombre'].'</option>';
+        }
+
+        echo '      </select>';
+?>
+                </div>
+                <div class="formulario_grupo_row" style="width: 100px;">
+                    <label for="nrodoc_contacto">NRO DOC</label>
+                    <input type="text" name="nrodoc_contacto" id="nrodoc_contacto" class="formulario_control" value="<?=$arr_empresa['nrodoc_contacto']?>">
+                </div>
+                <div class="formulario_grupo_row" style="width: 100px;">
+                    <label for="telefono_contacto">TELEFONO</label>
+                    <input type="text" name="telefono_contacto" id="telefono_contacto" class="formulario_control" value="<?=$arr_empresa['telf_contacto']?>">
+                </div>
+            </div>
+
+<?php
+            if ($obj_mae->busca_arreglo_bidi($varr_permisos, 'codigo', 'EMP-UPD-OP')){   // COO, ANALISTA OP
+                if ($arr_empresa['t_empresaid'] == 48){       // OP
+                    echo '
+                <button style="font-size:12px;background-color:var(--color-azulv2);border:none;margin-top: 15px;" type="button" class="btn btn-primary" onclick="guardarOperativo()">
+                    <i class="fa-solid fa-floppy-disk"></i> Guardar Datos Operativos
+                </button>';
+                }
+            }
+?>
+
+            <div class="contenedor_formulario_column"><p style="width:100%; height: 1px; background-color: #000;"></div>
+            <!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            ++++ fin de zona operativa ++++-->
+
+            <!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            ++++ inicio de zona legal ++++-->
+            <div style="font-weight: bold;color:var(--color-azulv2);font-size: 14px;margin-top: 10px;"> INFORMACION LEGAL</div>
 <?php
 
     if ($obj_mae->busca_arreglo_bidi($varr_permisos, 'codigo', 'EMP-ACC')){
+        //++++ REPRESENTANTE LEGAL
         echo '
-            <div style="font-size: 12px;margin-top: 10px;width:200px;"> ACCIONISTAS</div>
-            <button type="button" class="btn btn-primary" style="font-size:11px;background-color:var(--color-azulv2);border:none;" onclick="agregarAccionistas()"><i class="fa-solid fa-user-plus"></i> Accionistas</button>';
-
-        //==== RELACION DE ACIONISTAS YA REGISTRADOS
-        $varr_accionistas = $obj_mae->get_accionistas($_GET['id']);
-        $v_z = 0;
-
-        if (count($varr_accionistas) > 0) $v_tabla_accionistas = '<div>';
-
-        for ($i=0; $i<count($varr_accionistas); $i++){
-            $v_z ++;
-
-            if ($i == 0) 
-                $v_tabla_accionistas .= '
-                <table class="tabla_resize">
-                    <thead><tr>
-                        <th scope="col">Id</th>
-                        <th scope="col">Nombre</th>
-                        <th scope="col">TipoDoc</th>
-                        <th scope="col">Nro Doc</th>
-                    </tr></thead>
-                    <tbody>';
-            
-            $v_tabla_accionistas .= '   
-                    <tr>
-                        <td data-label="Id">'.$varr_accionistas[$i]['accionista_id'].'</td>
-                        <td data-label="Nombre">'.$varr_accionistas[$i]['accionista_nombre'].'</td>
-                        <td data-label="TipoDoc">'.$varr_accionistas[$i]['tipodoc'].'</td>
-                        <td data-label="Nro Doc">'.$varr_accionistas[$i]['nro_documento'].'</td>
-                    </tr>';
-        }
-
-        if (count($varr_accionistas) > 0) $v_tabla_accionistas .= '</tbody></table></div>';
-        echo $v_tabla_accionistas;
-        echo '<input type="hidden" name="q_accionistas" id="q_accionistas" value="'.$v_z.'">';
-
-        //==== REPRESENTANTE LEGAL
-        echo '
-            <hr>
-            <div style="font-weight: bold;color:var(--color-azulv2);font-size: 14px;margin-top: 10px;"> REPRESENTANTE LEGAL</div>
-
             <div class="contenedor_formulario_column">
                 <div class="formulario_grupo_row" style="width: 250px;">
-                    <label for="nombre_repre">NOMBRE</label>
+                    <label for="nombre_repre">NOMBRE REP LEGAL</label>
                     <input type="text" name="nombre_repre" id="nombre_repre" class="formulario_control" value="'.$arr_empresa['nombre_repre'].'">
                 </div>
                 <div class="formulario_grupo_row" style="width: 200px;">
-                    <label for="email_repre">EMAIL</label>
+                    <label for="email_repre">EMAIL REP LEGAL</label>
                     <input type="text" name="email_repre" id="email_repre" class="formulario_control" value="'.$arr_empresa['email_repre'].'">
                 </div>
                 <div class="formulario_grupo_row" style="width: 100px;">
@@ -326,7 +347,7 @@ else $v_muestra_estado_legal = '';
         $arr_tdoc = $obj_mae->get_tipos('TIPOIDENTIF');
 
         for ($i=0; $i<count($arr_tdoc); $i++){
-            if ($arr_tdoc[$i]['id'] == $arr_empresa['tdoc_repre']) 
+            if ($arr_tdoc[$i]['id'] == $arr_empresa['tdoc_repre'])
                 echo '      <option value="'.$arr_tdoc[$i]['id'].'" selected>'.$arr_tdoc[$i]['nombre'].'</option>';
             else echo '     <option value="'.$arr_tdoc[$i]['id'].'">'.$arr_tdoc[$i]['nombre'].'</option>';
         }
@@ -343,6 +364,7 @@ else $v_muestra_estado_legal = '';
                 </div>
             </div>';
 
+        //++++ DATOS DE LA EMPRESA QUE NO SEA OP
         if ($t_empresa != 'obligpago'){
             echo '
             <div class="contenedor_formulario_column">
@@ -362,8 +384,8 @@ else $v_muestra_estado_legal = '';
 
             echo '
                 <div class="formulario_grupo_row" style="width: 200px;">
-                    <label for="regmercantil_file">CAMARA COMERCIO</label>
-                    <input type="file" name="regmercantil_file" id="regmercantil_file" class="formulario_control">
+                    <label for="regmercantil_file">REGISTRO MERCANTIL</label>
+                    <input type="file" name="regmercantil_file" id="regmercantil_file" class="formulario_control" style="background-color:#fff;">
                 </div>';
 
             if ($arr_empresa['vigencia_path'] != '' && !is_null($arr_empresa['vigencia_path']))
@@ -385,65 +407,61 @@ else $v_muestra_estado_legal = '';
                     <label for="certaccionistas_path">PDF</label>
                     <label><a href="'.$varr_documentos['cert_accionistas'].'" target="_blank"><i class="fa-solid fa-file-pdf" style="font-size:18px;"></i></a></label>
                 </div>';
-            
+
             echo '
             </div>';
         }
-    }
-?>
-            <!--============== CONTACTO -->
-            <hr>
-            <div style="font-weight: bold;color:var(--color-azulv2);font-size: 14px;margin-top: 10px;width: 100%;float: left;">INFORMACION DE CONTACTO</div>
 
+        //++++ ACCIONISTAS
+        echo '
             <div class="contenedor_formulario_column">
-                <div class="formulario_grupo_row" style="width: 250px;">
-                    <label for="nombre_contacto">NOMBRE</label>
-                    <input type="text" name="nombre_contacto" id="nombre_contacto" class="formulario_control" value="<?=$arr_empresa['nombre_contacto']?>" <?php echo $v_readonly;?>>
-                </div>
-                <div class="formulario_grupo_row" style="width: 200px;">
-                    <label for="email_contacto">EMAIL</label>
-                    <input type="text" name="email_contacto" id="email_contacto" class="formulario_control" value="<?=$arr_empresa['email_contacto']?>" <?php echo $v_readonly;?>>
-                </div>
-                <div class="formulario_grupo_row" style="width: 100px;">
-                    <label for="tdoc_contacto">TIPO DOC</label>
+                <table class="tabla_resize">
+                    <thead><tr>
+                        <th scope="col">Id</th>
+                        <th scope="col">Nombre Accionista</th>
+                        <th scope="col">TipoDoc</th>
+                        <th scope="col">Nro Doc</th>
+                    </tr></thead>';
 
-<?php
-    if ($v_readonly == 'readonly'){
-        echo '      <input type="text" name="tdoc" id="tdoc" value="'.$arr_empresa['doc_contacto'].'" readonly class="formulario_control"></li>
-                    <input type="hidden" name="tdoc_contacto" id="tdoc_contacto" value="'.$arr_empresa['tdoc_contacto'].'">';
-    } else{
-        echo '      <select name="tdoc_contacto" class="formulario_control" id="tdoc_contacto">';
+        $varr_accionistas = $obj_mae->get_accionistas($_GET['id']);
+        $v_z = 0;
+        $v_tabla_accionistas = '';
 
-        $arr_tdoc = $obj_mae->get_tipos('TIPOIDENTIF');
+        for ($i=0; $i<count($varr_accionistas); $i++){
+            $v_z ++;
 
-        for ($i=0; $i<count($arr_tdoc); $i++){
-            if ($arr_tdoc[$i]['id'] == $arr_empresa['tdoc_repre']) 
-                echo '  <option value="'.$arr_tdoc[$i]['id'].'" selected>'.$arr_tdoc[$i]['nombre'].'</option>';
-            else echo ' <option value="'.$arr_tdoc[$i]['id'].'">'.$arr_tdoc[$i]['nombre'].'</option>';
+            if ($i == 0) 
+                $v_tabla_accionistas .= '
+                    <tbody>';
+            
+            $v_tabla_accionistas .= '   
+                    <tr>
+                        <td data-label="Id">'.$varr_accionistas[$i]['accionista_id'].'</td>
+                        <td data-label="Nombre">'.$varr_accionistas[$i]['accionista_nombre'].'</td>
+                        <td data-label="TipoDoc">'.$varr_accionistas[$i]['tipodoc'].'</td>
+                        <td data-label="Nro Doc">'.$varr_accionistas[$i]['nro_documento'].'</td>
+                    </tr>';
         }
 
-        echo '      </select>';
-    }
-?>
-                </div>
-                <div class="formulario_grupo_row" style="width: 100px;">
-                    <label for="nrodoc_contacto">NRO DOC</label>
-                    <input type="text" name="nrodoc_contacto" id="nrodoc_contacto" class="formulario_control" value="<?=$arr_empresa['nrodoc_contacto']?>" <?php echo $v_readonly;?>>
-                </div>
-                <div class="formulario_grupo_row" style="width: 100px;">
-                    <label for="telefono_contacto">TELEFONO</label>
-                    <input type="text" name="telefono_contacto" id="telefono_contacto" class="formulario_control" value="<?=$arr_empresa['telf_contacto']?>" <?php echo $v_readonly;?>>
-                </div>
+        if ($v_tabla_accionistas != '') $v_tabla_accionistas .= '</tbody>';
+        echo $v_tabla_accionistas;
+
+        echo '  </table>
             </div>
 
-<?php
-    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-    //@@@@@@@@@@@@@@@@@@@@@@@@ EVALUACION LEGAL
+            <button type="button" class="btn btn-primary" style="font-size:11px;background-color:var(--color-azulv2);border:none;margin-top:15px;" onclick="agregarAccionistas()">
+                <i class="fa-solid fa-user-plus"></i> Accionistas
+            </button>';
+
+        echo '<input type="hidden" name="q_accionistas" id="q_accionistas" value="'.$v_z.'">';
+    }
+
+            //++++ EVALUACION LEGAL
 
     if ($obj_mae->busca_arreglo_bidi($varr_permisos, 'codigo', 'EMP-LEG')){
         echo '
-            <hr>
             <div style="font-weight: bold;color:var(--color-azulv2);font-size: 14px;margin-top: 10px;width:100%;float:left;"> EVALUACION LEGAL</div>';
+
         if (is_null($arr_empresa['evaluacion_accionistas']) || $arr_empresa['evaluacion_accionistas'] == ''){
             $v_evaluacion = 'No hay evaluación de accionistas !!';
             $v_bg_evaluacion = 'style="font-weight: bold;"';
@@ -489,11 +507,14 @@ else $v_muestra_estado_legal = '';
             </div>';
     }
 
-    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-    //@@@@@@@@@@@@@@@@@@@@@@@@ CONTRATO DE VINCULACION
+            //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            //++++ fin de zona legal ++++
+
+            //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            //++++ contrato de vinculacion ++++-->
     $varr_param_endoso = $obj_mae->get_parametro_detalle(85);
 
-    echo '<input type="hidden" name="contrato_provee" id="contrato_provee" value="'.$varr_param_endoso['valornum'].'">';
+    echo '  <input type="hidden" name="contrato_provee" id="contrato_provee" value="'.$varr_param_endoso['valornum'].'">';
 
     if ($obj_mae->busca_arreglo_bidi($varr_permisos, 'codigo', 'EMP-LEG')){
         if ($t_empresa != 'obligpago'){
@@ -556,237 +577,6 @@ else $v_muestra_estado_legal = '';
                 </div>
             </div>';
         }
-    }
-
-    //==== RIESGOS DEL OP
-
-    if (($arr_empresa['t_empresaid'] == 48 || $arr_empresa['t_empresaid'] == 50 || $arr_empresa['t_empresaid'] == 51 || $arr_empresa['t_empresaid'] == 52) && ($obj_mae->busca_arreglo_bidi($varr_permisos, 'codigo', 'EMP-RISK'))){
-        $v_arr_riesgos = $obj_mae->get_riesgo_obpago($_GET['id']);
-        
-        if ($v_arr_riesgos['count'] == 0){
-            $f_riesgo = '';
-            $v_feval_score = '';
-            $v_riesgo_id = 0;
-            $v_dias_xvencer_score = 0;
-            $v_dias_xvencer_factu = 0;
-        } else {
-            $v_riesgo_id = $v_arr_riesgos['riesgo_id'];
-            $f_riesgo_t = strtotime($v_arr_riesgos['f_evaluacion']);
-            $f_riesgo = date('d-m-Y',$f_riesgo_t);
-            $arr_dias_min = $obj_mae->dias_vigencia_riesgos(7); //cantidad de dias de vigencia del riesgo factureate
-            $arr_dias_minfact = $obj_mae->dias_vigencia_riesgos(23); //cantidad de dias de alerta para modificacion de evaluacion
-
-            $date1_t = date('Y-m-d');
-            $date1 = new DateTime($date1_t);
-            $date2 = new DateTime($v_arr_riesgos['f_evaluacion']);
-            $v_diasvencimiento = $date1->diff($date2);      // hoy - fecha evaluacion
-            $diasvencimiento = $v_diasvencimiento->days;    // dias transcurrido
-            $v_dias_alerta = $arr_dias_min['valor'] - $arr_dias_minfact['valor'];   // dias para alertar
-            $v_dias_xvencer_factu = $arr_dias_min['valor'] - $diasvencimiento;
-
-            if ($arr_dias_min['valor'] >= $diasvencimiento){    // esta vigente
-                if ($v_dias_alerta <= $diasvencimiento){    // alertar
-                    $mensaje_vencimiento = $arr_dias_min['descripcion'].' urgente los riesgos';
-                    $v_bg = "background-color:#b30a1f;color:#ffffff;";
-                } else{
-                    $mensaje_vencimiento = 'calificacion VIGENTE';
-                    $v_bg = "color:#000000;";
-                }
-            } else{    // vencido
-                $mensaje_vencimiento = 'calificacion VENCIDA';
-                $v_bg = "background-color:#b30a1f;color:#ffffff;";
-                $v_dias_xvencer_factu = $v_dias_xvencer_factu * -1;
-            }
-
-            $v_feval_score_t = strtotime($v_arr_riesgos['f_evalua_score']);
-            $v_feval_score = date('d-m-Y',$v_feval_score_t);
-            $arr_dias_score = $obj_mae->dias_vigencia_riesgos(22); //cantidad de dias de vigencia de evaluacion
-
-            $v_dt_feval_score = new DateTime($v_arr_riesgos['f_evalua_score']);
-            $v_obj_dias_transcurridos = $date1->diff($v_dt_feval_score);
-            $v_dias_transcurridos_score = $v_obj_dias_transcurridos->days;
-            $v_dias_alerta_score = $arr_dias_score['valor'] - $arr_dias_minfact['valor'];
-            $v_dias_xvencer_score = $arr_dias_score['valor'] - $v_dias_transcurridos_score;
-
-            if ($arr_dias_score['valor'] >= $v_dias_transcurridos_score){    // esta vigente
-                if ($v_dias_alerta_score <= $v_dias_transcurridos_score){    // alertar
-                    $mensaje_vencimiento_score = $arr_dias_score['descripcion'].' urgente los riesgos';
-                    $v_bg_score = "background-color:#b30a1f;color:#ffffff;";
-                } else{
-                    $mensaje_vencimiento_score = 'calificacion VIGENTE';
-                    $v_bg_score = "color:#000000;";
-                }
-            } else{    // vencido
-                $mensaje_vencimiento_score = 'calificacion VENCIDA';
-                $v_bg_score = "background-color:#b30a1f;color:#ffffff;";
-                $v_dias_xvencer_score = -1 * $v_dias_xvencer_score;
-            }
-        }
-?>
-            <input type="hidden" name="riesgo_id" id="riesgo_id" value="<?=$v_riesgo_id?>">
-
-            <hr>
-            <div style="font-weight: bold;color:var(--color-azulv2);font-size: 14px;margin-top: 20px;width: 100%; float: left;">RIESGOS DEL OBLIGADO AL PAGO</div>
-
-            <div style="font-weight: bold;color:#000;font-size: 12px;margin-top: 10px;width: 100%; float: left;">CALIFICACION BURO DE CREDITO</div>
-
-            <div class="contenedor_formulario_column">
-                <div class="formulario_grupo_row" style="width: 150px;">
-                    <label for="f_evaluacion_score">FECHA CALIFICACION</label>
-                    <input type="text" name="f_evaluacion_score" id="f_evaluacion_score" class="formulario_control" value="<?=$v_feval_score?>" readonly>
-                </div>
-                <div class="formulario_grupo_row" style="width: 150px;">
-                    <label for="dias_xvencer_score">DIAS X VENCER</label>
-                    <input type="text" name="dias_xvencer_score" id="dias_xvencer_score" class="formulario_control" value="<?=$v_dias_xvencer_score?>" readonly>
-                </div>
-                <div class="formulario_grupo_row" style="width: 250px;">
-                    <label for="mensaje">NOTA</label>
-                    <input type="text" name="mensaje" id="mensaje" class="formulario_control" value="<?=$mensaje_vencimiento_score?>" readonly>
-                </div>
-            </div>
-
-            <div class="contenedor_formulario_column">
-                <div class="formulario_grupo_row" style="width: 150px;">
-                    <label for="emp_riesgoid">BURO</label>
-                    <select name="emp_riesgoid" id="emp_riesgoid" class="formulario_control">
-<?php
-        $arr_emp_riesgos = $obj_mae->empresas_riesgo();
-
-        if (is_null($v_arr_riesgos['empresa_scoreid']) || !isset($v_arr_riesgos[0]) || (count($v_arr_riesgos) == 0))
-            echo '      <option value="0" selected><-- Seleccionar --></option>';
-        else echo '     <option value="0"><-- Seleccionar --></option>';
-
-        for ($i=0; $i<count($arr_emp_riesgos); $i++){
-            if ($arr_emp_riesgos[$i]['id'] == $v_arr_riesgos['empresa_scoreid']) 
-                echo '  <option value="'.$arr_emp_riesgos[$i]['id'].'" selected>'.$arr_emp_riesgos[$i]['nombre'].'</option>';
-            else echo ' <option value="'.$arr_emp_riesgos[$i]['id'].'">'.$arr_emp_riesgos[$i]['nombre'].'</option>';
-        }
-?>
-                    </select>
-                    <input type='hidden' name="emp_riesgoid_old" id="emp_riesgoid_old" value="<?=$v_arr_riesgos['empresa_scoreid']?>">
-                </div>
-                <div class="formulario_grupo_row" style="width: 250px;">
-                    <label for="nivel_score_riesgoid">NIVEL RIESGO</label>
-                    <select name="nivel_score_riesgoid" id="nivel_score_riesgoid" class="formulario_control">
-<?php
-        $arr_niveles_riesgo = $obj_mae->niveles_riesgo();
-        $v_variable = "'score'";
-
-        echo '          <option value="0"><-- Seleccionar --></option>';
-
-        for ($i=0; $i<count($arr_niveles_riesgo); $i++){
-            if ($arr_niveles_riesgo[$i]['id'] == $v_arr_riesgos['riesgo_scoreid']) 
-                echo '  <option value="'.$arr_niveles_riesgo[$i]['id'].'" selected>['.$arr_niveles_riesgo[$i]['calificacion'].'] ['.$arr_niveles_riesgo[$i]['nombre'].'] '.$arr_niveles_riesgo[$i]['descripcion'].'</option>';
-            else echo ' <option value="'.$arr_niveles_riesgo[$i]['id'].'">['.$arr_niveles_riesgo[$i]['calificacion'].'] ['.$arr_niveles_riesgo[$i]['nombre'].'] '.$arr_niveles_riesgo[$i]['descripcion'].'</option>';
-        }
-?>
-                    </select>
-                    <input type='hidden' name="nivel_score_riesgoid_old" id="nivel_score_riesgoid_old" value="<?=$v_arr_riesgos['riesgo_scoreid']?>">
-                </div>
-                <div class="formulario_grupo_row" style="width: 100px;">
-                    <label style="color:#fff;">ACCION</label>
-                    <button style="font-size:12px;background-color:var(--color-azulv2);border:none;margin-top: 5px;" type="button" class="btn btn-primary" onclick="valida_informe(<?=$v_variable?>)">
-                        <i class="fa-regular fa-floppy-disk"></i> Grabar BURO
-                    </button>
-                </div>
-            </div>
-
-            <div class="contenedor_formulario_column">
-                <div class="formulario_grupo_row" style="width: 450px;">
-                    <label for="score_riesgo_justi">JUSTIFICACION</label>
-                    <textarea name="score_riesgo_justi" id="score_riesgo_justi" cols="70" rows="5" class="formulario_control"><?php echo $v_arr_riesgos['desc_riesgoscore'];?></textarea>
-                    <input type='hidden' name="score_riesgo_justi_old" id="score_riesgo_justi_old" value="<?=$v_arr_riesgos['desc_riesgoscore']?>">
-                </div>
-
-                <div class="formulario_grupo_row" style="width: 70px;" id="informe_buro">
-<?php
-        if ($v_arr_riesgos['path_informe_score'] != ''){
-            echo '  
-                    <label>PDF</label>
-                    <label><a href="'.$v_arr_riesgos['path_informe_score'].'" target="_blank"><i class="fa-solid fa-file-pdf" style="font-size:18px;"></i></a></label>';
-        }
-?>
-
-                </div>
-
-                <div class="formulario_grupo_row" style="width: 350px;">
-                    <label for="informe_score_file">INFORME</label>
-                    <input type="file" name="informe_score_file" id="informe_score_file" class="formulario_control" style="background:#fff;">
-                    <input type="hidden" name="path_score" value="<?=$v_arr_riesgos['path_informe_score']?>">
-                </div>
-            </div>
-
-            <div style="font-weight: bold;color:#000;font-size: 12px;margin-top: 10px;width: 100%;float: left;">CALIFICACION FACTUREATE</div>
-
-            <div class="contenedor_formulario_column">
-                <div class="formulario_grupo_row" style="width: 150px;">
-                    <label for="f_evaluacion">FECHA CALIFICACION</label>
-                    <input type="text" name="f_evaluacion" id="f_evaluacion" class="formulario_control" value="<?=$f_riesgo?>" readonly>
-                </div>
-                <div class="formulario_grupo_row" style="width: 150px;">
-                    <label for="dias_xvencer">DIAS X VENCER</label>
-                    <input type="text" name="dias_xvencer" id="dias_xvencer" class="formulario_control" value="<?=$v_dias_xvencer_factu?>" readonly>
-                </div>
-                <div class="formulario_grupo_row" style="width: 250px;">
-                    <label for="mensaje_factu">NOTA</label>
-                    <input type="text" name="mensaje_factu" id="mensaje_factu" class="formulario_control" value="<?=$mensaje_vencimiento?>" readonly>
-                </div>
-            </div>
-
-            <div class="contenedor_formulario_column">
-                <div class="formulario_grupo_row" style="width: 250px;">
-                    <label for="f_evaluacion">NIVEL RIESGO</label>
-                    <select name="nivel_factureate_riesgoid" id="nivel_factureate_riesgoid" class="formulario_control">
-<?php
-        $arr_niveles_riesgo = $obj_mae->niveles_riesgo();
-        $v_variable = 'factreate';
-
-        echo '          <option value="0"><-- Seleccionar --></option>';
-
-        for ($i=0; $i<count($arr_niveles_riesgo); $i++){
-            if ($arr_niveles_riesgo[$i]['id'] == $v_arr_riesgos['riesgo_factid']) 
-                echo '  <option value="'.$arr_niveles_riesgo[$i]['id'].'" selected>['.$arr_niveles_riesgo[$i]['calificacion'].'] ['.$arr_niveles_riesgo[$i]['nombre'].'] '.$arr_niveles_riesgo[$i]['descripcion'].'</option>';
-            else echo ' <option value="'.$arr_niveles_riesgo[$i]['id'].'">['.$arr_niveles_riesgo[$i]['calificacion'].'] ['.$arr_niveles_riesgo[$i]['nombre'].'] '.$arr_niveles_riesgo[$i]['descripcion'].'</option>';
-        }
-?>
-                    </select>
-                    <input type='hidden' name="nivel_factureate_riesgoid_old" value="<?=$v_arr_riesgos['riesgo_factid']?>">
-                </div>
-                <div class="formulario_grupo_row" style="width: 100px;">
-                    <label style="color:#fff;">ACCION</label>
-                    <button style="font-size:12px;background-color:var(--color-azulv2);border:none;margin-top: 5px;" type="button" class="btn btn-primary" onclick="guardarRiesgoFactureate()">
-                        <i class="fa-regular fa-floppy-disk"></i> Grabar Factureate
-                    </button>
-                </div>
-            </div>
-
-            <div class="contenedor_formulario_column">
-                <div class="formulario_grupo_row" style="width: 450px;">
-                    <label for="factureate_riesgo_justi">JUSTIFICACION</label>
-                    <textarea class="formulario_control" name="factureate_riesgo_justi" id="factureate_riesgo_justi" cols="70" rows="5"><?php echo $v_arr_riesgos['desc_riesgofact'];?></textarea>
-                    <input type='hidden' name="factureate_riesgo_justi_old" value="<?=$v_arr_riesgos['desc_riesgofact']?>">
-                </div>
-
-                <div class="formulario_grupo_row" style="width: 70px;" id="informe_factureate">
-
-<?php
-        if ($v_arr_riesgos['path_informe_factu'] != ''){
-            echo '  
-                    <label>PDF</label>
-                    <label><a href="'.$v_arr_riesgos['path_informe_factu'].'" target="_blank"><i class="fa-solid fa-file-pdf" style="font-size:18px;"></i></a></label>';
-        }
-?>
-
-                </div>
-
-                <div class="formulario_grupo_row" style="width: 350px;">
-                    <label for="informe_score_file">INFORME</label>
-                    <input type="file" name="informe_factu_file" id="informe_factu_file" class="formulario_control" style="background:#fff;">
-                    <input type="hidden" name="path_factu" value="<?=$v_arr_riesgos['path_informe_factu']?>">
-                </div>
-            </div>
-            
-<?php
     }
 
             //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -863,15 +653,6 @@ else $v_muestra_estado_legal = '';
                 </button>';
                         }
                     }
-                }
-            }
-
-            if ($obj_mae->busca_arreglo_bidi($varr_permisos, 'codigo', 'EMP-UPD-OP')){   // COO, ANALISTA OP
-                if ($arr_empresa['t_empresaid'] == 48){       // OP
-                    echo '
-                <button style="font-size:12px;background-color:var(--color-azulv2);border:none;margin-top: 5px;" type="button" class="btn btn-primary" onclick="guardarOperativo()">
-                    <i class="fa-solid fa-floppy-disk"></i> Guardar OP
-                </button>';
                 }
             }
 
@@ -1066,7 +847,7 @@ else $v_muestra_estado_legal = '';
 
             document.frm.accion.value = "update";
 
-            if (direccion == '' || t_empresaid == 0 || v_paginaweb == '' || actividad == 0 || v_actividaddesc == '') alert ('Debe completar la informacion de la empresa');
+            if (direccion == '' || t_empresaid == 0 || v_paginaweb == '' || actividad == 0 || v_actividaddesc == '') alert ('Debe completar la informacion operativa de la empresa');
             else {
                 var formData = new FormData(document.getElementById("frm"));
                     
@@ -1079,9 +860,9 @@ else $v_muestra_estado_legal = '';
                         dataType: "html",
                         success:function(data,status){
                             alert(data);
-                            $('#contenedor_principal').fadeIn(1000).html(data);
-                            $('#contenedor_principal').modal('hide');
-                            refresh_page(v_empresa_id);
+                            //$('#contenedor_principal').fadeIn(1000).html(data);
+                            //$('#contenedor_principal').modal('hide');
+                            //refresh_page(v_empresa_id);
                         }
                 });
             }

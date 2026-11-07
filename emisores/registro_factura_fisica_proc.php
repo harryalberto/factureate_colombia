@@ -15,7 +15,6 @@ require("../lib/mail_util.php");
 $objfactura = new factura;
 $emp = new maestros;
 $obj_mail = new mail_util;
-$vobj_seg_proc = new seguridad;
 
 date_default_timezone_set($_SESSION['user']['zona_horaria']);
 
@@ -105,11 +104,19 @@ if (isset($_POST['numeroemisor'])){
 
     if ($tipoaccion == 'new' || $tipoaccion == 'xml'){
         // verificacion de existencia del cliente
-        $varr_cliente_express = array('identificacion' => $arrfactura['numerocliente'], 'nombre' => $arrfactura['cliente'], 'cliente_correo' => $_POST['cliente_correo'],
-                                        'cliente_direccion' => $_POST['cliente_direccion'], 'cliente_contacto' => $_POST['cliente_contacto']);
+        if (!isset($_POST['cliente_correo']) || is_null($_POST['cliente_correo'])) $v_cliente_correo = '';
+        else $v_cliente_correo = $_POST['cliente_correo'];
+
+        if (!isset($_POST['cliente_direccion']) || is_null($_POST['cliente_direccion'])) $v_cliente_direccion = '';
+        else $v_cliente_direccion = $_POST['cliente_direccion'];
+
+        if (!isset($_POST['cliente_contacto']) || is_null($_POST['cliente_contacto'])) $v_cliente_contacto = '';
+        else $v_cliente_contacto = $_POST['cliente_contacto'];
+
+        $varr_cliente_express = array(  'identificacion' => $arrfactura['numerocliente'], 'nombre' => $arrfactura['cliente'], 'cliente_correo' => $v_cliente_correo,
+                                        'cliente_direccion' => $v_cliente_direccion, 'cliente_contacto' => $v_cliente_contacto);
 
         $arrfactura['clienteid'] = $emp->registro_express_cliente_arr($varr_cliente_express);
-        $vobj_seg_proc->next_usuario();
         // llamada a la grabacion de la factura
         $arrfactura['accion'] = 'insert';
         
@@ -120,13 +127,11 @@ if (isset($_POST['numeroemisor'])){
     } else{
         if ($tipoaccion == 'grabaenvia'){
             $arrfactura['clienteid'] = $emp->registro_express_cliente($arrfactura['numerocliente'],$arrfactura['cliente']);
-            $vobj_seg_proc->next_usuario();
             $arrfactura['accion'] = 'insert';
             $facturaid = $objfactura->graba_factura($arrfactura);
         } else {
             //if ($_POST['numeroclienteold'] != $arrfactura['numerocliente']) 
             $arrfactura['clienteid'] = $emp->registro_express_cliente($arrfactura['numerocliente'],$arrfactura['cliente']);
-            $vobj_seg_proc->next_usuario();
             //else $arrfactura['clienteid'] = $_POST['clienteid'];
 
             $arrfactura['accion'] = 'update';
@@ -152,10 +157,7 @@ if (isset($_POST['numeroemisor'])){
         $v_valida = 1;
 
         // VERIFICA INFORMACION
-        if ($varr_factura['xmlpath'] != '' || $varr_factura['facturapath'] != '') $v_archivos_disponible = 'ok';
-        else $v_archivos_disponible = '';
-
-        if ($varr_factura['tipofinanciamiento'] == 0 || $v_archivos_disponible == '') $v_valida = -2;
+        if ($varr_factura['tipofinanciamiento'] == 0 || $varr_factura['facturapath'] == '') $v_valida = -2;
         
         if ($v_valida == 1){
             $resultado = $objfactura->envia_factura($_POST['factura_id']);

@@ -23,32 +23,43 @@ $output = [];
 if ($_POST['origen'] == 'score'){
     if (isset($_FILES['informe_score_file']) && $_FILES['informe_score_file']['name'] != ''){
         $v_con_cambios = 1;
-        $v_path_carpeta = '../archivos/empresa_'.$_POST['ruc'].'/evaluacion_riesgo';
 
+        //++++ validacion de la carpeta
+        $v_path_carpeta = '../archivos/empresa_'.$_POST['ruc'];
+        if (!is_dir($v_path_carpeta)) mkdir($v_path_carpeta, 0777, true);   //verifica existencia de carpeta
+        $v_path_carpeta = '../archivos/empresa_'.$_POST['ruc'].'/evaluacion_riesgo';
         if (!is_dir($v_path_carpeta)) mkdir($v_path_carpeta, 0777, true);   //verifica existencia de carpeta
 
+        //++++ guardado del archivo de informe
         $v_path = '../archivos/empresa_'.$_POST['ruc'].'/evaluacion_riesgo/'.$v_hoy_esp.'_buro_'.$_FILES['informe_score_file']['name'];
         move_uploaded_file($_FILES['informe_score_file']['tmp_name'],  $v_path);
 
-        $v_arr_riesgos = array('riesgo_id'=>$_POST['nivel_score_riesgoid'], 'f_evaluacion'=>$_POST['f_evaluacion_score'], 'id'=>$_POST['riesgo_id'],
-                                'descripcion'=>$_POST['score_riesgo_justi'],'empresa_score_id'=>$_POST['emp_riesgoid'], 'informe_riesgo'=>$v_path,
-                                'tipo_riesgo'=>$_POST['origen'], 'dias_xvencer'=>$_POST['dias_xvencer_score'], 'empresa_id'=>$_POST['empresaid']);
+        //++++ arreglo que se usara para el guardado
+        $v_arr_riesgos = array( 'riesgo_id'=>$_POST['nivel_score_riesgoid'],    'f_evaluacion'=>$_POST['f_evaluacion_score'],       'id'=>$_POST['riesgo_id'],
+                                'descripcion'=>$_POST['score_riesgo_justi'],    'empresa_score_id'=>$_POST['emp_riesgoid'],         'informe_riesgo'=>$v_path,
+                                'tipo_riesgo'=>$_POST['origen'],                'dias_xvencer'=>$_POST['dias_xvencer_score'],       'empresa_id'=>$_POST['empresaid'],
+                                'puntaje_buro' => $_POST['puntaje_buro'],       'puntaje_conv' => $_POST['puntaje_conv']
+                            );
 
-        $v_subject = 'Se actualizo el riesgo del Score de credito de la empresa '.$_POST['nombre_empresa'];
+        //++++ datos del correo a enviar
         $v_body = 'Se actualizo el riesgo del BURO de credito de la empresa '.$_POST['nombre_empresa'].' con ID '.$_POST['ruc'];
 
-        /*$v_resultado = '<label>PDF</label>
-                    <label><a href="'.$v_path.'" target="_blank"><i class="fa-solid fa-file-pdf" style="font-size:18px;"></i></a></label>';*/
+        $arr_email_notificacion = array('notificaid' => 47,
+                                        'datos_body' => '<br>Empresa: '.$_POST['nombre_empresa'].' <br> ID: '.$_POST['ruc']);
+
         $output['respuesta'] = '<label>PDF</label>
                     <label><a href="'.$v_path.'" target="_blank"><i class="fa-solid fa-file-pdf" style="font-size:18px;"></i></a></label>';
     } else { 
         $v_con_cambios = 0;
-        //$v_resultado = "0";
         $output['respuesta'] = '0';
     }
 } else{
+    //++++ actualizacion de los riesgos factureate
     if (isset($_FILES['informe_factu_file']) && $_FILES['informe_factu_file']['name'] != ''){
+        // el informe esta adjunto quiere decir para paso la comprobacion
         $v_con_cambios = 1;
+
+        // guardo el informe de factureate
         $v_path_carpeta = '../archivos/empresa_'.$_POST['ruc'].'/evaluacion_riesgo';
 
         if (!is_dir($v_path_carpeta)) mkdir($v_path_carpeta, 0777, true);   //verifica existencia de carpeta
@@ -56,9 +67,35 @@ if ($_POST['origen'] == 'score'){
         $v_path = $v_path_carpeta.'/'.'_'.$_FILES['informe_factu_file']['name'];
         move_uploaded_file($_FILES['informe_factu_file']['tmp_name'],  $v_path);
 
-        $v_arr_riesgos = array('riesgo_id'=>$_POST['nivel_factureate_riesgoid'], 'f_evaluacion'=>$_POST['f_evaluacion'], 'id'=>$_POST['riesgo_id'],
-                                'descripcion'=>$_POST['factureate_riesgo_justi'],'empresa_score_id'=>0, 'informe_riesgo'=>$v_path,
-                                'tipo_riesgo'=>$_POST['origen'], 'dias_xvencer'=>$_POST['dias_xvencer'], 'empresa_id'=>$_POST['empresaid']);
+        // guardo la variable de cumplimiento de pago
+        $varr_cumplimiento_pago = array(    'historia_pago' => $_POST['historia_pago'],         'calificacion_pago' => $_POST['calificacion_pago'],
+                                            'dias_promedio_pago' => $_POST['dias_prom_pago'],   'tipo_variable' => 'CUMPLIMIENTO PAGO',
+                                            'empresa_id' => $_POST['empresaid'],                'puntaje_cumplimiento_pago' => $_POST['calificacion_pago']
+                                        );
+
+        $obj_mae->guarda_riesgos_variables_op($varr_cumplimiento_pago);
+
+        // guardo la variable perfil empresa
+        $varr_perfil = array(   'tipo_variable' => 'PERFIL EMPRESA',            'calificacion_perfil' => $_POST['calificacion_perfil'],
+                                'anhos_operando' => $_POST['anhos_operando'],   'tamanho' => $_POST['tamanho'],
+                                'empresa_id' => $_POST['empresaid']
+                            );
+
+        $obj_mae->guarda_riesgos_variables_op($varr_perfil);
+
+        // guardo las variables macro economicas
+        $varr_macro = array( 'tipo_variable' => 'MACRO',                             'cadena_macro' => $_POST['cadena_datos_macro'],
+                            'puntaje_macro_total' => $_POST['puntaje_macro_total'], 'empresa_id' => $_POST['empresaid']
+                        );
+
+        $obj_mae->guarda_riesgos_variables_op($varr_macro);
+
+        //++++ genero el arreglo para guardar los datos del riesgo factureate
+        $v_arr_riesgos = array( 'id' => $_POST['riesgo_sec_id'],                    'f_evaluacion'=>$_POST['f_evaluacion'],
+                                'descripcion'=>$_POST['factureate_riesgo_justi'],   'empresa_score_id'=>0,                              'informe_riesgo'=>$v_path,
+                                'tipo_riesgo'=>$_POST['origen'],                    'dias_xvencer'=>$_POST['dias_xvencer'],             'empresa_id'=>$_POST['empresaid'],
+                                'puntaje_factureate' => $_POST['puntaje_factureate']
+                            );
 
         $v_subject = 'Se actualizo el riesgo Factureate de la empresa '.$_POST['nombre_empresa'];
         $v_body = 'Se actualizo el riesgo Factureate de la empresa '.$_POST['nombre_empresa'].' con ID '.$_POST['ruc'];
@@ -73,41 +110,23 @@ if ($_POST['origen'] == 'score'){
 }
 
 if ($v_con_cambios == 1){
-    $v_riesgo_id = $obj_mae->update_riesgos($v_arr_riesgos);
+    //++++ registro la evaluacion de riesgo
+    $v_riesgo_id = $obj_mae->update_riesgos($v_arr_riesgos);    // devuelve el id secuencial
 
-    $arr_email = array('perfilid' => 9, 'nombre_salida' => 'FACTUREATE Riesgos',
-                        'subject' => $v_subject,
-                        'body' => $v_body.'<br><br>Operaciones - FACTUREATE');
-    
-    /*=============================================
-    ==== envio de correo al personal de factureate
-    ===============================================*/
-    $obj_mail->enviar_correo_xperfil($arr_email);
+    //++++ registro el resumen de riesgos factureate
+    if ($_POST['origen'] == 'factureate'){
+        // resumenes
+        $v_cadena_resumen = $_POST['cadena_tipos'];
+        $v_cadena_resumen = rtrim($v_cadena_resumen, '-');
+        $varr_resumen = explode('-', $v_cadena_resumen);
 
-    $obj_mail->enviar_notificacion_externo(24);     // NOTIFICACION EXTERNA DE RECHAZOS
-    $obj_mail->enviar_multicorreo_interno(25);      // NOTIFICACION INTERNA DE RECHAZOS
-    $obj_mail->enviar_multicorreo_interno(26);      // NOTIFICACION INTERNA DE ACEPTACION
-
-    //==== cambio de calificacion de BURO
-    if ($v_arr_riesgos['tipo_riesgo'] == 'score'){
-        if ($_POST['nivel_score_riesgoid'] != $_POST['nivel_score_riesgoid_old']){
-            $varr_nivel = $vobj_mae->get_detalle_nivel_riesgo($_POST['nivel_score_riesgoid']);
-            $varr_nivel_old = $vobj_mae->get_detalle_nivel_riesgo($_POST['nivel_score_riesgoid_old']);
-
-            $varr_notimail = array( 'notificaid' => 41, 
-                                    'datos_body' => '<br>Empresa: '.$_POST['nombre_empresa'].'<br>Calificacion inicial: '.$varr_nivel['nombre'].' ['.$varr_nivel['calificacion'].']<br>Calificacion final: '.$varr_nivel_old['nombre'].' ['.$varr_nivel_old['calificacion'].']<br><br>Factureate App');
-            $obj_mail->enviar_correo_xnotificacion($varr_notimail);       // envio de notificacion por cambio de calificacion de BURO
-        }
-    } else {
-        if (($_POST['nivel_factureate_riesgoid'] != $_POST['nivel_factureate_riesgoid_old']) && $_POST['nivel_factureate_riesgoid_old'] > 0){
-            $varr_nivel = $vobj_mae->get_detalle_nivel_riesgo($_POST['nivel_factureate_riesgoid']);
-            $varr_nivel_old = $vobj_mae->get_detalle_nivel_riesgo($_POST['nivel_factureate_riesgoid_old']);
-
-            $varr_notimail = array( 'notificaid' => 42, 
-                                    'datos_body' => '<br>Empresa: '.$_POST['nombre_empresa'].'<br>Calificacion inicial: '.$varr_nivel['nombre'].' ['.$varr_nivel['calificacion'].']<br>Calificacion final: '.$varr_nivel_old['nombre'].' ['.$varr_nivel_old['calificacion'].']<br><br>Factureate App');
-            $obj_mail->enviar_correo_xnotificacion($varr_notimail);       // envio de notificacion por cambio de calificacion de BURO
+        foreach ($varr_resumen as $dato){
+            $obj_mae->guarda_resumen_riesgos($v_riesgo_id, $dato, $_POST['resumen-'.$dato]);
         }
     }
+
+    //+++ envio de correo al personal de factureate
+    //$obj_mail->enviar_correo_xnotificacion($arr_email_notificacion);
     
     $output['resultado'] = $v_riesgo_id;
 } else $output['resultado'] = 0;

@@ -11,7 +11,7 @@ require("../lib-trans/factura.php");
 <HTML>
 <HEAD>
 
-<?
+<?php
     require("../lib/head.php");
     $acceso = 'PENDIENTES PAGO';
     require("../lib/valida-acceso.php");
@@ -38,7 +38,7 @@ $rowcount = $vobj_factura->get_financiamientos('COUNT', 0, 0, $filtros,'');
 //#############################################################
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
-<?
+<?php
     $menu = 'op/pendientes_pago.php';
     //------ PARTE SUPERIOR ------
     require("../lib/superior.php");

@@ -55,6 +55,7 @@ if (!empty($_POST['estados'])){
 
 //==== CALCULO LOS FILTROS
 //$filtros = 'factura.estado ='.$estadoid;
+$filtros = '';
 
 //==== CALCULO LA CANTIDAD DE REGISTROS CONSIDERANDO FILTROS
 
@@ -266,9 +267,22 @@ $rowcount = $objmaestro->get_empresas_xestadoriesgo($varr_estados['PENDIENTES'],
     
     <script type="text/javascript">
         function verDetalle(p_id){
-            //location.href = 'empresa_gestion_detalle.php?id='+p_id+'&previo=empresas_xriesgo';
             $('.modal-title').text('EMPRESA DETALLE');
             $('.modal-body').load('empresa_xriesgo_modal.php?id='+p_id,function(){
+                $('#EmpresaDetalle').modal({show:true});
+            });
+        }
+
+        function riesgoOP(p_id){
+            $('.modal-title').text('EMPRESA DETALLE');
+            $('.modal-body').load('empresa_xriesgo_modal.php?id='+p_id,function(){
+                $('#EmpresaDetalle').modal({show:true});
+            });
+        }
+
+        function riesgoEmisor(p_id){
+            $('.modal-title').text('RIESGO EMPRESA');
+            $('.modal-body').load('empresa_xriesgo_emisor_modal.php?id='+p_id,function(){
                 $('#EmpresaDetalle').modal({show:true});
             });
         }

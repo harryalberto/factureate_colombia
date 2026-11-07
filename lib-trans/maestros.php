@@ -236,6 +236,8 @@ class maestros{
     function get_riesgo_obpago($empresaid){
         $conn = new db_param_trans; $conn->connect();
         $conn2 = new db_param_trans; $conn2->connect();
+        $conn3 = new db_param_trans; $conn3->connect();
+        $conn4 = new db_param_trans; $conn4->connect();
 
         $idqry = $conn2->query("select count(1) as contador from riesgo_empresa where empresaid = ".$empresaid." and estado = 1");
         if (!$idqry) echo pg_last_error($conn2->Link_ID);
@@ -254,14 +256,47 @@ class maestros{
                                         'path_informe_score' => $obj->path_informe_score,'path_informe_factu' => $obj->path_informe_factu,
                                         'f_evaluacion' => $obj->f_evaluacion,           'f_evalua_score' => $obj->f_evalua_score,
                                         'riesgo_id' => $obj->riesgo_id,                 'color_riesgo_fact' => $obj->color_riesgo_fact, 'colorfuente_riesgo_fact' => $obj->colorfuente_riesgo_fact,
-                                        'color_riesgo_score' => $obj->color_riesgo_score,'colorfuente_riesgo_score' => $obj->colorfuente_riesgo_score);
+                                        'color_riesgo_score' => $obj->color_riesgo_score,'colorfuente_riesgo_score' => $obj->colorfuente_riesgo_score
+                                    );
+
+            // informacion complementaria 1
+            $v_sql = "  select  riesgo_empresa.score_factureate, tipo_riesgo_empresa.calificacion, tipo_riesgo_empresa.nombre, riesgo_empresa.score_buro, riesgo_empresa.score_buro_convertido
+                        from    riesgo_empresa, tipo_riesgo_empresa
+                        where   riesgo_empresa.empresaid = ".$empresaid." and riesgo_empresa.estado = 1 and
+                                tipo_riesgo_empresa.id = riesgo_empresa.riesgoid";
+
+            $idqry = $conn4->query($v_sql); if (!$idqry) echo pg_last_error($conn4->Link_ID);
+            $obj4 = $conn4->next_record();
+
+            $arrobpagoriesgo['score_factureate'] = $obj4->score_factureate;
+            $arrobpagoriesgo['score_buro'] = $obj4->score_buro;
+            $arrobpagoriesgo['score_buro_convertido'] = $obj4->score_buro_convertido;
+            $arrobpagoriesgo['calificacion'] = $obj4->calificacion;
+            $arrobpagoriesgo['calificacion_nombre'] = $obj4->nombre;
+
+            // informacion complementaria 2
+            if ($arrobpagoriesgo['riesgo_scoreid'] == 0) $arrobpagoriesgo['calificacion_buro'] = '';
+            else {
+                $v_sql = "  select  calificacion
+                            from    tipo_riesgo_empresa
+                            where   id = ".$arrobpagoriesgo['riesgo_scoreid'];
+
+                $idqry = $conn3->query($v_sql); if (!$idqry) echo pg_last_error($conn3->Link_ID);
+                $obj3 = $conn3->next_record();
+
+                $arrobpagoriesgo['calificacion_buro'] = $obj3->calificacion;
+            }
         } else $arrobpagoriesgo = array('count' => 0,
                                         'color_riesgo_score' => 'de3d4c',               'colorfuente_riesgo_score' => 'fff',
                                         'crscore' => '---',                             'nrscore' => 'PENDIENTE',
                                         'color_riesgo_fact' => 'de3d4c',                'colorfuente_riesgo_fact' => 'fff',
                                         'crfact' => '---',                              'nrfact' => 'PENDIENTE',
                                         'riesgo_factid' => 0,                           'desc_riesgofact' => '',
-                                        'riesgo_scoreid' => 0,                          'desc_riesgoscore' => '');
+                                        'riesgo_scoreid' => 0,                          'desc_riesgoscore' => '',
+                                        'riesgo_id' => 0,                               'f_evalua_score' => '',
+                                        'calificacion' => '',                           'score_factureate' => 0,
+                                        'calificacion_nombre' => '',                    'calificacion_buro' => ''
+                                    );
 
         //$conn->close();
         return $arrobpagoriesgo;
@@ -617,89 +652,124 @@ class maestros{
         //$conn->close();
         return $arr_result;
     }
-    function registra_riesgos($arr_input){
-        $conn = new db_param_trans;
-        $conn->connect();
 
-        $idqry = $conn->query("select EMP_REGISTRA_RIESGOS(".$arr_input['empresaid'].",".$_SESSION['user']['usuarioid'].", ".$arr_input['scoreid'].",
-                                                            ".$arr_input['nivel_scoreid'].",'".$arr_input['justi_nivel_score']."', ".$arr_input['nivel_factuid'].",
+    function registra_riesgos($arr_input){
+        $conn = new db_param_trans; $conn->connect();
+        $conn2 = new db_param_trans; $conn2->connect();
+        $conn3 = new db_param_trans; $conn3->connect();
+
+        // busqueda del nivel de riesgo desde el puntaje
+        if ($arr_input['tipo'] == 'FACTUREATE'){
+            $v_sql = "  select  id
+                        from    tipo_riesgo_empresa
+                        where   valor_inferior <= ".$arr_input['puntaje_factureate']." and valor_superior >= ".$arr_input['puntaje_factureate'];
+
+            $idqry = $conn2->query($v_sql); if (!$idqry) echo pg_last_error($conn2->Link_ID);
+            $obj2 = $conn2->next_record();
+            $v_nivel_riesgo_id = $obj2->id;
+            $v_nivel_riesgo_buro_id = 0;
+        } else {
+            $v_nivel_riesgo_id = 0;
+            $v_nivel_riesgo_buro_id = $arr_input['nivel_scoreid'];
+        }
+
+        $idqry = $conn->query("select EMP_REGISTRA_RIESGOS( ".$arr_input['empresaid'].",".$_SESSION['user']['usuarioid'].", ".$arr_input['scoreid'].",
+                                                            ".$v_nivel_riesgo_buro_id.",'".$arr_input['justi_nivel_score']."', ".$v_nivel_riesgo_id.",
                                                             '".$arr_input['justi_nivel_factu']."','".$arr_input['path_score']."',
                                                             '".$arr_input['path_factu']."') as contador");
         if (!$idqry) echo pg_last_error($conn->Link_ID);
         $obj = $conn->next_record();
         $v_resultado = $obj->contador;
-        
-        //$conn->close();
 
+        // guardado de informacion adicional
+        if ($arr_input['tipo'] == 'FACTUREATE'){
+            $v_sql = "  update riesgo_empresa set score_factureate = ".$arr_input['puntaje_factureate']." where id = ".$v_resultado;
+        }
+
+        $idqry = $conn3->query($v_sql); if (!$idqry) echo pg_last_error($conn3->Link_ID);
+        
         return $v_resultado;
     }
+
     function update_riesgos($v_arr_param){
         $conn = new db_param_trans; $conn->connect();
         $conn2 = new db_param_trans; $conn2->connect();
         $conn3 = new db_param_trans; $conn3->connect();
         $conn4 = new db_param_trans; $conn4->connect();
+        $conn5 = new db_param_trans; $conn5->connect();
         $conn_risk = new db_param_trans; $conn_risk->connect();
         
         date_default_timezone_set($_SESSION['user']['zona_horaria']);
         $v_fecha_hoy = date('Y-m-d');
 
         if ($v_arr_param['tipo_riesgo'] == 'score'){ 
-            if ($v_arr_param['id'] == 0){   // CUANDO NO TIENE NINGUNA EVALUACION REGISTRADA
-                $v_arr_aux = array('empresaid'=>$v_arr_param['empresa_id'], 'scoreid'=>$v_arr_param['empresa_score_id'], 'nivel_scoreid'=>$v_arr_param['riesgo_id'],
-                                    'justi_nivel_score'=>$v_arr_param['descripcion'], 'nivel_factuid'=>0, 'justi_nivel_factu'=>'', 'path_score'=>$v_arr_param['informe_riesgo'],
-                                    'path_factu'=>'');
+            if ($v_arr_param['id'] == 0){
+                //++++ insertar un nuevo registro de riesgo
+                $v_arr_aux = array( 'empresaid'=>$v_arr_param['empresa_id'],            'scoreid'=>$v_arr_param['empresa_score_id'],    'nivel_scoreid'=>$v_arr_param['riesgo_id'],
+                                    'justi_nivel_score'=>$v_arr_param['descripcion'],   'nivel_factuid'=>0,                             'justi_nivel_factu'=>'',
+                                    'path_score'=>$v_arr_param['informe_riesgo'],       'path_factu'=>'',                               'tipo' => 'BURO'
+                                );
                 $v_riesgo_id = $this->registra_riesgos($v_arr_aux);
             } else {
+                //++++ actualizo el riesgo ya registrado
                 $v_tipo_riesgo = 66;    //RIESGO SCORE
-                //if ($v_arr_param['dias_xvencer'] < 0) $v_estado = 42;   // CADUCADO
-                //else $v_estado = 1;     // ACTIVO
-                $v_estado = 1;     // ACTIVO
 
-                if ($v_arr_param['id'] > 0){
-                    $idqry = $conn2->query("select EMP_UPDATE_RIESGOS(".$v_arr_param['id'].",".$_SESSION['user']['usuarioid'].", ".$v_tipo_riesgo.") as contador");
-                    if (!$idqry) echo pg_last_error($conn2->Link_ID);
-                    $conn2->next_record();
+                //++++ actualizo el log de los riesgos
+                $idqry = $conn2->query("select EMP_UPDATE_RIESGOS(".$v_arr_param['id'].",".$_SESSION['user']['usuarioid'].", ".$v_tipo_riesgo.") as contador");
+                if (!$idqry) echo pg_last_error($conn2->Link_ID);
 
-                    $idqry = $conn->query("update riesgo_empresa set f_evalua_score = '".$v_fecha_hoy."', riesgoscoreid = ".$v_arr_param['riesgo_id'].", 
+                //++++ actualizo el score de riesgos
+                $idqry = $conn->query(" update riesgo_empresa set f_evalua_score = '".$v_fecha_hoy."', riesgoscoreid = ".$v_arr_param['riesgo_id'].",
                                             desc_riesgo_score = '".$v_arr_param['descripcion']."', empresa_scoreid = ".$v_arr_param['empresa_score_id'].",
-                                            informe_score = '".$v_arr_param['informe_riesgo']."', usuarioid = ".$_SESSION['user']['usuarioid'].", estado = ".$v_estado." 
+                                            informe_score = '".$v_arr_param['informe_riesgo']."', usuarioid = ".$_SESSION['user']['usuarioid'].",
+                                            score_buro = ".$v_arr_param['puntaje_buro'].", score_buro_convertido = ".$v_arr_param['puntaje_conv']."
                                         where id = ".$v_arr_param['id']);
-                    if (!$idqry) echo pg_last_error($conn->Link_ID);
-                    $conn->next_record();
-                }
+                if (!$idqry) echo pg_last_error($conn->Link_ID);
 
-                $v_riesgo_id = $v_arr_param['riesgo_id'];
+                $v_riesgo_id = $v_arr_param['id'];
+
+                //==== calculo del riesgo factureate para los casos en que se actualiza o registra el riesgo de buro
+                $this->calcula_riesgo_factureate($v_riesgo_id, $v_arr_param['empresa_id']);
             }
         } else{
             //==== riesgo factureate
-
             if ($v_arr_param['id'] == 0){
                 //==== primer ingreso de riesgo de la empresa
-
-                $v_arr_aux = array('empresaid'=>$v_arr_param['empresa_id'], 'scoreid'=>0, 'nivel_scoreid'=>0,
-                                    'justi_nivel_score'=>'', 'nivel_factuid'=>$v_arr_param['riesgo_id'], 'justi_nivel_factu'=>$v_arr_param['descripcion'], 
-                                    'path_score'=>'', 'path_factu'=>$v_arr_param['informe_riesgo']);
+                $v_arr_aux = array( 'empresaid'=>$v_arr_param['empresa_id'],    'scoreid'=>0,                                   'nivel_scoreid'=>0,
+                                    'justi_nivel_score'=>'',                    'justi_nivel_factu'=>$v_arr_param['descripcion'],
+                                    'path_score'=>'',                           'path_factu'=>$v_arr_param['informe_riesgo'],   'puntaje_factureate' => $v_arr_param['puntaje_factureate'],
+                                    'tipo' => 'FACTUREATE',                     'puntaje_factureate' => $v_arr_param['puntaje_factureate']
+                                );
                 $v_riesgo_id = $this->registra_riesgos($v_arr_aux);
                 $v_estado = 1;
             } else {
+                //++++ actualizo el riesgo factureate
                 $v_tipo_riesgo = 67;    // RIESGO FACTUREATE
                 $v_estado = 1;
 
+                //++++ registro el log de riesgos
                 $idqry = $conn2->query("select EMP_UPDATE_RIESGOS(".$v_arr_param['id'].",".$_SESSION['user']['usuarioid'].", ".$v_tipo_riesgo.") as contador");
                 if (!$idqry) echo pg_last_error($conn2->Link_ID);
-                $conn2->next_record();
 
-                $idqry = $conn->query("update riesgo_empresa set fevaluacion = '".$v_fecha_hoy."', riesgoid = ".$v_arr_param['riesgo_id'].", 
-                                        desc_riesgo_factureate = '".$v_arr_param['descripcion']."', 
-                                        informe_factureate = '".$v_arr_param['informe_riesgo']."', usuarioid = ".$_SESSION['user']['usuarioid'].", estado = ".$v_estado." 
-                                    where id = ".$v_arr_param['id']);
+                // obtengo el nivel de riesgo
+                $v_sql = "  select  id
+                            from    tipo_riesgo_empresa
+                            where   valor_inferior <= ".$v_arr_param['puntaje_factureate']." and valor_superior >= ".$v_arr_param['puntaje_factureate'];
+
+                $idqry = $conn5->query($v_sql); if (!$idqry) echo pg_last_error($conn5->Link_ID);
+                $obj5 = $conn5->next_record();
+                $v_riesgo_id = $obj5->id;
+
+                $idqry = $conn->query(" update  riesgo_empresa
+                                        set     fevaluacion = '".$v_fecha_hoy."', riesgoid = ".$v_riesgo_id.", desc_riesgo_factureate = '".$v_arr_param['descripcion']."',
+                                                informe_factureate = '".$v_arr_param['informe_riesgo']."', usuarioid = ".$_SESSION['user']['usuarioid'].", estado = ".$v_estado."
+                                        where   id = ".$v_arr_param['id']);
                 if (!$idqry) echo pg_last_error($conn->Link_ID);
-                $conn->next_record();
 
-                $v_riesgo_id = $v_arr_param['riesgo_id'];
+                $v_riesgo_id = $v_arr_param['id'];
             }
 
-            if ($v_estado == 1) $this->actualiza_estado_riesgo_empresa($v_arr_param['empresa_id']);
+            if ($v_estado == 1) $this->actualiza_estado_riesgo_empresa($v_arr_param['empresa_id']);     // actualiza EMPRESA Y FACTURA EVALUACION
             else{ 
                 $v_query = "update empresa set pendiente_riesgo = 'SI' where id = ".$v_arr_param['empresa_id'];
                 $idqry = $conn4->query($v_query);
@@ -708,37 +778,229 @@ class maestros{
                 $conn4->next_record();
             }
         
-            $this->calcula_estado_empresa($v_arr_param['empresa_id']);    
+            $this->calcula_estado_empresa($v_arr_param['empresa_id']);      // update del estado de la empresa si cumplio con todos los requerimientos de riesgos
         }
 
         //==== se coloca el riesgo a las facturas enviadas que no tienen riesgo
-
-        $v_sql = "  update  factura set riesgofacturaid = ".$v_riesgo_id." 
-                    where   clienteid = ".$v_arr_param['empresa_id']." and estado = 12 and coalesce(riesgofacturaid,0) = 0";
-
-        $idqry = $conn_risk->query($v_sql);
-        if (!$idqry) echo pg_last_error($conn_risk->Link_ID);
-        $conn_risk->next_record();
-
-        //==== calculo del riesgo factureate
-        
-        $this->calcula_riesgo_factureate($v_riesgo_id);
-
-        //$conn->close(); $conn2->close(); $conn3->close(); $conn4->close();
+        $this->calcula_riesgo_factura_xop($v_arr_param['empresa_id']);
 
         return $v_riesgo_id;
+    }
+
+    function guarda_riesgos_variables_emisor($parr_datos){
+        $conn = new db_param_trans; $conn->connect();
+        $conn2 = new db_param_trans; $conn2->connect();
+
+        $v_sql = "  select  count(1) as contador
+                    from    riesgo_empresa_variable
+                    where   riesgo_empresa_variable.variable_id = ".$parr_datos['variable_id']." and riesgo_empresa_variable.empresa_id = ".$parr_datos['empresa_id'];
+
+        $idqry = $conn->query($v_sql); if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+
+        if ($obj->contador > 0){
+            $v_sql = "  update  riesgo_empresa_variable
+                        set     calificacion = ".$parr_datos['param_valor'].", impacto_id = ".$parr_datos['param_id'].", justificacion = '".$parr_datos['justi']."'
+                        where   empresa_id = ".$parr_datos['empresa_id']." and variable_id = ".$parr_datos['variable_id'];
+        } else {
+            $v_sql = "  insert into riesgo_empresa_variable (empresa_id, variable_id, impacto, nivel, calificacion, impacto_id, nivel_id, justificacion)
+                        values (".$parr_datos['empresa_id'].", ".$parr_datos['variable_id'].", 0, 0, ".$parr_datos['param_valor'].", ".$parr_datos['param_id'].", 0, '".$parr_datos['justi']."')";
+        }
+
+        $idqry = $conn2->query($v_sql); if (!$idqry) echo pg_last_error($conn2->Link_ID);
+    }
+
+    function guarda_riesgos_variables_op($parr_datos){
+        $conn = new db_param_trans; $conn->connect();
+        $conn2 = new db_param_trans; $conn2->connect();
+        $conn3 = new db_param_trans; $conn3->connect();
+
+        date_default_timezone_set($_SESSION['user']['zona_horaria']);
+
+        //++++ variable cumplimiento de pago
+        if ($parr_datos['tipo_variable'] == 'CUMPLIMIENTO PAGO'){
+            //++++ actualizo los dias promedio de pago
+            $v_sql = "  update  empresa set dias_promedio_pago = ".$parr_datos['dias_promedio_pago']."
+                        where   id = ".$parr_datos['empresa_id'];
+
+            $idqry = $conn->query($v_sql); if (!$idqry) echo pg_last_error($conn->Link_ID);
+
+            //++++ compruebo si tiene registrada su variable
+            $v_sql = "  select count(1) as contador from riesgo_empresa_variable where empresa_id = ".$parr_datos['empresa_id']." and variable_id = 1";
+
+            $idqry = $conn2->query($v_sql); if (!$idqry) echo pg_last_error($conn2->Link_ID);
+            $obj = $conn2->next_record();
+
+            //++++ actualizo o inserto los valores de la variable de la empresa
+            if ($obj->contador > 0){
+                $v_sql = "  update  riesgo_empresa_variable
+                            set     calificacion = ".$parr_datos['puntaje_cumplimiento_pago']."
+                            where   empresa_id = ".$parr_datos['empresa_id']." and variable_id = 1";
+            } else {
+                $v_sql = "  insert into riesgo_empresa_variable (empresa_id, variable_id, impacto, nivel, calificacion)
+                            values (".$parr_datos['empresa_id'].", 1, 0, 0, ".$parr_datos['puntaje_cumplimiento_pago'].")";
+            }
+
+            $idqry = $conn3->query($v_sql); if (!$idqry) echo pg_last_error($conn3->Link_ID);
+        }
+
+        //++++ variable perfil empresa
+        if ($parr_datos['tipo_variable'] == 'PERFIL EMPRESA'){
+            //++++ actualizo tamanho de la empresa y fecha de inicio de operaciones
+            $v_hoy = new DateTime();
+            $v_hoy->modify("-{$parr_datos['anhos_operando']} years");
+            $v_fecha_inicio = $v_hoy->format('Y-m-d');
+
+            $v_sql = "  update  empresa set tamanhoid = ".$parr_datos['tamanho'].", finicioactividades = '".$v_fecha_inicio."'
+                        where   id = ".$parr_datos['empresa_id'];
+
+            $idqry = $conn->query($v_sql); if (!$idqry) echo pg_last_error($conn->Link_ID);
+
+            //++++ compruebo si tiene registrada su variable
+            $v_sql = "  select count(1) as contador from riesgo_empresa_variable where empresa_id = ".$parr_datos['empresa_id']." and variable_id = 2";
+
+            $idqry = $conn2->query($v_sql); if (!$idqry) echo pg_last_error($conn2->Link_ID);
+            $obj = $conn2->next_record();
+
+            //++++ actualizo o inserto los valores de la variable de la empresa
+            if ($obj->contador > 0){
+                $v_sql = "  update  riesgo_empresa_variable
+                            set     calificacion = ".$parr_datos['calificacion_perfil']."
+                            where   empresa_id = ".$parr_datos['empresa_id']." and variable_id = 2";
+            } else {
+                $v_sql = "  insert into riesgo_empresa_variable (empresa_id, variable_id, impacto, nivel, calificacion)
+                            values (".$parr_datos['empresa_id'].", 2, 0, 0, ".$parr_datos['calificacion_perfil'].")";
+            }
+
+            $idqry = $conn3->query($v_sql); if (!$idqry) echo pg_last_error($conn3->Link_ID);
+        }
+
+        //++++ variables macro
+        if ($parr_datos['tipo_variable'] == 'MACRO'){
+            $v_cadena_macro = $parr_datos['cadena_macro'];      // todos los datos macro en una cadena
+            $v_cadena_macro = rtrim($v_cadena_macro, '-');
+            $varr_macro = explode('-', $v_cadena_macro);        // arreglo con los datos macro
+            $v_indice = 1;
+            $v_variable_id = 0;
+            $v_impacto = 0;
+            $v_nivel = 0;
+
+            foreach ($varr_macro as $dato){
+                if ($v_indice == 1){
+                    // leo el id de la variable
+                    if (preg_match('/^([a-zA-Z]+)(\d+)$/', $dato, $coincidencias)){
+                        $v_variable_id = (int)$coincidencias[2];    // parte numerica variable###
+                    }
+                } elseif ($v_indice == 2) $v_impacto_id = $dato;
+                elseif ($v_indice == 3) $v_impacto = $dato;
+                elseif ($v_indice == 4) $v_nivel_id = $dato;
+                elseif ($v_indice == 5) $v_nivel = $dato;
+
+                // registro la sub variable
+                if ($v_indice == 5) $this->guarda_subvariable_macro_empresa($parr_datos['empresa_id'], $v_variable_id, $v_impacto, $v_nivel, $v_impacto_id, $v_nivel_id);
+
+                // manejo del indice
+                if ($v_indice == 5) $v_indice = 1;
+                else $v_indice ++;
+            }
+
+            //++++ guardo la variable padre macro
+            //++++ compruebo si tiene registrada su variable
+            $v_sql = "  select count(1) as contador from riesgo_empresa_variable where empresa_id = ".$parr_datos['empresa_id']." and variable_id = 6";
+
+            $idqry = $conn2->query($v_sql); if (!$idqry) echo pg_last_error($conn2->Link_ID);
+            $obj = $conn2->next_record();
+
+            //++++ actualizo o inserto los valores de la variable de la empresa
+            if ($obj->contador > 0){
+                $v_sql = "  update  riesgo_empresa_variable
+                            set     calificacion = ".$parr_datos['puntaje_macro_total']."
+                            where   empresa_id = ".$parr_datos['empresa_id']." and variable_id = 6";
+            } else {
+                $v_sql = "  insert into riesgo_empresa_variable (empresa_id, variable_id, impacto, nivel, calificacion)
+                            values (".$parr_datos['empresa_id'].", 6, 0, 0, ".$parr_datos['puntaje_macro_total'].")";
+            }
+
+            $idqry = $conn3->query($v_sql); if (!$idqry) echo pg_last_error($conn3->Link_ID);
+        }
+    }
+
+    function guarda_subvariable_macro_empresa($p_empresa_id, $p_variable_id, $p_impacto, $p_nivel, $p_impacto_id, $p_nivel_id){
+        $conn = new db_param_trans; $conn->connect();
+        $conn2 = new db_param_trans; $conn2->connect();
+
+        //++++ compruebo si tiene registrada su variable
+        $v_sql = "  select count(1) as contador from riesgo_empresa_variable where empresa_id = ".$p_empresa_id." and variable_id = ".$p_variable_id;
+
+        $idqry = $conn->query($v_sql); if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+
+        //++++ actualizo o inserto los valores de la variable de la empresa
+        if ($obj->contador > 0){
+            $v_sql = "  update  riesgo_empresa_variable
+                        set     impacto = ".$p_impacto.", nivel = ".$p_nivel.", impacto_id = ".$p_impacto_id.", nivel_id = ".$p_nivel_id."
+                        where   empresa_id = ".$p_empresa_id." and variable_id = ".$p_variable_id;
+        } else {
+            $v_sql = "  insert into riesgo_empresa_variable (empresa_id, variable_id, impacto, nivel, calificacion, impacto_id, nivel_id)
+                        values (".$p_empresa_id.", ".$p_variable_id.", ".$p_impacto.", ".$p_nivel.", 0, ".$p_impacto_id.", ".$p_nivel_id.")";
+        }
+
+        $idqry = $conn2->query($v_sql); if (!$idqry) echo pg_last_error($conn2->Link_ID);
+    }
+
+    function guarda_resumen_riesgos($p_riesgo_id, $p_tipo_id, $p_resumen){
+        $conn = new db_param_trans; $conn->connect();
+        $conn2 = new db_param_trans; $conn2->connect();
+        $conn3 = new db_param_trans; $conn3->connect();
+
+        //++++ compruebo que ya existe el resumen
+        $v_sql = "select count(1) as contador from riesgo_empresa_detalle where riesgo_empresa_id = ".$p_riesgo_id." and estado_id = 1 and tipo_detalle_id = ".$p_tipo_id;
+
+        $idqry = $conn->query($v_sql); if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+
+        if ($obj->contador > 0){
+            $v_sql = "  update  riesgo_empresa_detalle set descripcion = '".$p_resumen."'
+                        where   riesgo_empresa_id = ".$p_riesgo_id." and estado_id = 1 and tipo_detalle_id = ".$p_tipo_id;
+        } else {
+            $idqry = $conn3->query("select nextval('riesgo_emp_det_sec') as seq"); if (!$idqry) echo pg_last_error($conn3->Link_ID);
+            $obj = $conn3->next_record();
+
+            $v_sql = "  insert into riesgo_empresa_detalle (id,riesgo_empresa_id,estado_id,tipo_detalle_id,descripcion)
+                        values (".$obj->seq.",".$p_riesgo_id.",1,".$p_tipo_id.",'".$p_resumen."')";
+        }
+
+        $idqry = $conn2->query($v_sql); if (!$idqry) echo pg_last_error($conn2->Link_ID);
+    }
+
+    function calcula_riesgo_factura_xop($p_empresa_id){
+        $conn = new db_param_trans; $conn->connect();
+
+        // funcion que calcula el riesgo emisor y el riesgo comercial de cada factura
+        $v_sql = "  select  FINAN_UPDATE_RIESGO_FACTURA(".$p_empresa_id.")";
+
+        $idqry = $conn->query($v_sql); if (!$idqry) echo pg_last_error($conn->Link_ID);
+    }
+
+    function calcula_riesgo_factura_comercial($p_empresa_id){
+        $conn = new db_param_trans; $conn->connect();
+
+        // funcion que calcula el riesgo emisor y el riesgo comercial de cada factura
+        $v_sql = "  select  FINAN_UPDATE_RIESGO_FACTURA(".$p_empresa_id.")";
+
+        $idqry = $conn->query($v_sql); if (!$idqry) echo pg_last_error($conn->Link_ID);
     }
 
     function actualiza_estado_riesgo_empresa ($p_empresa_id){
         $conn = new db_param_trans; $conn->connect();
 
+        // se coloca el pendiente de riesgo NO en EMPRESA y la evaluacion tipo 80 en factura_evaluacion
         $v_qry = "select EMP_UPDATE_RIESGO_EMPRESA(".$p_empresa_id.") as result";
-        $idqry = $conn->query($v_qry);
-        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $idqry = $conn->query($v_qry); if (!$idqry) echo pg_last_error($conn->Link_ID);
+
         $obj = $conn->next_record();
         $resultado = $obj->result;
 
-        //$conn->close();
         return $resultado;
     }
 
@@ -753,11 +1015,124 @@ class maestros{
         //$conn->close();
         return $resultado;
     }
-    function calcula_riesgo_factureate($p_riesgoemp_id){
-        
-        $v_fecha_hoy = date('d-m-Y');
 
-        
+    function calcula_riesgo_factureate($p_riesgoemp_id, $p_empresa_id){
+        $conn = new db_param_trans; $conn->connect();
+        $conn2 = new db_param_trans; $conn2->connect();
+        $conn3 = new db_param_trans; $conn3->connect();
+        $conn4 = new db_param_trans; $conn4->connect();
+
+        // obtengo de las variables que se consideran
+        $v_sql = "  select  riesgo_empresa_variable.calificacion, risk_variables.id, risk_variables.impacto
+                    from    risk_variables left join riesgo_empresa_variable on
+                            riesgo_empresa_variable.variable_id = risk_variables.id and riesgo_empresa_variable.empresa_id = ".$p_empresa_id."
+                    where   risk_variables.variable_padre = 0 and risk_variables.dimension_id = 1";
+
+        $idqry = $conn->query($v_sql); if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+
+        // obtengo los datos de la calificacion
+        $v_sql = "  select  riesgoscoreid, empresa_scoreid, score_buro, score_factureate, score_buro_convertido
+                    from    riesgo_empresa
+                    where   id = ".$p_riesgoemp_id;
+
+        $idqry = $conn2->query($v_sql); if (!$idqry) echo pg_last_error($conn2->Link_ID);
+        $obj2 = $conn2->next_record();
+
+        // calculo el factor base
+        $v_factor_base = 0;
+        $varr_variables = array();
+        $v_indice = 0;
+
+        for($i = 0; $i < $conn->nrows(); $i ++){
+            // historial de pagos
+            if ($obj->id == 1){
+                $varr_historia_pagos = $this->promedio_pagos_op($p_empresa_id);
+
+                if ($varr_historia_pagos['historia_pagos'] > 0) {
+                    $v_factor_base = $v_factor_base + $obj->impacto;
+                    $varr_variables[$v_indice] = array('calificacion' => $obj->calificacion, 'impacto' => $obj->impacto);
+                    $v_indice ++;
+                }
+            }
+
+            // perfil de empresa o macro economico
+            if ($obj->id == 2 || $obj->id == 6) {
+                $v_factor_base = $v_factor_base + $obj->impacto;
+                $varr_variables[$v_indice] = array('calificacion' => $obj->calificacion, 'impacto' => $obj->impacto);
+                $v_indice ++;
+            }
+
+            // buro de credito
+            if ($obj->id == 5){
+                if ($obj2->score_buro > 0) {
+                    $v_factor_base = $v_factor_base + $obj->impacto;
+                    $varr_variables[$v_indice] = array('calificacion' => $obj2->score_buro_convertido, 'impacto' => $obj->impacto);
+                    $v_indice ++;
+                }
+            }
+
+            $obj = $conn->next_record();
+        }
+
+        // calculo el nivel de riesgo
+        $v_score_factureate = 0;
+
+        for ($i = 0; $i < count($varr_variables); $i++){
+            $v_score_factureate = $v_score_factureate + ($varr_variables[$i]['calificacion'] * ($varr_variables[$i]['impacto'] / $v_factor_base));
+        }
+
+        // factor concentracion
+        $v_factor_concentracion = $this->get_factor_concentracion($p_empresa_id);
+        $v_score_factureate = $v_score_factureate * $v_factor_concentracion;
+
+        // actualizo el score de factureate
+        if ($v_score_factureate !== $obj2->score_factureate){
+            $v_sql = "  select  id
+                        from    tipo_riesgo_empresa
+                        where   valor_inferior <= ".$v_score_factureate." and valor_superior >= ".$v_score_factureate." and estado = 1";
+
+            $idqry = $conn3->query($v_sql); if (!$idqry) echo pg_last_error($conn3->Link_ID);
+            $obj3 = $conn3->next_record();
+
+            $v_sql = "  update riesgo_empresa set riesgoid = ".$obj3->id.", score_factureate = ".$v_score_factureate." where id = ".$p_riesgoemp_id;
+            $idqry = $conn4->query($v_sql); if (!$idqry) echo pg_last_error($conn4->Link_ID);
+        }
+    }
+
+    function get_factor_concentracion($p_empresa_id){
+        $conn = new db_param_trans; $conn->connect();
+
+        $varr_param = $this->get_risk_parametros(30,'');
+
+        if ($varr_param['valor_num'] == 1) $v_factor = 1;   // falta desarrollar
+        else $v_factor = 1;
+
+        return $v_factor;
+    }
+
+    function get_resumen_variables($p_riesgo_secid){
+        $conn = new db_param_trans; $conn->connect();
+
+        $varr_result = array();
+
+        $v_sql = "  select  tipos.id as tipo_id, tipos.nombre, riesgo_empresa_detalle.descripcion
+                    from    tipos left outer join riesgo_empresa_detalle on riesgo_empresa_detalle.tipo_detalle_id = tipos.id and riesgo_empresa_detalle.estado_id = 1 and
+                            riesgo_empresa_detalle.riesgo_empresa_id = ".$p_riesgo_secid."
+                    where   tipos.tipo_base = 'ANALISIS PAGADOR' and tipos.estado = 1";
+
+        $idqry = $conn->query($v_sql); if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+
+        // generacion del arreglo de resultado
+        for($i = 0; $i < $conn->nrows(); $i ++){
+            $varr_result[$i] = array(   'tipo_id' => $obj->tipo_id,         'tipo_nombre' => $obj->nombre,              'riesgo_empresa_desc' => $obj->descripcion
+                                    );
+
+            $obj = $conn->next_record();
+        }
+
+        return $varr_result;
     }
 
     function dias_vigencia_riesgos($parametro){
@@ -3394,6 +3769,322 @@ class maestros{
         $v_resultado = $obj->resultado;
 
         return $v_resultado;
+    }
+
+    function convertir_ScoreBuro($p_score, $p_empresa_score){
+        $conn = new db_param_trans; $conn->connect();
+
+        if ($p_empresa_score == 1){
+            //+++ EXPERIAN
+            $v_sql = "  select  risk_conversion_buro.id, risk_conversion_buro.riesgo_id, risk_conversion_buro.minimo as minimo_buro,
+                                risk_conversion_buro.maximo as maximo_buro, tipo_riesgo_empresa.valor_inferior as minimo_factu, tipo_riesgo_empresa.valor_superior as maximo_factu
+                        from    risk_conversion_buro, tipo_riesgo_empresa
+                        where   risk_conversion_buro.buro_id = ".$p_empresa_score." and risk_conversion_buro.estado_id = 1 and tipo_riesgo_empresa.nivel = risk_conversion_buro.riesgo_id and
+                                tipo_riesgo_empresa.estado = 1
+                        order by risk_conversion_buro.riesgo_id";
+
+            $idqry = $conn->query($v_sql);
+            if (!$idqry) echo pg_last_error($conn->Link_ID);
+            $obj = $conn->next_record();
+            $varr_tabla_conversion = array();
+
+            for ($i = 0; $i < $conn->nrows(); $i++){
+                $varr_tabla_conversion[$obj->riesgo_id] = array('minimo_buro' => $obj->minimo_buro,     'maximo_buro' => $obj->maximo_buro,
+                                                                'minimo_factu' => $obj->minimo_factu,   'maximo_factu' => $obj->maximo_factu);
+
+                $obj = $conn->next_record();
+            }
+
+            $minimo_buro = $varr_tabla_conversion[2]['minimo_buro'];
+            $maximo_buro = $varr_tabla_conversion[7]['maximo_buro'];
+            // EXPERIAN límites de la escala de Experian (150 - 950)
+            $score = max($minimo_buro, min($maximo_buro, $p_score));
+
+            for ($j = 1; $j <= count($varr_tabla_conversion); $j++) {
+                if ($score >= $varr_tabla_conversion[$j]['minimo_buro'] && $score <= $varr_tabla_conversion[$j]['maximo_buro']) {
+                    // Si el tramo tiene un solo valor o es exacto
+                    if ($varr_tabla_conversion[$j]['minimo_buro'] == $varr_tabla_conversion[$j]['maximo_buro']) {
+                        return $varr_tabla_conversion[$j]['minimo_factu'];
+                    }
+
+                    // Interpolación lineal proporcional dentro del rango personalizado
+                    $proporcion = ($score - $varr_tabla_conversion[$j]['minimo_buro']) / ($varr_tabla_conversion[$j]['maximo_buro'] - $varr_tabla_conversion[$j]['minimo_buro']);
+                    $valorConvertido = $varr_tabla_conversion[$j]['minimo_factu'] + ($proporcion * ($varr_tabla_conversion[$j]['maximo_factu'] - $varr_tabla_conversion[$j]['minimo_factu']));
+
+                    // Retornar redondeado a 2 decimales (o puedes usar round() para enteros)
+                    return round($valorConvertido, 2);
+                }
+            }
+        }
+    }
+
+    function getRiesgoid_xpuntaje($p_puntaje){
+        $conn = new db_param_trans; $conn->connect();
+
+        $v_sql = "  select  id, calificacion, color, color_fuente
+                    from    tipo_riesgo_empresa
+                    where   valor_inferior <= ".$p_puntaje." and valor_superior >= ".$p_puntaje." and estado = 1";
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+
+        $varr_result = array(   'riesgo_id' => $obj->id,        'calificacion' => $obj->calificacion,       'color' => $obj->color,         'color_fuente' => $obj->color_fuente);
+
+        return $varr_result;
+    }
+
+    function promedio_pagos_op($p_op_id){
+        $conn = new db_param_trans; $conn->connect();
+        $conn2 = new db_param_trans; $conn2->connect();
+
+        $varr_result = array();
+
+        $v_sql = "  select  count(1) as historia_pagos
+                    from    pagos_op, empresa
+                    where   empresa.id = ".$p_op_id." and pagos_op.id_pagador = empresa.identificacion";
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+        $varr_result['historia_pagos'] = $obj->historia_pagos;
+
+        if ($varr_result['historia_pagos'] > 0){
+            $v_sql = "  select  dias_promedio_pago
+                        from    empresa
+                        where   id = ".$p_op_id;
+
+            $idqry = $conn2->query($v_sql);
+            if (!$idqry) echo pg_last_error($conn2->Link_ID);
+            $obj = $conn2->next_record();
+            $varr_result['dias_promedio'] = $obj->dias_promedio_pago;
+        } else $varr_result['dias_promedio'] = 0;
+
+        $varr_result['calificacion'] = $this->calcula_calificacion_cumple_pago_op($p_op_id, $varr_result['historia_pagos'],$varr_result['dias_promedio']);
+
+        return $varr_result;
+    }
+
+    function calcula_calificacion_cumple_pago_op($p_op_id, $p_historia_pagos, $p_promedio_pagos){
+        $conn = new db_param_trans; $conn->connect();
+        $conn2 = new db_param_trans; $conn2->connect();
+
+        if ($p_historia_pagos == 0) $resultado = 0;
+        else {
+            //++++ incumplimientos
+            $v_sql = "  select  count(1) as contador
+                        from    financiamiento, factura
+                        where   factura.clienteid = ".$p_op_id." and financiamiento.facturaid = factura.id and financiamiento.estado = 30";
+
+            $idqry = $conn->query($v_sql);
+            if (!$idqry) echo pg_last_error($conn->Link_ID);
+            $obj = $conn->next_record();
+
+            if ($obj->contador > 0){
+                $varr_maximo_incumplimiento = $this->get_risk_parametros(6,'');
+
+                if ($varr_maximo_incumplimiento['valor_num'] <= $obj->contador) $resultado = 0;
+                else {
+                    //++++ tiene incumplimientos pero menos que el parametro
+                    $v_sql = "  select  calificacion
+                                from    risk_parametros
+                                where   grupo = 'CUMPLE PAGO OP' and estado_id = 1 and valor_minimo <= ".$p_promedio_pagos." and valor_maximo >= ".$p_promedio_pagos;
+
+                    $idqry = $conn->query($v_sql);
+                    if (!$idqry) echo pg_last_error($conn->Link_ID);
+                    $obj = $conn->next_record();
+
+                    $resultado = $obj->calificacion;
+                }
+            } else {
+                //++++ no tiene incumplimientos
+                $v_sql = "  select  calificacion
+                            from    risk_parametros
+                            where   grupo = 'CUMPLE PAGO OP' and estado_id = 1 and valor_minimo <= ".$p_promedio_pagos." and valor_maximo >= ".$p_promedio_pagos;
+
+                $idqry = $conn->query($v_sql);
+                if (!$idqry) echo pg_last_error($conn->Link_ID);
+                $obj = $conn->next_record();
+
+                $resultado = $obj->calificacion;
+            }
+        }
+
+        return $resultado;
+    }
+
+    function get_risk_parametros($p_id, $p_grupo){
+        $conn = new db_param_trans; $conn->connect();
+
+        $varr_result = array();
+
+        if ($p_id > 0){
+            $v_sql = "  select  valor_num, valor_char
+                        from    risk_parametros
+                        where   id = ".$p_id;
+
+            $idqry = $conn->query($v_sql);
+            if (!$idqry) echo pg_last_error($conn->Link_ID);
+            $obj = $conn->next_record();
+
+            $varr_result['valor_num'] = $obj->valor_num;
+            $varr_result['valor_char'] = $obj->valor_char;
+        } else {
+            $v_sql = "  select  valor_num, valor_char, valor_minimo, valor_maximo, calificacion, id, nombre
+                        from    risk_parametros
+                        where   grupo = '".$p_grupo."'";
+
+            $idqry = $conn->query($v_sql);
+            if (!$idqry) echo pg_last_error($conn->Link_ID);
+            $obj = $conn->next_record();
+
+            for ($i = 0; $i < $conn->nrows(); $i++){
+                $varr_result[$i] = array(   'valor_num' => $obj->valor_num,     'valor_char' => $obj->valor_char,   'valor_minimo' => $obj->valor_minimo,
+                                            'valor_maximo' => $obj->valor_maximo,'calificacion' => $obj->calificacion, 'parametro_id' => $obj->id,
+                                            'nombre' => $obj->nombre
+                                        );
+
+                $obj = $conn->next_record();
+            }
+        }
+
+        return $varr_result;
+    }
+
+    function get_risk_variables($p_variable, $p_padre, $p_dimension){
+        $conn = new db_param_trans; $conn->connect();
+
+        $varr_result = array();
+
+        if ($p_variable > 0){
+            $v_sql = "  select  dimension_id, nombre, impacto, variable_padre
+                        from    risk_variables
+                        where   estado_id = 1 and id = ".$p_variable;
+
+            $idqry = $conn->query($v_sql);
+            if (!$idqry) echo pg_last_error($conn->Link_ID);
+            $obj = $conn->next_record();
+
+            for ($i = 0; $i < $conn->nrows(); $i++){
+                $varr_result[$i] = array(   'dimension_id' => $obj->dimension_id,     'nombre' => $obj->nombre,   'impacto' => $obj->impacto,
+                                            'variable_padre' => $obj->variable_padre
+                                        );
+
+                $obj = $conn->next_record();
+            }
+        } elseif ($p_padre > 0) {
+            $v_sql = "  select  id, dimension_id, nombre, impacto
+                        from    risk_variables
+                        where   estado_id = 1 and variable_padre = ".$p_padre;
+
+            $idqry = $conn->query($v_sql);
+            if (!$idqry) echo pg_last_error($conn->Link_ID);
+            $obj = $conn->next_record();
+
+            for ($i = 0; $i < $conn->nrows(); $i++){
+                $varr_result[$i] = array(   'variable_id' => $obj->id,      'dimension_id' => $obj->dimension_id,     'nombre' => $obj->nombre,   'impacto' => $obj->impacto
+                                        );
+
+                $obj = $conn->next_record();
+            }
+        } else {
+            $v_sql = "  select  id, nombre, impacto, variable_padre
+                        from    risk_variables
+                        where   estado_id = 1 and dimension_id = ".$p_dimension;
+
+            $idqry = $conn->query($v_sql);
+            if (!$idqry) echo pg_last_error($conn->Link_ID);
+            $obj = $conn->next_record();
+
+            for ($i = 0; $i < $conn->nrows(); $i++){
+                $varr_result[$i] = array(   'variable_id' => $obj->id,      'nombre' => $obj->nombre,   'impacto' => $obj->impacto,     'variable_padre' => $obj->variable_padre
+                                        );
+
+                $obj = $conn->next_record();
+            }
+        }
+
+        return $varr_result;
+    }
+
+    function get_risk_variables_empresa($p_empresa_id, $p_dimension){
+        $conn = new db_param_trans; $conn->connect();
+
+        $v_sql = "  select  coalesce(riesgo_empresa_variable.calificacion,0) as calificacion, risk_variables.id, risk_variables.impacto, risk_variables.nombre,
+                            coalesce(riesgo_empresa_variable.impacto_id,0) impacto_id, coalesce(riesgo_empresa_variable.justificacion,'') as justificacion
+                    from    risk_variables left join riesgo_empresa_variable on
+                            riesgo_empresa_variable.variable_id = risk_variables.id and riesgo_empresa_variable.empresa_id = ".$p_empresa_id."
+                    where   risk_variables.variable_padre = 0 and risk_variables.dimension_id = ".$p_dimension;
+
+        $idqry = $conn->query($v_sql); if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+
+        $varr_respuesta = array();
+
+        for ($i = 0; $i < $conn->nrows(); $i++){
+            $varr_respuesta[$i] = array('calificacion' => $obj->calificacion,       'variable_id' => $obj->id,          'impacto' => $obj->impacto,     'nombre' => $obj->nombre,
+                                        'impacto_id' => $obj->impacto_id,           'justificacion' => $obj->justificacion);
+            $obj = $conn->next_record();
+        }
+
+        return $varr_respuesta;
+    }
+
+    function get_riesgo_empresa_variable($p_empresa){
+        $conn = new db_param_trans; $conn->connect();
+
+        $varr_result = array();
+
+        $v_sql = "  select  riesgo_empresa_variable.variable_id, riesgo_empresa_variable.impacto_id, riesgo_empresa_variable.nivel_id,
+                            risk_variables.dimension_id, risk_variables.nombre, risk_variables.impacto as variable_impacto, risk_variables.variable_padre,
+                            risk_variables.tipo_ref_id, impacto_param.valor_num as impacto_valor, nivel_param.valor_num as nivel_valor
+                    from    riesgo_empresa_variable, risk_variables, risk_parametros as impacto_param, risk_parametros as nivel_param
+                    where   riesgo_empresa_variable.empresa_id = ".$p_empresa." and risk_variables.id = riesgo_empresa_variable.variable_id and
+                            impacto_param.id = riesgo_empresa_variable.impacto_id and nivel_param.id = riesgo_empresa_variable.nivel_id";
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+
+        for ($i = 0; $i < $conn->nrows(); $i++){
+            $varr_result[$i] = array(   'variable_id' => $obj->variable_id,     'impacto' => $obj->impacto_id,     'nivel' => $obj->nivel_id,
+                                        'dimension_id' => $obj->dimension_id,   'nombre' => $obj->nombre,       'variable_impacto' => $obj->variable_impacto,
+                                        'variable_padre' => $obj->variable_padre, 'tipo_ref_id' => $obj->tipo_ref_id,
+                                        'impacto_valor' => $obj->impacto_valor, 'nivel_valor' => $obj->nivel_valor
+                                        );
+
+            $obj = $conn->next_record();
+        }
+
+        return $varr_result;
+    }
+
+    function get_calificacion_riesgo_xpuntaje($p_puntaje){
+        $conn = new db_param_trans; $conn->connect();
+
+        $varr_result = array();
+
+        $v_sql = "  select  id, nombre, calificacion, descripcion, color, color_fuente, nivel
+                    from    tipo_riesgo_empresa
+                    where   valor_inferior <= ".$p_puntaje." and valor_superior >= ".$p_puntaje." and estado = 1";
+
+        $idqry = $conn->query($v_sql);
+        if (!$idqry) echo pg_last_error($conn->Link_ID);
+        $obj = $conn->next_record();
+
+        $varr_result['riesgo_id'] = $obj->id;
+        $varr_result['nombre'] = $obj->nombre;
+        $varr_result['calificacion'] = $obj->calificacion;
+        $varr_result['descripcion'] = $obj->descripcion;
+        $varr_result['color'] = $obj->color;
+        $varr_result['color_fuente'] = $obj->color_fuente;
+        $varr_result['nivel'] = $obj->nivel;
+
+        return $varr_result;
+    }
+
+    function get_variable_concentracion($p_empresa_id){
+        return 1;
     }
 }
 ?>

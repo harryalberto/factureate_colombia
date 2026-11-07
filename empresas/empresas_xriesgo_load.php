@@ -17,16 +17,6 @@ $pagina = $_POST['pagina'];
 if ($_POST['rowcount'] == 0) $rowcount = $vobj_mae_load->get_empresas_xestadoriesgo($_POST['e_pendientes'], $_POST['e_vencidos'], $_POST['e_xvencer'], $_POST['e_activo'], 0, 0,'count');
 else $rowcount = $_POST['rowcount'];
 
-/*if ($_POST['orderCol'] == 0) $v_order = 'factura.id '.$_POST['orderType'];
-if ($_POST['orderCol'] == 1) $v_order = 'empresa.nombre '.$_POST['orderType'];
-if ($_POST['orderCol'] == 2) $v_order = 'cliente.nombre '.$_POST['orderType'];
-if ($_POST['orderCol'] == 3) $v_order = 'factura.numero '.$_POST['orderType'];
-if ($_POST['orderCol'] == 4) $v_order = 'factura.femision '.$_POST['orderType'];
-if ($_POST['orderCol'] == 5) $v_order = 'factura.fvencimiento '.$_POST['orderType'];
-if ($_POST['orderCol'] == 6) $v_order = 'tipos.nombre '.$_POST['orderType'];
-if ($_POST['orderCol'] == 7) $v_order = 'factura.total '.$_POST['orderType'];
-if ($_POST['orderCol'] == 9) $v_order = 'factura.fenvio '.$_POST['orderType'];*/
-
 $varr_empresas = $vobj_mae_load->get_empresas_xestadoriesgo($_POST['e_pendientes'], $_POST['e_vencidos'], $_POST['e_xvencer'], $_POST['e_activo'],$_POST['registros'],$rowini,'select');
 $totalFiltro = count($varr_empresas);
 $totalRegistros = $rowcount;
@@ -39,18 +29,32 @@ $output['data'] = '';
 $output['paginacion'] = '';
 
 for ($i = 0; $i < count($varr_empresas); $i++){
-    $v_boton_detalle = '<button type="button" class="btn btn-primary" style="font-size:11px;background-color:var(--color-azulv2);border:none;" onclick="verDetalle('.$varr_empresas[$i]['empresa_id'].')"><i class="fa-solid fa-magnifying-glass"></i></button>';
+    // botom para emisores
+    if ($varr_empresas[$i]['tempresa_id'] == 46)
+        $v_boton_detalle = '<button type="button" class="btn btn-primary" style="font-size:11px;background-color:var(--color-azulv2);border:none;" onclick="riesgoEmisor('.$varr_empresas[$i]['empresa_id'].')"><i class="fa-solid fa-money-check-dollar"></i></button>';
 
+    // botom para pagadores
+    if ($varr_empresas[$i]['tempresa_id'] == 48)
+        $v_boton_detalle = '<button type="button" class="btn btn-primary" style="font-size:11px;background-color:var(--color-azulv2);border:none;" onclick="riesgoOP('.$varr_empresas[$i]['empresa_id'].')"><i class="fa-solid fa-vault"></i></button>';
+
+    // botom para inversor
+    if ($varr_empresas[$i]['tempresa_id'] == 47)
+        $v_boton_detalle = '<button type="button" class="btn btn-primary" style="font-size:11px;background-color:var(--color-azulv2);border:none;" onclick="verDetalle('.$varr_empresas[$i]['empresa_id'].')"><i class="fa-solid fa-magnifying-glass"></i></button>';
+    
     if (!is_null($varr_empresas[$i]['f_registro'])){$t_fregistro = strtotime($varr_empresas[$i]['f_registro']);$f_registro = date('d-m-Y',$t_fregistro);}
+    else $f_registro = '';
 
     if (!is_null($varr_empresas[$i]['f_modifica'])){$t_fmodifica = strtotime($varr_empresas[$i]['f_modifica']);$f_modifica = date('d-m-Y',$t_fmodifica);}
     else $f_modifica = '';
 
     if (!is_null($varr_empresas[$i]['f_envio'])){$t_fenvio = strtotime($varr_empresas[$i]['f_envio']);$f_envio = date('d-m-Y',$t_fenvio);}
-    if (!is_null($varr_empresas[$i]['f_aprobacion'])){$t_faprobacion = strtotime($varr_empresas[$i]['f_aprobacion']);$f_aprobacion = date('d-m-Y',$t_faprobacion);}
+    else $f_envio = '';
 
-    // CASO DE EMISORES E INVERSORES
-    if ($varr_empresas[$i]['tempresa_id'] == 46 || $varr_empresas[$i]['tempresa_id'] == 47) 
+    if (!is_null($varr_empresas[$i]['f_aprobacion'])){$t_faprobacion = strtotime($varr_empresas[$i]['f_aprobacion']);$f_aprobacion = date('d-m-Y',$t_faprobacion);}
+    else $f_aprobacion = '';
+
+    // CASO DE INVERSORES
+    if ($varr_empresas[$i]['tempresa_id'] == 47)
         $v_pendiente_riesgo = 'NO APLICA'; else $v_pendiente_riesgo = $varr_empresas[$i]['pendiente_riesgo'];
     
     $output['data'] .= '<tr>

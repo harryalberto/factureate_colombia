@@ -32,8 +32,8 @@ for ($i=0; $i<count($varr_tiposdoc); $i++){
 /*--------------------------------------------------------*/
 ?>
 <BODY bottommargin=0 leftmargin=0 topmargin=0>
+    <div id="principal" style="padding-left: 10px;overflow: hidden;">
     <form method="post" name="frm_accionistas" id="frm_accionistas">
-    <div class="contenedor_formulario">
         <input type="hidden" name="nro_registros" id="nro_registros" value="<?=$v_nro_registros?>">
         <input type="hidden" name="empresa2_id" id="empresa2_id" value="<?=$_GET['empresa_id']?>">
         
@@ -85,8 +85,9 @@ for ($i=0; $i<count($varr_tiposdoc); $i++){
                 processData: false,
                 dataType: "html",
                 success:function(data,status){
-                    $('#MasAccionistas').fadeIn(1000).html(data);
-                    $('#MasAccionistas').modal('hide');
+                    alert(data);
+                    //$('#MasAccionistas').fadeIn(1000).html(data);
+                    //$('#MasAccionistas').modal('hide');
                     refresh_page(v_empresa_id);
                 }
             });

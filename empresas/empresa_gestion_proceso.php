@@ -242,9 +242,9 @@ if ($_POST['accion'] == 'aprobar_legal_op'){
 
     if ($_POST['estado_id'] != 3) $obj_mae->calcula_estado_empresa($_POST['empresaid']);
     
-    $obj_mail->enviar_notificacion_externo(24);     // NOTIFICACION EXTERNA DE RECHAZOS
-    $obj_mail->enviar_multicorreo_interno(25);      // NOTIFICACION INTERNA DE RECHAZOS
-    $obj_mail->enviar_multicorreo_interno(26);      // NOTIFICACION INTERNA DE ACEPTACION
+    //$obj_mail->enviar_notificacion_externo(24);     // NOTIFICACION EXTERNA DE RECHAZOS
+    //$obj_mail->enviar_multicorreo_interno(25);      // NOTIFICACION INTERNA DE RECHAZOS
+    //$obj_mail->enviar_multicorreo_interno(26);      // NOTIFICACION INTERNA DE ACEPTACION
 
     echo 'Informacion operativa guardada';
 }
