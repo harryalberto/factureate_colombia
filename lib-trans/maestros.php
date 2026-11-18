@@ -4086,5 +4086,13 @@ class maestros{
     function get_variable_concentracion($p_empresa_id){
         return 1;
     }
+
+    function update_pendiente_riesgo($p_empresa_id){
+        $conn = new db_param_trans; $conn->connect();
+
+        $v_sql = "update empresa set pendiente_riesgo = 'NO' where id = ".$p_empresa_id;
+
+        $idqry = $conn->query($v_sql); if (!$idqry) echo pg_last_error($conn->Link_ID);
+    }
 }
 ?>

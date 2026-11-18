@@ -182,7 +182,7 @@ else $v_muestra_estado_legal = '';
             <div style="font-weight: bold;color:var(--color-azulv2);font-size: 14px;margin-top: 10px;"> INFORMACION OPERATIVA</div>
 
             <!--+++++++++++++++++++++++++++++++++++++++++++
-            ++++ bloque operativo ++++-->
+            ++++ BLOQUE INFORMACIONDE LA EMPRESA 1 -->
             <div class="contenedor_formulario_column">
                 <div class="formulario_grupo_row" style="width: 100px;">
                     <label for="ruc">ID EMPRESA</label>
@@ -456,7 +456,27 @@ else $v_muestra_estado_legal = '';
         echo '<input type="hidden" name="q_accionistas" id="q_accionistas" value="'.$v_z.'">';
     }
 
-            //++++ EVALUACION LEGAL
+            /*++++++++++++++++++++++++++++++++++++++++++++++++
+            ++++++ INFORMACION DE RIESGOS EMISOR */
+    if ($arr_empresa['t_empresaid'] == 46 || $arr_empresa['t_empresaid'] == 50){
+        $varr_riesgo_emisor = $obj_mae->get_risk_variables_empresa($_GET['id'], 2);
+?>
+
+            <div style="font-weight: bold;color:var(--color-azulv2);font-size: 14px;margin-top: 10px;width:100%;float:left;"> EVALUACION RIESGOS EMISOR</div>
+
+<?php
+        if (count($varr_riesgo_emisor) > 0) echo '
+            <div style="color:var(--color-verde);font-size: 12px;margin-top: 10px;width:100%;float:left;">
+                <i class="fa-solid fa-circle-check"></i> El Emisor cuenta con analisis de riesgo registrado
+            </div>';
+        else echo '
+            <div style="color:var(--color-rojo);font-size: 12px;margin-top: 10px;width:100%;float:left;">
+                <i class="fa-solid fa-square-xmark"></i> El Emisor NO cuenta con analisis de riesgo registrado
+            </div>';
+    }
+
+            /*++++++++++++++++++++++++++++++++++++++++++++++++
+            ++++++ EVALUACION LEGAL */
 
     if ($obj_mae->busca_arreglo_bidi($varr_permisos, 'codigo', 'EMP-LEG')){
         echo '
@@ -587,7 +607,7 @@ else $v_muestra_estado_legal = '';
 
             if ($obj_mae->busca_arreglo_bidi($varr_permisos, 'codigo', 'EMP-LEG')){
                 if ($arr_empresa['t_empresaid'] != 48 && $arr_empresa['t_empresaid'] != 50){    //EMISOR
-                    if ($arr_empresa['estado'] == 2){  // ESTADO EN VALIDACION
+                    if ($arr_empresa['estado'] == 2 && count($varr_riesgo_emisor) > 0 && count($varr_accionistas) > 0){  // ESTADO EN VALIDACION
                     echo '
                 <button style="font-size:12px;background-color:var(--color-azulv2);border:none;margin-top: 5px;" type="button" class="btn btn-primary" id="boton_aprobacion" onclick="aprobarLegal()">
                     <i class="fa-solid fa-thumbs-up"></i> Aprobar Legal

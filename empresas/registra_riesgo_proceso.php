@@ -32,6 +32,10 @@ if ($_POST['tipo_riesgo'] == 'EMISOR'){
 		} else $v_indice ++;
 	}
 
+	// actualiza el estado de pendiente de riesgo a NO
+	$vobj_mae_proc->update_pendiente_riesgo($_POST['empresa_id']);
+
+	// actualiza el riesgo de todaslasfacturas asociadas
 	$vobj_mae_proc->calcula_riesgo_factura_comercial($_POST['empresa_id']);
 	$output['respuesta'] = 'OK';
 }
